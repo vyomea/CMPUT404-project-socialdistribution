@@ -18,8 +18,8 @@ export default function Profile(): JSX.Element {
     // You sent them a request - Request Sent
     // Else - Follow
     const myProfile = false;
-    const [isFollowing, setFollowing] = React.useState(false);
-    const [sentRequest, setRequestSent] = React.useState(true);
+    const [isFollowing, setFollowing] = React.useState(true);
+    const [sentRequest, setRequestSent] = React.useState(false);
 
     const handleFollow = () => {
         setRequestSent(true);
