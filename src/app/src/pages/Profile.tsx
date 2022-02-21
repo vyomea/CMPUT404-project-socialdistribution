@@ -17,8 +17,8 @@ export default function Profile(): JSX.Element {
     // If you follow them - Unfollow
     // You sent them a request - Request Sent
     // Else - Follow
-    const myProfile = false;
-    const [isFollowing, setFollowing] = React.useState(true);
+    const myProfile = true;
+    const [isFollowing, setFollowing] = React.useState(false);
     const [sentRequest, setRequestSent] = React.useState(false);
 
     const handleFollow = () => {
@@ -33,18 +33,21 @@ export default function Profile(): JSX.Element {
         return (
         <>
             <Box style={{ display: 'flex', height: window.innerHeight }}>
-                <Box display="flex" sx={{
+                <Box boxShadow={5} display="flex" sx={{
                     flexDirection: 'column',
                     width: '30%',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    borderRight: 1,
                 }}>
+
+                    {author.profileImage?(
+                        null
+                    ):
                     <Avatar sx={{ width: 150, height: 150, m:2}}>
                         <PersonIcon
                             sx={{ width: 100, height: 100 }}
                         />
-                    </Avatar>
+                    </Avatar>}
                     
                     <Typography variant="h4" align="center">
                         {author.displayName}
@@ -115,7 +118,7 @@ export default function Profile(): JSX.Element {
                     alignItems: 'center',
                 }}>
                     <List>
-                        {[1, 2, 3,4,5,6,7,8,9,10].map((value) => (
+                        {[1, 2, 3,4,5,6,7,8,9,10].map(() => (
                             <Card variant="outlined" sx={{
                                 m:2
                             }}>
