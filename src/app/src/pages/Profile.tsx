@@ -24,6 +24,14 @@ export default function Profile(): JSX.Element {
     const [isFollowing, setFollowing] = React.useState(false);
     const [sentRequest, setRequestSent] = React.useState(false);
 
+    const handleFollow = () => {
+        setRequestSent(true);
+    }
+
+    const handleUnfollow = () => {
+        setFollowing(false);                     
+    }
+
     if (author !== undefined){
         return (
         <>
@@ -81,9 +89,7 @@ export default function Profile(): JSX.Element {
                     isFollowing?(
                         <Button 
                         variant="contained"
-                        onClick={() => {
-                            setFollowing(false);                     
-                        }}
+                        onClick={handleUnfollow}
                         >
                         Unfollow
                         </Button>
@@ -98,9 +104,7 @@ export default function Profile(): JSX.Element {
                     ):
                     <Button 
                     variant="contained"
-                    onClick={() => {
-                        setRequestSent(true);
-                    }}
+                    onClick={handleFollow}
                     >
                     Follow
                     </Button>
