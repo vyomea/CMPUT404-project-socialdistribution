@@ -1,5 +1,4 @@
 import * as React from "react"
-import ReactDOM from "react-dom";
 import { Box, Card, IconButton, Avatar, List, CardContent, Button, Typography } from "@mui/material"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import PersonIcon from "@mui/icons-material/Person"
@@ -20,7 +19,7 @@ export default function Profile(): JSX.Element {
     // Else - Follow
     const myProfile = false;
     const [isFollowing, setFollowing] = React.useState(false);
-    const [sentRequest, setRequestSent] = React.useState(false);
+    const [sentRequest, setRequestSent] = React.useState(true);
 
     const handleFollow = () => {
         setRequestSent(true);
@@ -138,5 +137,3 @@ export default function Profile(): JSX.Element {
     }
     return <Box/>
 }
-const rootElement = document.getElementById("root");
-ReactDOM.render(<Profile />, rootElement);
