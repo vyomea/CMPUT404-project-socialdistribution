@@ -1,4 +1,5 @@
 import * as React from "react"
+import ReactDOM from "react-dom";
 import { Box, Card, IconButton, Avatar, List, CardContent, Button, Typography } from "@mui/material"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import PersonIcon from "@mui/icons-material/Person"
@@ -6,7 +7,8 @@ import PersonIcon from "@mui/icons-material/Person"
 export default function Profile(): JSX.Element {
     const john = {
         displayName: 'John Doe',
-        githubUsername: 'github',
+        github: 'github',
+        profileImage: null,
         friends:2,
         followers:10,
         following:5
@@ -14,7 +16,13 @@ export default function Profile(): JSX.Element {
 
     const author=john;
 
-    const myProfile = true;
+    // If it's your profle - Edit
+    // If you follow them - Unfollow
+    // You sent them a request - Request Sent
+    // Else - Follow
+    const myProfile = false;
+    const [isFollowing, setFollowing] = React.useState(false);
+    const [sentRequest, setRequestSent] = React.useState(false);
 
     if (author !== undefined){
         return (
@@ -36,11 +44,11 @@ export default function Profile(): JSX.Element {
                     <Typography variant="h4" align="center">
                         {author.displayName}
                     </Typography>
-                    {author.githubUsername?(
+                    {author.github?(
                         <IconButton
                             onClick={() =>
                                 window.open(
-                                    `https://www.github.com/${author.githubUsername}`
+                                    `https://www.github.com/${author.github}`
                                 )
                             }
                         ><GitHubIcon/>
@@ -69,7 +77,34 @@ export default function Profile(): JSX.Element {
                         >
                         Edit
                     </Button>
-                    ):null}
+                    ):
+                    isFollowing?(
+                        <Button 
+                        variant="contained"
+                        onClick={() => {
+                            setFollowing(false);                     
+                        }}
+                        >
+                        Unfollow
+                        </Button>
+                    ):
+                    sentRequest?(
+                        <Button 
+                        variant="contained"
+                        disabled
+                        >
+                        Request Sent
+                        </Button>
+                    ):
+                    <Button 
+                    variant="contained"
+                    onClick={() => {
+                        setRequestSent(true);
+                    }}
+                    >
+                    Follow
+                    </Button>
+                    }
     
                 </Box>
 
@@ -101,3 +136,5 @@ export default function Profile(): JSX.Element {
     }
     return <Box/>
 }
+const rootElement = document.getElementById("root");
+ReactDOM.render(<Profile />, rootElement);
