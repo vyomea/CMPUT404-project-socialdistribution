@@ -5,7 +5,7 @@ import GitHubIcon from "@mui/icons-material/GitHub"
 import PersonIcon from "@mui/icons-material/Person"
 
 export default function Profile(): JSX.Element {
-    const john = {
+    const author = {
         displayName: 'John Doe',
         github: 'github',
         profileImage: null,
@@ -13,8 +13,6 @@ export default function Profile(): JSX.Element {
         followers:10,
         following:5
     }
-
-    const author=john;
 
     // If it's your profle - Edit
     // If you follow them - Unfollow
