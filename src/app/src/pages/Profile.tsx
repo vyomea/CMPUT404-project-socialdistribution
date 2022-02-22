@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Box, Card, IconButton, Avatar, List, CardContent, Button, Typography, Container } from "@mui/material"
+import { Box, Card, IconButton, Avatar, List, CardContent, Button, Typography } from "@mui/material"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import PersonIcon from "@mui/icons-material/Person"
 import NavBar from "../components/NavBar";
