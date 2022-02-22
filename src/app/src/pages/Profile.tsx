@@ -132,10 +132,14 @@ export default function Profile(): JSX.Element {
                     mt:0.5
                 }}>
                     <List style={{maxHeight: '100%', overflow: 'auto'}}>
-                        {[1, 2, 3,4,5,6,7,8,9,10].map(() => (
-                            <Card variant="outlined" sx={{
+                        {[1, 2, 3,4,5,6,7,8,9,10].map((i) => (
+                            <Card 
+                                key={i} 
+                                variant="outlined" 
+                                sx={{
                                 m:2
-                            }}>
+                                }}
+                            >
                                 <CardContent sx={{
                                     width: 700,
                                     height:80,
