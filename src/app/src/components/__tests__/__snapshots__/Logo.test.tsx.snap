@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Logo suite Renders correctly 1`] = `
+<div
+  className="sc-bdvvtL hBXxPh"
+  onClick={[Function]}
+>
+  Website.
+</div>
+`;
