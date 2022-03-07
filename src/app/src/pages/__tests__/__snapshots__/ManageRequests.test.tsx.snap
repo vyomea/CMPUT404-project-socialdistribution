@@ -198,7 +198,7 @@ exports[`ManageRequests suite Renders correctly 1`] = `
         }
       />
       <ul
-        className="MuiList-root MuiList-padding css-h4y409-MuiList-root"
+        className="MuiList-root MuiList-padding css-voqmaj-MuiList-root"
         style={
           Object {
             "maxHeight": "100%",
@@ -210,7 +210,7 @@ exports[`ManageRequests suite Renders correctly 1`] = `
           className="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root css-1dz3du8-MuiPaper-root-MuiCard-root"
         >
           <div
-            className="MuiCardContent-root css-uvr8tz-MuiCardContent-root"
+            className="MuiCardContent-root css-xgot80-MuiCardContent-root"
           >
             <div
               className="MuiBox-root css-1v0ni0h"
@@ -310,7 +310,7 @@ exports[`ManageRequests suite Renders correctly 1`] = `
           className="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root css-1dz3du8-MuiPaper-root-MuiCard-root"
         >
           <div
-            className="MuiCardContent-root css-uvr8tz-MuiCardContent-root"
+            className="MuiCardContent-root css-xgot80-MuiCardContent-root"
           >
             <div
               className="MuiBox-root css-1v0ni0h"

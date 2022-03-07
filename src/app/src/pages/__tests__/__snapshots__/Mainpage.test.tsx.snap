@@ -53,6 +53,16 @@ exports[`Mainpage suite Renders correctly 1`] = `
     onTouchEnd={[Function]}
     onTouchMove={[Function]}
     onTouchStart={[Function]}
+    style={
+      Object {
+        "bottom": 20,
+        "left": "auto",
+        "margin": 0,
+        "position": "fixed",
+        "right": 20,
+        "top": "auto",
+      }
+    }
     tabIndex={0}
     type="button"
   >
@@ -71,6 +81,16 @@ exports[`Mainpage suite Renders correctly 1`] = `
   </button>
   <div
     className="sc-iwjdpV cVtJki"
-  />
+  >
+    <ul
+      className="MuiList-root MuiList-padding css-1xk8fh6-MuiList-root"
+      style={
+        Object {
+          "maxHeight": "100%",
+          "overflow": "auto",
+        }
+      }
+    />
+  </div>
 </div>
 `;
