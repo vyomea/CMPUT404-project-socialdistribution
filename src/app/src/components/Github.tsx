@@ -10,7 +10,7 @@ const octokit = new Octokit({
 });
 
 interface props {
-  username: string;
+  username: any;
 }
 
 const GithubContainer = styled.div`
@@ -36,19 +36,21 @@ const Github = ({ username }: props) => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function onLoad() {
-      await octokit
-        .request('GET /users/{username}/events/public', {
-          username: username,
-        })
-        .then((res) => {
-          setItems(res.data);
-          setLoading(false);
-        })
-        .catch((e) => console.log(e));
+      if (username) {
+        await octokit
+          .request('GET /users/{username}/events/public', {
+            username: username,
+          })
+          .then((res) => {
+            setItems(res.data);
+            setLoading(false);
+          })
+          .catch((e) => console.log(e));
+      }
     }
     onLoad();
   }, [username]);
-
+  let key = 0;
   return (
     <GithubContainer>
       <GithubHeader>Github Activity</GithubHeader>
@@ -59,7 +61,9 @@ const Github = ({ username }: props) => {
         </GithubHeader>
       ) : (
         items.map((item: any) => {
-          return <Activity type={item?.type} payload={item?.payload} repo={item?.repo} />;
+          return (
+            <Activity key={key++} type={item?.type} payload={item?.payload} repo={item?.repo} />
+          );
         })
       )}
     </GithubContainer>

@@ -3,7 +3,7 @@ let newPayload: any = {};
 const getHTMLURLfromSha = (commits: any, size: number) => {
   let arr: Array<string> = [];
   let url = '';
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < commits.length; i++) {
     url = commits[i]['url'];
     url = url?.replace('api.', '');
     url = url?.replace('commits', 'commit');
