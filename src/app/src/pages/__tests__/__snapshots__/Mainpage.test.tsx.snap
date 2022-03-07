@@ -2,10 +2,10 @@
 
 exports[`Mainpage suite Renders correctly 1`] = `
 <div
-  className="sc-fKVqWL jCzvhL"
+  className="sc-iwjdpV OHnYU"
 >
   <div
-    className="sc-bBHxTw cuWUQB"
+    className="sc-cxpSdN TLJOs"
   >
     <div
       className="sc-bdvvtL dVmOGZ"
@@ -80,10 +80,10 @@ exports[`Mainpage suite Renders correctly 1`] = `
     </svg>
   </button>
   <div
-    className="sc-iwjdpV cVtJki"
+    className="sc-llYSUQ gRojfe"
   >
     <ul
-      className="MuiList-root MuiList-padding css-1xk8fh6-MuiList-root"
+      className="MuiList-root MuiList-padding css-xgw77h-MuiList-root"
       style={
         Object {
           "maxHeight": "100%",
@@ -91,6 +91,48 @@ exports[`Mainpage suite Renders correctly 1`] = `
         }
       }
     />
+    <div
+      className="sc-iJKOTD kGsKvO"
+    >
+      <div
+        className="sc-fFeiMQ ejkoIZ"
+      >
+        <div
+          className="sc-bkkeKt bUsYpp"
+        >
+          Github Activity
+        </div>
+        <div
+          className="sc-bkkeKt bUsYpp"
+        >
+          <span
+            className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSuccess css-15u8j6q-MuiCircularProgress-root"
+            role="progressbar"
+            style={
+              Object {
+                "height": 40,
+                "width": 40,
+              }
+            }
+          >
+            <svg
+              className="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+              viewBox="22 22 44 44"
+            >
+              <circle
+                className="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                cx={44}
+                cy={44}
+                fill="none"
+                r={20.2}
+                strokeWidth={3.6}
+                style={Object {}}
+              />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 `;

@@ -1,5 +1,6 @@
 import NavBar from '../components/NavBar';
 import UserPost from '../components/UserPost';
+import Github from '../components/Github';
 import styled from 'styled-components';
 import Author from '../api/models/Author';
 import Post from '../api/models/Post';
@@ -42,26 +43,9 @@ const MainPageContentContainer = styled.div`
   width: 100%;
 `;
 
-// // This is the NewPost Button
-// const NewPostButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-//   color: theme.palette.getContrastText('#e6c9a8'),
-//   backgroundColor: 'white',
-//   border: '2px solid black',
-//   height: '10%',
-//   width: '90%',
-//   padding: '1%',
-//   '&:hover': {
-//     backgroundColor: '#F9F7F5',
-//   },
-// }));
-
-// // This holds the New Post button and Github Stream
-// const NewPostGithubActivityContainer = styled.div`
-//   width: 10%;
-//   display: flex;
-//   justify-content: column;
-//   margin-right: 50px;
-// `;
+const GitContainer = styled.div`
+  margin-right: 1%;
+`;
 
 interface Props {
   currentUser?: Author;
@@ -104,7 +88,7 @@ export default function Mainpage({ currentUser }: Props) {
           bottom: 20,
           left: 'auto',
           position: 'fixed',
-      }}
+        }}
         sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' } }}
       >
         <AddIcon onClick={handleToggle} />
@@ -137,7 +121,7 @@ export default function Mainpage({ currentUser }: Props) {
         </Backdrop>
       ) : (
         <MainPageContentContainer>
-          <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{width:'85%', ml:5}}>
+          <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
             {posts?.map((post) => (
               <UserPost
                 data={post}
@@ -150,7 +134,10 @@ export default function Mainpage({ currentUser }: Props) {
                 id={post.id}
               />
             ))}
-            </List>
+          </List>
+          <GitContainer>
+            <Github username={currentUser?.displayName} />
+          </GitContainer>
         </MainPageContentContainer>
       )}
     </MainPageContainer>
