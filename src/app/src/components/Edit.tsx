@@ -126,7 +126,7 @@ const Edit = ({ id, currentUser, data }: any) => {
       contentType: type,
       content: content,
       image: 'mhm',
-      categories: category,
+      categories: (Array.isArray(category)?category:category.split(',')),
       count: 5,
       published: new Date(),
       visibility: visibility,
@@ -203,7 +203,7 @@ const Edit = ({ id, currentUser, data }: any) => {
             <MenuItem value="FRIENDS">Friends</MenuItem>
           </Select>
         </FormControl>
-        <ContentType>Categoies</ContentType>
+        <ContentType>Categories</ContentType>
         <TextField
           sx={{ width: '40%' }}
           id="standard-basic"
