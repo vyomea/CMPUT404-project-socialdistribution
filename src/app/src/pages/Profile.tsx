@@ -92,11 +92,23 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                 bgcolor: '#fff',
               }}
             >
-              {author.profileImage ? null : (
-                <Avatar sx={{ width: 150, height: 150, m: 2 }}>
-                  <PersonIcon sx={{ width: 100, height: 100 }} />
-                </Avatar>
-              )}
+            <Avatar sx={{ width: 150, height: 150 }} >
+            {author.profileImage ? 
+              <Box
+                  component="img"
+                  src={author.profileImage}
+                  alt="profile image"
+                  height="100%"
+                  width="100%"
+                  style={{
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                  }}
+              />
+            : (
+              <PersonIcon sx={{ width: '75%', height: '75%' }} />
+            )}
+            </Avatar> 
 
               <Typography variant="h4" align="center">
                 {author.displayName}

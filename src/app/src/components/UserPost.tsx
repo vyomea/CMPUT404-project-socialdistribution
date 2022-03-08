@@ -7,8 +7,9 @@ import Backdrop from '@mui/material/Backdrop';
 import Edit from './Edit';
 import Author from '../api/models/Author';
 import Post from '../api/models/Post';
-import { Avatar } from '@mui/material';
+import { Avatar, Box } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import { useNavigate } from "react-router-dom";
 
 interface postItem {
   post: Post | undefined;
@@ -49,6 +50,9 @@ const TopRowContainer = styled.div`
 // This is for the author name
 const NameContainer = styled.div`
   padding: 1%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  font-weight: bold;
 `;
 // This is for the Edit and Delete buttons
 const EditDeleteButtonContainer = styled.div`
@@ -117,9 +121,14 @@ const DeleteButton = Styled(Button)<ButtonProps>(({ theme }) => ({
   },
 }));
 
+const cursorStyle = {
+  cursor:'pointer'
+};
+
 const UserPost: React.FC<postItem> = (props?) => {
   const [open, setOpen] = React.useState(false);
   const [likes, setLikes] = React.useState(props?.likes);
+  const navigate = useNavigate();
 
   let showButtons = false;
 
@@ -132,6 +141,10 @@ const UserPost: React.FC<postItem> = (props?) => {
   };
   const handleToggle = () => {
     setOpen(!open);
+  };
+
+  const HandleNavigation = () => { 
+    navigate(`/profile/${props?.postAuthor?.id}`) 
   };
 
   return (
@@ -166,16 +179,30 @@ const UserPost: React.FC<postItem> = (props?) => {
         <PostContainer>
           
           <PostProfilePictureContainer>
-            {props?.postAuthor?.profileImage ? null : (
-                <Avatar sx={{ width: 70, height: 70, m: 2 }}>
-                  <PersonIcon sx={{ width: '75%', height: '75%' }} />
-                </Avatar>
+            <Avatar onClick={HandleNavigation} style={cursorStyle} sx={{ width: 70, height: 70, m: 2 }} >
+            {props?.postAuthor?.profileImage ? 
+              <Box
+                  component="img"
+                  src={props.postAuthor.profileImage}
+                  alt="profile image"
+                  height="100%"
+                  width="100%"
+                  style={{
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                  }}
+              />
+            : (
+              <PersonIcon sx={{ width: '75%', height: '75%' }} />
             )}
+            </Avatar> 
           </PostProfilePictureContainer>
 
           <PostDetailsContainer>
             <TopRowContainer>
-              <NameContainer>{props?.postAuthor?.displayName}</NameContainer>
+              <NameContainer onClick={HandleNavigation} style={cursorStyle} >
+                {props?.postAuthor?.displayName}
+              </NameContainer>
 
               {showButtons?(
                 <EditDeleteButtonContainer>
@@ -187,7 +214,7 @@ const UserPost: React.FC<postItem> = (props?) => {
             </TopRowContainer>
             <ContentContainer>{props?.post?.content}</ContentContainer>
             <LikesCommentsContainer>
-              <LikesContainer onClick={()=>setLikes(likes+1)}>{likes} Likes</LikesContainer>
+              <LikesContainer onClick={()=>setLikes(likes+1)} style={{cursor:'pointer'}}>{likes} Likes</LikesContainer>
               <CommentsContainer>{props?.post?.count} Comments</CommentsContainer>
             </LikesCommentsContainer>
           </PostDetailsContainer>
