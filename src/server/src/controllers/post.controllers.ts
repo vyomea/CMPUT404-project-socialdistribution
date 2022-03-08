@@ -5,11 +5,16 @@ import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 
 const createPost = async (req: AuthenticatedRequest, res: Response) => {
-  //const post_exists = await Post.findOne({ where: { id: req.params.post_id } });
-  // if (post_exists !== null) {
-  //   res.status(400).send({ error: 'Post already exists' });
-  //   return;
-  // }
+  if (req.params.post_id) {
+    const post_exists = await Post.findOne({
+      where: { id: req.params.post_id },
+    });
+    if (post_exists !== null) {
+      res.status(400).send({ error: 'Post already exists' });
+      return;
+    }
+  }
+  
   const { title, description, source, origin, contentType, content, categories, visibility } =
     req.body;
   const author = await Author.findOne({
@@ -23,7 +28,7 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
   }
   try {
     const post = await Post.create({
-      ...(req.params.id && { id: req.params.post_id }),
+      ...(req.params.post_id && { id: req.params.post_id }),
       title: title,
       description: description,
       source: source,
