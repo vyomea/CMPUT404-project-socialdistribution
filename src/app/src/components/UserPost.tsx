@@ -8,6 +8,7 @@ import Edit from './Edit';
 import Author from '../api/models/Author';
 import { Avatar } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import ReactMarkdown from 'react-markdown';
 
 interface postItem {
   Name: string;
@@ -163,9 +164,9 @@ const UserPost: React.FC<postItem> = (props?) => {
         <PostContainer>
           <PostProfilePictureContainer>
             {props.currentUser?.profileImage ? null : (
-                <Avatar sx={{ width: 70, height: 70, m: 2 }}>
-                  <PersonIcon sx={{ width: '75%', height: '75%' }} />
-                </Avatar>
+              <Avatar sx={{ width: 70, height: 70, m: 2 }}>
+                <PersonIcon sx={{ width: '75%', height: '75%' }} />
+              </Avatar>
             )}
           </PostProfilePictureContainer>
           <PostDetailsContainer>
@@ -176,9 +177,11 @@ const UserPost: React.FC<postItem> = (props?) => {
                 <DeleteButton>Delete</DeleteButton>
               </EditDeleteButtonContainer>
             </TopRowContainer>
-            <ContentContainer>{props?.ContentText}</ContentContainer>
+            <ContentContainer>
+              <ReactMarkdown>{props?.ContentText}</ReactMarkdown>
+            </ContentContainer>
             <LikesCommentsContainer>
-              <LikesContainer onClick={()=>setLikes(likes+1)}>{likes} Likes</LikesContainer>
+              <LikesContainer onClick={() => setLikes(likes + 1)}>{likes} Likes</LikesContainer>
               <CommentsContainer>{props?.Comments} Comments</CommentsContainer>
             </LikesCommentsContainer>
           </PostDetailsContainer>
