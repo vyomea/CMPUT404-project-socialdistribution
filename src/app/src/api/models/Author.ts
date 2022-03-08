@@ -3,4 +3,5 @@ export default interface Author {
   displayName: string;
   github: string;
   profileImage: string;
+  isAdmin: boolean;
 }
