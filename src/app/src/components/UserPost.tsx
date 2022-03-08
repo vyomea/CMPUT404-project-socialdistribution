@@ -6,18 +6,15 @@ import { CloseRounded } from '@mui/icons-material';
 import Backdrop from '@mui/material/Backdrop';
 import Edit from './Edit';
 import Author from '../api/models/Author';
+import Post from '../api/models/Post';
 import { Avatar } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 
 interface postItem {
-  Name: string;
-  ContentText: string;
-  Likes: number;
-  Comments: number;
-  ProfilePicturePath?: string;
-  id?: any;
+  post: Post | undefined;
   currentUser: Author | undefined;
-  data?: any;
+  postAuthor: Author | undefined;
+  likes: number;
 }
 
 // This is for the whole Post, which includes the profile picure, content, etc
@@ -122,7 +119,13 @@ const DeleteButton = Styled(Button)<ButtonProps>(({ theme }) => ({
 
 const UserPost: React.FC<postItem> = (props?) => {
   const [open, setOpen] = React.useState(false);
-  const [likes, setLikes] = React.useState(props?.Likes);
+  const [likes, setLikes] = React.useState(props?.likes);
+
+  let showButtons = false;
+
+  if((props?.postAuthor && props?.currentUser)&&(props.currentUser.id===props.postAuthor.id)){
+    showButtons = true;
+  }
 
   const handleClose = () => {
     setOpen(false);
@@ -157,29 +160,35 @@ const UserPost: React.FC<postItem> = (props?) => {
               border: '1px solid white',
             }}
           />
-          <Edit id={props.id} currentUser={props.currentUser} data={props.data} />
+          <Edit id={props?.post?.id} currentUser={props.currentUser} data={props?.post} />
         </Backdrop>
       ) : (
         <PostContainer>
+          
           <PostProfilePictureContainer>
-            {props.currentUser?.profileImage ? null : (
+            {props?.postAuthor?.profileImage ? null : (
                 <Avatar sx={{ width: 70, height: 70, m: 2 }}>
                   <PersonIcon sx={{ width: '75%', height: '75%' }} />
                 </Avatar>
             )}
           </PostProfilePictureContainer>
+
           <PostDetailsContainer>
             <TopRowContainer>
-              <NameContainer>{props?.Name}</NameContainer>
-              <EditDeleteButtonContainer>
-                <EditButton onClick={handleToggle}>Edit</EditButton>
-                <DeleteButton>Delete</DeleteButton>
-              </EditDeleteButtonContainer>
+              <NameContainer>{props?.postAuthor?.displayName}</NameContainer>
+
+              {showButtons?(
+                <EditDeleteButtonContainer>
+                  <EditButton onClick={handleToggle}>Edit</EditButton>
+                  <DeleteButton>Delete</DeleteButton>
+                </EditDeleteButtonContainer>
+              ):null}
+
             </TopRowContainer>
-            <ContentContainer>{props?.ContentText}</ContentContainer>
+            <ContentContainer>{props?.post?.content}</ContentContainer>
             <LikesCommentsContainer>
               <LikesContainer onClick={()=>setLikes(likes+1)}>{likes} Likes</LikesContainer>
-              <CommentsContainer>{props?.Comments} Comments</CommentsContainer>
+              <CommentsContainer>{props?.post?.count} Comments</CommentsContainer>
             </LikesCommentsContainer>
           </PostDetailsContainer>
         </PostContainer>

@@ -124,14 +124,11 @@ export default function Mainpage({ currentUser }: Props) {
           <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
             {posts?.map((post) => (
               <UserPost
-                data={post}
-                Name={'' + currentUser?.displayName}
+                post={post}
                 currentUser={currentUser}
-                ContentText={post.content}
-                Likes={0}
-                Comments={post.count}
+                postAuthor={currentUser}
+                likes={0}
                 key={post.id}
-                id={post.id}
               />
             ))}
           </List>
