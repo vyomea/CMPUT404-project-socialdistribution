@@ -5,7 +5,13 @@ import renderer from "react-test-renderer";
 import Mainpage from "../Mainpage";
 
 let container: any = null;
-const testUser = {"id":"","displayName":"","github":" ","profileImage":" "}
+const testUser = {
+  id: "",
+  displayName: "",
+  github: " ",
+  profileImage: " ",
+  isAdmin: false,
+};
 //issues with container type and its methods
 
 beforeEach(() => {
@@ -23,7 +29,7 @@ afterEach(() => {
 
 describe("Mainpage suite", () => {
   it("Renders correctly", () => {
-    const tree = renderer.create(<Mainpage currentUser={testUser}/>).toJSON();
+    const tree = renderer.create(<Mainpage currentUser={testUser} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 });
