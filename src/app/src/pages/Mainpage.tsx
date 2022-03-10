@@ -72,7 +72,7 @@ export default function Mainpage({ currentUser }: Props) {
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
-      .posts.list(1, 100)
+      .posts.list(1, 10)
       .then((data) => {
         setPosts(data);
       })
