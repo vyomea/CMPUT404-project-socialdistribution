@@ -55,6 +55,7 @@ export default function Mainpage({ currentUser }: Props) {
   // For now, mainpage just shows your own posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
   const [open, setOpen] = useState(false);
+  const [postsChanged, setpostsChanged] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -64,15 +65,19 @@ export default function Mainpage({ currentUser }: Props) {
     setOpen(!open);
   };
 
+  const handlePostsChanged = () => {
+    setpostsChanged(!postsChanged);
+  };
+
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
-      .posts.list(1, 5)
+      .posts.list(1, 100)
       .then((data) => {
         setPosts(data);
       })
       .catch((error) => {});
-  }, [currentUser?.id]);
+  }, [currentUser?.id, postsChanged]);
 
   return (
     <MainPageContainer>
@@ -118,7 +123,7 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} />
+          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} />
         </Backdrop>
       ) : (
         <MainPageContentContainer>
@@ -129,6 +134,7 @@ export default function Mainpage({ currentUser }: Props) {
                 currentUser={currentUser}
                 postAuthor={currentUser}
                 likes={0}
+                handlePostsChanged={handlePostsChanged}
                 key={post.id}
               />
             ))}

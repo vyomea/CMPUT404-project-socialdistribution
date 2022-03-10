@@ -33,6 +33,11 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   //Get author's posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
+  const [postsChanged, setpostsChanged] = useState(false);
+
+  const handlePostsChanged = () => {
+    setpostsChanged(!postsChanged);
+  };
 
   useEffect(() => {
     api.authors
@@ -42,7 +47,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       .catch((error) => {
         console.log(error);
       });
-  }, [id]);
+  }, [id,postsChanged]);
 
   // If it's your profle - Edit
   let myProfile = false;
@@ -176,6 +181,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                     currentUser={currentUser}
                     postAuthor={author}
                     likes={0}
+                    handlePostsChanged={handlePostsChanged}
                     key={post.id}
                   />
                 ))}

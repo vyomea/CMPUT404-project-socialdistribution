@@ -16,6 +16,7 @@ interface postItem {
   currentUser: Author | undefined;
   postAuthor: Author | undefined;
   likes: number;
+  handlePostsChanged:any;
 }
 
 // This is for the whole Post, which includes the profile picure, content, etc
@@ -173,7 +174,12 @@ const UserPost: React.FC<postItem> = (props?) => {
               border: '1px solid white',
             }}
           />
-          <Edit id={props?.post?.id} currentUser={props.currentUser} data={props?.post} />
+          <Edit 
+            id={props?.post?.id} 
+            currentUser={props.currentUser} 
+            data={props?.post} 
+            handlePostsChanged={props?.handlePostsChanged} 
+          />
         </Backdrop>
       ) : (
         <PostContainer>
