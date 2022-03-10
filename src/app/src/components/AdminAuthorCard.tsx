@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Card, CardContent, Button, ButtonGroup, Box, Typography, Avatar} from "@mui/material";
+import { Card, CardContent, Button, ButtonGroup, Box, Typography, Avatar, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import Author from "../api/models/Author"
+import api from "../api/api"
 
 export default function AdminAuthorCard({
     author,
@@ -9,9 +10,25 @@ export default function AdminAuthorCard({
     author: Author
 }): JSX.Element {
 
+    //Open dialog for deleting an author
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+      setOpen(true);
+    };
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
+
+    const handleDelete = () => {
+        alert('Deleted author')
+        handleClose();
+    };
+
     const buttons = [
         <Button onClick={()=>alert("Go to Edit User Page")}key="edit" > Edit </Button>,
-        <Button onClick={()=>alert("Delete user")} key="del"> Delete </Button>,
+        <Button onClick={handleClickOpen} key="del"> Delete </Button>,
     ];
 
     return (
@@ -62,6 +79,26 @@ export default function AdminAuthorCard({
                         <ButtonGroup variant="contained" size="large">
                             {buttons}
                         </ButtonGroup>
+
+                        <Dialog
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                            {"Delete Author"}
+                            </DialogTitle>
+                            <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                Delete author from server?
+                            </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button onClick={handleDelete} autoFocus>Ok</Button>
+                            </DialogActions>
+                        </Dialog>
 
                     </Box>
                 </Box>
