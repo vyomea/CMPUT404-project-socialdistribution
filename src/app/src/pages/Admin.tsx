@@ -48,7 +48,7 @@ export default function Admin(): JSX.Element {
         .list(1,10)
         .then((data)=>setPosts(data))
         .catch((error) => {console.log(error)})
-    }, [id,posts])
+    }, [id])
 
     const nodes=[
         {

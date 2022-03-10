@@ -42,7 +42,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       .catch((error) => {
         console.log(error);
       });
-  }, [id, posts]);
+  }, [id]);
 
   // If it's your profle - Edit
   let myProfile = false;

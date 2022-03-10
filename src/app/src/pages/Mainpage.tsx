@@ -59,6 +59,7 @@ export default function Mainpage({ currentUser }: Props) {
   const handleClose = () => {
     setOpen(false);
   };
+
   const handleToggle = () => {
     setOpen(!open);
   };
@@ -71,7 +72,7 @@ export default function Mainpage({ currentUser }: Props) {
         setPosts(data);
       })
       .catch((error) => {});
-  }, [currentUser?.id, posts]);
+  }, [currentUser?.id]);
 
   return (
     <MainPageContainer>
