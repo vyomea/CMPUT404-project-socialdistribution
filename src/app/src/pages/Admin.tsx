@@ -11,6 +11,13 @@ import api from "../api/api";
 import { useState, useEffect } from 'react';
 
 export default function Admin(): JSX.Element {
+    const [open, setOpen] = useState(false);
+    const [authorsChanged, setAuthorsChanged] = useState(false);
+    
+    const handleAuthorsChanged = () => {
+        setAuthorsChanged(!authorsChanged);
+      };
+    
     //Some fake data to help with layouts
     const signupRequests = [
         {
@@ -31,7 +38,7 @@ export default function Admin(): JSX.Element {
         .list(1,10)
         .then((data)=>setAuthors(data))
         .catch((error) => {console.log('No authors')})
-    }, [])
+    }, [authorsChanged])
 
     //Need to be able to get all posts
     const [posts, setPosts] = useState<Post[] | undefined>(undefined)
@@ -48,7 +55,7 @@ export default function Admin(): JSX.Element {
         .list(1,10)
         .then((data)=>setPosts(data))
         .catch((error) => {console.log(error)})
-    }, [id,posts])
+    }, [id])
 
     const nodes=[
         {
@@ -90,7 +97,7 @@ export default function Admin(): JSX.Element {
             <AdminRequestCard request={request} key={request.id}/>
         )),
         authors?.map((author) => (
-            <AdminAuthorCard author={author} key={author.id}/>
+            <AdminAuthorCard author={author} handleAuthorsChanged={handleAuthorsChanged} key={author.id}/>
         )),
         posts?.map((post) => (
             <AdminPostCard post={post} key={post.id}/>

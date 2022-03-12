@@ -1,37 +1,81 @@
 import * as React from "react";
-import { Card, CardContent, Button, ButtonGroup, Box, Typography, Avatar, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
+import { Card, CardContent, Button, ButtonGroup, Box, Typography, Avatar, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Backdrop} from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
+import { CloseRounded } from '@mui/icons-material';
 import Author from "../api/models/Author"
-import api from "../api/api"
+import EditAuthor from './EditAuthor';
 
 export default function AdminAuthorCard({
     author,
+    handleAuthorsChanged,
 }: {
-    author: Author
+    author: Author,
+    handleAuthorsChanged: any
 }): JSX.Element {
 
     //Open dialog for deleting an author
-    const [open, setOpen] = React.useState(false);
+    const [deleteOpen, setDeleteOpen] = React.useState(false);
 
     const handleClickOpen = () => {
-      setOpen(true);
+        setDeleteOpen(true);
     };
   
-    const handleClose = () => {
-      setOpen(false);
+    const handleClickClose = () => {
+        setDeleteOpen(false);
     };
 
     const handleDelete = () => {
         alert('Deleted author')
-        handleClose();
+        handleClickClose();
     };
 
+    //Edit open
+    const [open, setOpen] = React.useState(false);
+
+    const handleClose = () => {
+        setOpen(false);
+      };
+      const handleToggle = () => {
+        setOpen(!open);
+      };
+
     const buttons = [
-        <Button onClick={()=>alert("Go to Edit User Page")}key="edit" > Edit </Button>,
+        <Button onClick={handleToggle}key="edit" > Edit </Button>,
         <Button onClick={handleClickOpen} key="del"> Delete </Button>,
     ];
 
     return (
+    <>
+        {open ? (
+        <Backdrop
+          sx={{
+            color: '#fff',
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+          open={open}
+        >
+          <CloseRounded
+            onClick={handleClose}
+            sx={{
+              '&:hover': {
+                cursor: 'pointer',
+              },
+              marginBottom: '10px',
+              borderRadius: '100%',
+              border: '1px solid white',
+            }}
+          />
+          <EditAuthor
+            data={author}
+            handleAuthorsChanged={handleAuthorsChanged} 
+          />
+        </Backdrop>
+      ) : (
         <Card 
             variant="outlined" 
             sx={{
@@ -81,8 +125,8 @@ export default function AdminAuthorCard({
                         </ButtonGroup>
 
                         <Dialog
-                            open={open}
-                            onClose={handleClose}
+                            open={deleteOpen}
+                            onClose={handleClickClose}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                         >
@@ -95,7 +139,7 @@ export default function AdminAuthorCard({
                             </DialogContentText>
                             </DialogContent>
                             <DialogActions>
-                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button onClick={handleClickClose}>Cancel</Button>
                             <Button onClick={handleDelete} autoFocus>Ok</Button>
                             </DialogActions>
                         </Dialog>
@@ -103,7 +147,8 @@ export default function AdminAuthorCard({
                     </Box>
                 </Box>
             </CardContent>
-        </Card>
+        </Card>)}
+    </>
   );
 };
 
