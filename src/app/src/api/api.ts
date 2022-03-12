@@ -188,7 +188,7 @@ const api = {
          * @param data the data of the post
          * @returns TODO
          */
-        create: async (data: Omit<Post, 'id'>): Promise<unknown> =>
+        create: async (data: FormData): Promise<unknown> =>
           (await axios.post(`/authors/${authorId}/posts`, data)).data,
 
         /**
@@ -207,16 +207,18 @@ const api = {
            * @param data the data to update the post with
            * @returns TODO
            */
-          update: async (data: Post): Promise<unknown> =>
-            (await axios.post(`/authors/${authorId}/posts/${postId}`, data)).data,
+          update: async (data: FormData): Promise<unknown> =>
+            (await axios.post(`/authors/${authorId}/posts/${postId}`, data))
+              .data,
 
           /**
            * Creates the post.
            * @param data the data of the post
            * @returns TODO
            */
-          create: async (data: Post): Promise<unknown> =>
-            (await axios.put(`/authors/${authorId}/posts/${postId}`, data)).data,
+          create: async (data: FormData): Promise<unknown> =>
+            (await axios.put(`/authors/${authorId}/posts/${postId}`, data))
+              .data,
 
           /**
            * Deletes the post.

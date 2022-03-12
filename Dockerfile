@@ -19,7 +19,7 @@ WORKDIR /data/src/server/
 
 COPY src/server/package*.json ./
 
-RUN npm install
+# RUN cp -r ../app/build/ ./
 
 WORKDIR /data/
 

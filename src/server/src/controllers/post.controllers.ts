@@ -14,9 +14,18 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
       return;
     }
   }
-  
-  const { title, description, source, origin, contentType, content, categories, visibility } =
-    req.body;
+
+  const {
+    title,
+    description,
+    source,
+    origin,
+    contentType,
+    content,
+    categories,
+    visibility,
+  } = req.body;
+
   const author = await Author.findOne({
     where: {
       id: req.params.id,
@@ -33,13 +42,18 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
       description: description,
       source: source,
       origin: origin,
-      contentType: contentType,
+      contentType:
+        contentType === 'image' ? `${req.file.mimetype};base64` : contentType,
+      ...(contentType === 'image' && {
+        image: Buffer.from(req.file.buffer).toString('base64'),
+      }),
       content: content,
-      categories: categories,
+      categories: categories ? categories : [],
       visibility: visibility,
     });
     author.addPost(post);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ error: error });
     return;
   }
@@ -142,6 +156,24 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
   });
 };
 
+const getPostImage = async (req: Request, res: Response) => {
+  const post = await Post.findOne({
+    attributes: ['contentType', 'image'],
+    where: {
+      id: req.params.post_id,
+      author_id: req.params.id,
+    },
+  });
+  if (post === null || !post.contentType.includes('image')) {
+    res.sendStatus(404);
+    return;
+  }
+  const image = Buffer.from(post.image.toString(), 'base64');
+  res.setHeader('Content-Type', post.contentType.split(';')[0]);
+  res.setHeader('Content-Length', image.byteLength);
+  res.send(image);
+};
+
 const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
   const post = await Post.findOne({
     where: { id: req.params.post_id, author_id: req.params.id },
@@ -150,8 +182,16 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
     res.status(404).send();
     return;
   }
-  const { title, description, source, origin, contentType, content, categories, visibility } =
-    req.body;
+  const {
+    title,
+    description,
+    source,
+    origin,
+    contentType,
+    content,
+    categories,
+    visibility,
+  } = req.body;
 
   try {
     await post.update({
@@ -159,9 +199,15 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
       ...(description && { description: description }),
       ...(source && { source: source }),
       ...(origin && { origin: origin }),
-      ...(contentType && { contentType: contentType }),
+      ...(contentType && {
+        contentType:
+          contentType === 'image' ? `${req.file.mimetype};base64` : contentType,
+      }),
       ...(content && { content: content }),
-      ...(categories && { categories: categories }),
+      ...(contentType === 'image' && {
+        image: Buffer.from(req.file.buffer).toString('base64'),
+      }),
+      ...(categories && { categories: categories ? categories : [] }),
       ...(visibility && { visibility: visibility }),
     });
   } catch (error) {
@@ -171,4 +217,11 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
-export { createPost, deleteAuthorPost, getAuthorPost, getAuthorPosts, updateAuthorPost };
+export {
+  createPost,
+  deleteAuthorPost,
+  getAuthorPost,
+  getAuthorPosts,
+  getPostImage,
+  updateAuthorPost,
+};
