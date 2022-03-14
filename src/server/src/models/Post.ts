@@ -74,7 +74,7 @@ Post.init(
       allowNull: true,
     },
     image: {
-      type: DataTypes.BLOB('long'),
+      type: DataTypes.BLOB(),
       allowNull: true,
     },
     categories: {
