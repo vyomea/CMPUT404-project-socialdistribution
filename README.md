@@ -33,10 +33,14 @@ This project utilizes development containers as a development platform. Dev cont
 
 Deployment
 ==========
-This project is deployed on Heroku using the container stack. All configuration to the stack should be configured in `heroku.yml`. To deploy, push the latest change on branch `master` to remote `heroku`:
-```sh
-git push heroku master
-```
+This project is deployed on Heroku using the container stack. All configuration to the stack should be configured in `heroku.yml`.
+
+## Instructions
+1. Add the addon `heroku-postgresql` to the app on the app's dashboard. This will create a config variable `DATABASE_URL` as the database connection uri.
+2. Add the following config variables to the app on the app's dashboard:
+    - `JWT_SECRET`: ********
+    - `NODE_ENV`: `production`
+3. Set the app to deploy on GitHub push to master branch on the app's dashboard.
 
 Contributing
 ============
