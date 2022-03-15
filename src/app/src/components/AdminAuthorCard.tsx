@@ -73,6 +73,7 @@ export default function AdminAuthorCard({
           <EditAuthor
             data={author}
             handleAuthorsChanged={handleAuthorsChanged} 
+            handleClose={handleClose}
           />
         </Backdrop>
       ) : (

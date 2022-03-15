@@ -10,6 +10,7 @@ import Author from '../api/models/Author';
 interface Props {
   data: Author;
   handleAuthorsChanged: any;
+  handleClose: any;
 }
 
 const EditContainer = styled.div`
@@ -47,7 +48,7 @@ const ContentType = styled.div`
   font-size: 150%;
 `;
 
-const EditAuthor = ({ data, handleAuthorsChanged }: Props) => {
+const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   const [displayName, setName] = React.useState(data.displayName);
   const [github, setGithub] = React.useState((data.github)?data.github:"");
   const [profileImage, setImage] = React.useState((data.profileImage)?data.profileImage:"");
@@ -77,7 +78,7 @@ const EditAuthor = ({ data, handleAuthorsChanged }: Props) => {
     api.authors
     .withId(author.id)
     .update(author)
-    .then(()=>handleAuthorsChanged())
+    .then(()=>{handleAuthorsChanged(); handleClose()})
     .catch((e) => console.log(e.response));
   
     };

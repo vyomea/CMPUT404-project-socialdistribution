@@ -22,7 +22,7 @@ export default function Admin(): JSX.Element {
     };
 
     const handleToggle = () => {
-    setOpen(!open);
+        setOpen(!open);
     };
 
     const handleAuthorsChanged = () => {
@@ -144,7 +144,7 @@ export default function Admin(): JSX.Element {
                     border: '1px solid white',
                     }}
                 />
-                <AddAuthor handleAuthorsChanged={handleAuthorsChanged}/>
+                <AddAuthor handleAuthorsChanged={handleAuthorsChanged} handleClose={handleClose}/>
                 </Backdrop>
             ) : (
                     <Box sx={{ height: window.innerHeight,width: window.innerWidth}}>

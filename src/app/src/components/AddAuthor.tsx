@@ -7,6 +7,7 @@ import api from '../api/api';
 
 interface Props {
   handleAuthorsChanged: any;
+  handleClose: any;
 }
 
 const EditContainer = styled.div`
@@ -44,7 +45,7 @@ const ContentType = styled.div`
   font-size: 150%;
 `;
 
-const AddAuthor = ({ handleAuthorsChanged }: Props) => {
+const AddAuthor = ({ handleAuthorsChanged, handleClose }: Props) => {
   const [displayName, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -65,7 +66,7 @@ const AddAuthor = ({ handleAuthorsChanged }: Props) => {
   const handleEdit = () => {
     api
     .register(email,password,displayName)
-    .then(()=>handleAuthorsChanged())
+    .then(()=>{handleAuthorsChanged(); handleClose()})
     .catch((e) => console.log(e.response))
     };
 
