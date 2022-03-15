@@ -4,11 +4,8 @@ import React from 'react';
 import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
 import api from '../api/api';
-import Author from '../api/models/Author';
-
 
 interface Props {
-  data: Author;
   handleAuthorsChanged: any;
 }
 
@@ -47,71 +44,64 @@ const ContentType = styled.div`
   font-size: 150%;
 `;
 
-const EditAuthor = ({ data, handleAuthorsChanged }: Props) => {
-  const [displayName, setName] = React.useState(data.displayName);
-  const [github, setGithub] = React.useState((data.github)?data.github:"");
-  const [profileImage, setImage] = React.useState((data.profileImage)?data.profileImage:"");
+const AddAuthor = ({ handleAuthorsChanged }: Props) => {
+  const [displayName, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    
+  const handleName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
   
-  const handleGithub = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGithub(event.target.value);
+  const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
   };
 
-  const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setImage(event.target.value);
+  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
   };
 
 
   const handleEdit = () => {
-    const author = {
-      id: data.id,
-      displayName: displayName,
-      github: ((github.trim()==="")||(github.trim().length===0))?undefined:github,
-      profileImage: ((profileImage.trim()==="")||(profileImage.trim().length===0))?undefined:profileImage
-    };
-  
-    api.authors
-    .withId(author.id)
-    .update(author)
+    api
+    .register(email,password,displayName)
     .then(()=>handleAuthorsChanged())
-    .catch((e) => console.log(e.response));
-  
+    .catch((e) => console.log(e.response))
     };
 
   return (
     <EditContainer>
       <Block>
-      <Header>Edit</Header>
+      <Header>Add</Header>
         <ContentType>Display Name</ContentType>
         <TextField
           sx={{ width: '40%' }}
           id="standard-basic"
           required
-          label="displayName"
+          label="display name"
           value={displayName}
-          onChange={handleNameChange}
+          onChange={handleName}
           fullWidth
         />
-        <ContentType>Github</ContentType>
+        <ContentType>Email</ContentType>
         <TextField
           sx={{ width: '40%' }}
           id="standard-basic"
-          label="github"
-          value={github}
-          onChange={handleGithub}
+          required
+          label="email"
+          value={email}
+          onChange={handleEmail}
           fullWidth
         />
-        <ContentType>Profile Image</ContentType>
+        <ContentType>Password</ContentType>
         <TextField
           sx={{ width: '40%' }}
           id="standard-basic"
-          label="imageURL"
-          value={profileImage}
-          onChange={handleImage}
+          required
+          label="password"
+          type="password"
+          value={password}
+          onChange={handlePassword}
           fullWidth
         />
       </Block>
@@ -126,4 +116,4 @@ const EditAuthor = ({ data, handleAuthorsChanged }: Props) => {
   );
 };
 
-export default EditAuthor;
+export default AddAuthor;

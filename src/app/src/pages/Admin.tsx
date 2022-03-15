@@ -9,14 +9,25 @@ import Author from "../api/models/Author";
 import Post from "../api/models/Post";
 import api from "../api/api";
 import { useState, useEffect } from 'react';
+import Backdrop from '@mui/material/Backdrop';
+import { CloseRounded } from '@mui/icons-material';
+import AddAuthor from '../components/AddAuthor';
 
 export default function Admin(): JSX.Element {
     const [open, setOpen] = useState(false);
     const [authorsChanged, setAuthorsChanged] = useState(false);
-    
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleToggle = () => {
+    setOpen(!open);
+    };
+
     const handleAuthorsChanged = () => {
         setAuthorsChanged(!authorsChanged);
-      };
+    };
     
     //Some fake data to help with layouts
     const signupRequests = [
@@ -108,65 +119,94 @@ export default function Admin(): JSX.Element {
     ];
       
     return (
-    <>
-    <Box sx={{ height: window.innerHeight,width: window.innerWidth}}>
-        <Box style={{ height: '5%' }} sx={{ bgcolor:"#fff"}}>
-            <NavBar items={[
-            {
-                Text: "",
-                handleClick: () => {
-                console.log(1);
-                },
-            },
-            ]} />
-        </Box>
-        <Box style={{ display: 'flex', height: "95%" }} sx={{ bgcolor:"#fff"}}>
-            <Box display="flex" sx={{
+        <>
+            {open ? (
+                <Backdrop
+                sx={{
+                    color: '#fff',
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
                     flexDirection: 'column',
-                    width: '30%',
                     alignItems: 'center',
-                    bgcolor:"#fff",
-                    ml:2,
-                    mt:9,
-                }}>
-
-                <ButtonGroup
-                    orientation="vertical"
-                    aria-label="vertical contained button group"
-                    variant="contained"
-                    size="large"
-                    fullWidth={true}
+                }}
+                open={open}
                 >
-                    {buttons.map((button) => (
-                        <Button onClick={()=>setListDisplay(button)}key={button.id} sx={buttonStyle}> {button.title} <Badge badgeContent={button.count} color="secondary" sx={badgeStyle}/></Button>
-                    ))}
+                <CloseRounded
+                    onClick={handleClose}
+                    sx={{
+                    '&:hover': {
+                        cursor: 'pointer',
+                    },
+                    marginBottom: '10px',
+                    borderRadius: '100%',
+                    border: '1px solid white',
+                    }}
+                />
+                <AddAuthor handleAuthorsChanged={handleAuthorsChanged}/>
+                </Backdrop>
+            ) : (
+                    <Box sx={{ height: window.innerHeight,width: window.innerWidth}}>
+                        <Box style={{ height: '5%' }} sx={{ bgcolor:"#fff"}}>
+                            <NavBar items={[
+                            {
+                                Text: "",
+                                handleClick: () => {
+                                console.log(1);
+                                },
+                            },
+                            ]} />
+                        </Box>
+                        <Box style={{ display: 'flex', height: "95%" }} sx={{ bgcolor:"#fff"}}>
+                            <Box display="flex" sx={{
+                                    flexDirection: 'column',
+                                    width: '30%',
+                                    alignItems: 'center',
+                                    bgcolor:"#fff",
+                                    ml:2,
+                                    mt:9,
+                                }}>
 
-                </ButtonGroup>
-                
-                {listDisplay.title ==='Authors'?(
-                    <Button onClick={()=>alert("Add Author Page")} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
-                ):null}
+                                <ButtonGroup
+                                    orientation="vertical"
+                                    aria-label="vertical contained button group"
+                                    variant="contained"
+                                    size="large"
+                                    fullWidth={true}
+                                >
+                                    {buttons.map((button) => (
+                                        <Button onClick={()=>setListDisplay(button)}key={button.id} sx={buttonStyle}> {button.title} <Badge badgeContent={button.count} color="secondary" sx={badgeStyle}/></Button>
+                                    ))}
 
-                {listDisplay.title==='Nodes'?(
-                     <Button onClick={()=>alert("Add Node Page")} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
-                ):null}
-    
-            </Box>
+                                </ButtonGroup>
+                                
+                                {listDisplay.title ==='Authors'?(
+                                    <Button onClick={handleToggle} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
+                                ):null}
 
-            <Box overflow="auto" display="flex" sx={{
-                flexDirection: 'column',
-                width: '70%',
-                alignItems: 'center',
-                mt:0.5
-            }}>
-                <Typography variant="h4">{listDisplay.title}</Typography>
-                <Divider style={{width:'85%'}}></Divider>
-                <List style={{maxHeight: '100%', overflow: 'auto'}} sx={{width:'90%'}}>
-                    {lists[listDisplay.id]}
-                </List>
-            </Box>
-        </Box>
-    </Box>
-    </>
-)
+                                {listDisplay.title==='Nodes'?(
+                                    <Button onClick={()=>alert("Add Node Page")} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
+                                ):null}
+                    
+                            </Box>
+
+                            <Box overflow="auto" display="flex" sx={{
+                                flexDirection: 'column',
+                                width: '70%',
+                                alignItems: 'center',
+                                mt:0.5
+                            }}>
+                                <Typography variant="h4">{listDisplay.title}</Typography>
+                                <Divider style={{width:'85%'}}></Divider>
+                                <List style={{maxHeight: '100%', overflow: 'auto'}} sx={{width:'90%'}}>
+                                    {lists[listDisplay.id]}
+                                </List>
+                            </Box>
+                        </Box>
+                    </Box>
+                )
+            }
+        </>
+    )
 }
