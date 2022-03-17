@@ -15,9 +15,9 @@ import { List } from '@mui/material';
 
 const items2 = [
   {
-    Text: 'Logout',
+    Text: "Logout",
     handleClick: () => {
-      localStorage.removeItem('token');
+      api.logout();
       window?.location?.reload();
     },
   },

@@ -5,11 +5,19 @@ RUN if [[ "${IS_DEV_CONTAINER+set}" != "set" ]]; then \
   curl https://cli-assets.heroku.com/install.sh | sh; \
   fi
 
-WORKDIR /data/src/app
+WORKDIR /data/src/app/
 
 COPY src/app/package*.json ./
 
 RUN npm ci
+
+WORKDIR /data/src/server/
+
+COPY src/server/package*.json ./
+
+RUN npm ci
+
+WORKDIR /data/src/app/
 
 COPY src/app/ ./
 
@@ -17,16 +25,14 @@ RUN npm run build
 
 WORKDIR /data/src/server/
 
-COPY src/server/package*.json ./
+COPY src/server/ ./
 
-RUN npm install
+RUN cp -r ../app/build ./
 
 WORKDIR /data/
 
-COPY ./ ./
+COPY docker-entrypoint.sh .
 
 RUN chmod 700 docker-entrypoint.sh
-
-EXPOSE 3000 3001
 
 CMD ["./docker-entrypoint.sh"]
