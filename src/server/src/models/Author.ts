@@ -10,6 +10,7 @@ class Author extends Model {
   declare displayName: string;
   declare github: string;
   declare profileImage: string;
+  declare isAdmin: boolean;
   static Posts: HasMany;
   declare addPost: (post: Post) => void;
 }
@@ -42,6 +43,11 @@ Author.init(
     profileImage: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {

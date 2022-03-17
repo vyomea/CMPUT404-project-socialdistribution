@@ -3,9 +3,17 @@ import Author from '../models/Author';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 
+const authorPublicAttributes = [
+  'id',
+  'displayName',
+  'github',
+  'profileImage',
+  'isAdmin',
+];
+
 const getAllAuthors = async (req: PaginationRequest, res: Response) => {
   const authors = await Author.findAll({
-    attributes: ['id', 'displayName', 'github', 'profileImage'],
+    attributes: authorPublicAttributes,
     offset: req.offset,
     limit: req.limit,
   });
@@ -19,7 +27,7 @@ const getAllAuthors = async (req: PaginationRequest, res: Response) => {
 
 const getAuthor = async (req: Request, res: Response) => {
   const author = await Author.findOne({
-    attributes: ['id', 'displayName', 'github', 'profileImage'],
+    attributes: authorPublicAttributes,
     where: { id: req.params.id },
   });
   if (author === null) {
@@ -30,7 +38,10 @@ const getAuthor = async (req: Request, res: Response) => {
 };
 
 const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
-  const author = await Author.findOne({ where: { id: req.authorId } });
+  const author = await Author.findOne({
+    attributes: authorPublicAttributes,
+    where: { id: req.authorId },
+  });
   if (author === null) {
     res.status(400).send();
     return;
