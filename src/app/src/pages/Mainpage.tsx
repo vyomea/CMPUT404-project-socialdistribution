@@ -55,23 +55,29 @@ export default function Mainpage({ currentUser }: Props) {
   // For now, mainpage just shows your own posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
   const [open, setOpen] = useState(false);
+  const [postsChanged, setpostsChanged] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
   };
+
   const handleToggle = () => {
     setOpen(!open);
+  };
+
+  const handlePostsChanged = () => {
+    setpostsChanged(!postsChanged);
   };
 
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
-      .posts.list(1, 5)
+      .posts.list(1, 10)
       .then((data) => {
         setPosts(data);
       })
       .catch((error) => {});
-  }, [currentUser?.id, posts]);
+  }, [currentUser?.id, postsChanged]);
 
   return (
     <MainPageContainer>
@@ -117,21 +123,19 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} />
+          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} />
         </Backdrop>
       ) : (
         <MainPageContentContainer>
           <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
             {posts?.map((post) => (
               <UserPost
-                data={post}
-                Name={'' + currentUser?.displayName}
+                post={post}
                 currentUser={currentUser}
-                ContentText={post.content}
-                Likes={0}
-                Comments={post.count}
+                postAuthor={currentUser}
+                likes={0}
+                handlePostsChanged={handlePostsChanged}
                 key={post.id}
-                id={post.id}
               />
             ))}
           </List>

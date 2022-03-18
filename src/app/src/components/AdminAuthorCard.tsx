@@ -96,14 +96,24 @@ export default function AdminAuthorCard({
                         width: '50%',
                         alignItems: 'center',
                     }}>
-                        {author.profileImage?(
-                            null
-                        ):
-                        <Avatar sx={{ width: 50, height: 50, mr:2}}>
-                            <PersonIcon
-                                sx={{ width: '100%', height: '100%' }}
+                        
+                        <Avatar sx={{ width: 50, height: 50, mr:2 }} >
+                        {author.profileImage ? 
+                            <Box
+                                component="img"
+                                src={author.profileImage}
+                                alt="profile image"
+                                height="100%"
+                                width="100%"
+                                style={{
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                }}
                             />
-                        </Avatar>}
+                            : (
+                            <PersonIcon sx={{ width: '75%', height: '75%' }} />
+                            )}
+                        </Avatar> 
                         
                         <Box display="block">
                             <Typography noWrap={true} sx={{ fontWeight: 'bold' }}>

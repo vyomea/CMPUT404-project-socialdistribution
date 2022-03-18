@@ -21,24 +21,12 @@ app.use(cors());
 app.use(express.json());
 app.use(authenticate);
 
-// app.get('/auth-optional', (req, res) => {
-//   if (!req.authorId) {
-//     res.send('You are not logged in');
-//   } else {
-//     res.send(`You are logged in as ${req.authorId}`);
-//   }
-// });
-
-// app.get('/auth-required', requiredLoggedIn, (req, res) => {
-//   res.send(`You are logged in as ${req.authorId}`);
-// });
-
 db.sync({ alter: true }).then(() => {
   app.use(auth);
   app.use('/authors', author);
 
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../build')));
+    app.use(express.static(path.join(__dirname, '../../build')));
   }
 
   app.all('*', (req: Request, res: Response) => {
