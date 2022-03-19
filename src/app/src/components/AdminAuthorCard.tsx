@@ -4,6 +4,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { CloseRounded } from '@mui/icons-material';
 import Author from "../api/models/Author"
 import EditAuthor from './EditAuthor';
+import { useNavigate } from "react-router-dom";
 
 export default function AdminAuthorCard({
     author,
@@ -12,6 +13,9 @@ export default function AdminAuthorCard({
     author: Author,
     handleAuthorsChanged: any
 }): JSX.Element {
+
+    //Navigate to profile
+    const navigate = useNavigate();
 
     //Open dialog for deleting an author
     const [deleteOpen, setDeleteOpen] = React.useState(false);
@@ -116,7 +120,12 @@ export default function AdminAuthorCard({
                         </Avatar> 
                         
                         <Box display="block">
-                            <Typography noWrap={true} sx={{ fontWeight: 'bold' }}>
+                            <Typography 
+                            onClick={()=>navigate(`/profile/${author.id}`)} 
+                            noWrap={true} 
+                            style={{cursor:'pointer'}} 
+                            sx={{ fontWeight: 'bold', textDecoration:'underline' }}
+                            >
                                 {author.id}
                             </Typography>
 

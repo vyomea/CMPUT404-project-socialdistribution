@@ -86,7 +86,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     setFollowing(false);
   };
 
-  if (author !== undefined) {
+  if (author !== undefined && currentUser!==undefined) {
     return (
       <>
       {open ? (
@@ -114,7 +114,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
             }}
           />
           <EditAuthor
-            data={author}
+            data={currentUser}
             handleAuthorsChanged={handleAuthorsChanged} 
             handleClose={handleClose}
           />
