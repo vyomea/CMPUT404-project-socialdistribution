@@ -72,14 +72,17 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       id: data.id,
       displayName: displayName,
       github: ((github.trim()==="")||(github.trim().length===0))?undefined:github,
-      profileImage: ((profileImage.trim()==="")||(profileImage.trim().length===0))?undefined:profileImage
+      profileImage: ((profileImage.trim()==="")||(profileImage.trim().length===0))?undefined:profileImage,
+      isAdmin: data.isAdmin
     };
+
+    console.log(author);
   
     api.authors
-    .withId(author.id)
-    .update(author)
-    .then(()=>{handleAuthorsChanged(); handleClose()})
-    .catch((e) => console.log(e.response));
+      .withId(author.id)
+      .update(author)
+      .then(()=>{handleAuthorsChanged(); handleClose()})
+      .catch((e) => console.log(e.response));
   
     };
 
