@@ -21,6 +21,7 @@ import api from '../api/api';
 
 interface Props {
   currentUser?: Author;
+  handlePostsChanged:any;
 }
 const EditContainer = styled.div`
   background-color: white;
@@ -84,7 +85,7 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: '#b5b5b5',
   },
 }));
-const Add = ({ currentUser }: Props) => {
+const Add = ({ currentUser, handlePostsChanged }: Props) => {
   const [content, setContent] = React.useState('');
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -152,7 +153,12 @@ const Add = ({ currentUser }: Props) => {
     for (key in post) {
       formData.append(key, post[key]);
     }
-    api.authors.withId('' + currentUser?.id).posts.create(formData);
+    api.authors
+    .withId('' + currentUser?.id)
+    .posts
+    .create(formData)
+    .then(()=>handlePostsChanged())
+    .catch((error) => console.log(error));
   };
 
   React.useEffect(() => {
