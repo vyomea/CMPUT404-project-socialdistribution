@@ -65,7 +65,7 @@ const AddAuthor = ({ handleAuthorsChanged, handleClose }: Props) => {
 
   const handleEdit = () => {
     api
-    .register(email,password,displayName)
+    .create(email,password,displayName)
     .then(()=>{handleAuthorsChanged(); handleClose()})
     .catch((e) => console.log(e.response))
     };

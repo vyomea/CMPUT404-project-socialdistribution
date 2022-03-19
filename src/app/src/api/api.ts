@@ -49,6 +49,23 @@ const api = {
     return result.data.author;
   },
 
+    /**
+   * Create a new author's account via admin.
+   * @returns the new author
+   */
+    create: async (
+      email: string,
+      password: string,
+      displayName: string
+    ): Promise<Author> => {
+      const result = await axios.post('/register', {
+        email,
+        password,
+        displayName,
+      });
+      return result.data.author;
+    },
+
   /**
    * Log out of the current author's account.
    */
