@@ -4,6 +4,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { CloseRounded } from '@mui/icons-material';
 import Author from "../api/models/Author"
 import EditAuthor from './EditAuthor';
+import api from '../api/api';
 import { useNavigate } from "react-router-dom";
 
 export default function AdminAuthorCard({
@@ -29,7 +30,12 @@ export default function AdminAuthorCard({
     };
 
     const handleDelete = () => {
-        alert('Deleted author')
+        api.authors
+        .withId(author.id)
+        .delete()
+        .then(()=>{handleAuthorsChanged()})
+        .catch((e) => console.log(e.response))
+
         handleClickClose();
     };
 

@@ -112,6 +112,13 @@ const api = {
         (await axios.post(`/authors/${authorId}`, data)).data,
 
       /**
+       * Deletes the author.
+       * @returns TODO
+       */
+      delete: async (): Promise<unknown> =>
+        (await axios.delete(`/authors/${authorId}`)).data,
+
+      /**
        * Actions relating to the author's inbox.
        */
       inbox: {
