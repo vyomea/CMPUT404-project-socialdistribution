@@ -73,7 +73,7 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: '#b5b5b5',
   },
 }));
-const Edit = ({ id, currentUser, data }: any) => {
+const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
   const [content, setContent] = React.useState(data.content);
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -125,7 +125,7 @@ const Edit = ({ id, currentUser, data }: any) => {
       description: description,
       contentType: type,
       content: content,
-      image: 'mhm',
+      image: images ? images[0] : undefined,
       categories: (Array.isArray(category)?category:category.split(',')),
       count: 5,
       published: new Date(),
@@ -133,10 +133,16 @@ const Edit = ({ id, currentUser, data }: any) => {
       unlisted: unlisted,
     };
     // console.log("",currentUser)
+    const formData = new FormData();
+    let key: keyof typeof post;
+    for (key in post) {
+      formData.append(key, post[key]);
+    }
     api.authors
       .withId('' + currentUser?.id)
       .posts.withId('' + id)
-      .update(post)
+      .update(formData)
+      .then(()=>handlePostsChanged())
       .catch((e) => console.log(e.response));
   };
 
@@ -253,7 +259,7 @@ const Edit = ({ id, currentUser, data }: any) => {
                     onChange={handleTextChange}
                   />
                   <CustomButton>
-                    <input type="file" accept="image/*" multiple onChange={handleUpload} />
+                    <input type="file" accept="image/*" name="image" multiple onChange={handleUpload} />
                   </CustomButton>
                 </>
               ) : (

@@ -16,7 +16,7 @@ class Post extends Model {
     | 'image/png;base64'
     | 'image/jpeg;base64';
   declare content: string;
-  declare image: string;
+  declare image: Blob;
   declare categories: string[];
   declare count: number;
   declare published: Date;
@@ -74,7 +74,7 @@ Post.init(
       allowNull: true,
     },
     image: {
-      type: DataTypes.STRING,
+      type: DataTypes.BLOB(),
       allowNull: true,
     },
     categories: {

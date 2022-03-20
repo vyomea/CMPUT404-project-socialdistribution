@@ -1,5 +1,11 @@
 import styled from 'styled-components';
-import { Button, ButtonGroup, ButtonProps, InputLabel, TextField } from '@mui/material';
+import {
+  Button,
+  ButtonGroup,
+  ButtonProps,
+  InputLabel,
+  TextField,
+} from '@mui/material';
 import { styled as Styled } from '@mui/material/styles';
 import React from 'react';
 import MenuItem from '@mui/material/MenuItem';
@@ -15,6 +21,7 @@ import api from '../api/api';
 
 interface Props {
   currentUser?: Author;
+  handlePostsChanged:any;
 }
 const EditContainer = styled.div`
   background-color: white;
@@ -78,7 +85,7 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: '#b5b5b5',
   },
 }));
-const Add = ({ currentUser }: Props) => {
+const Add = ({ currentUser, handlePostsChanged }: Props) => {
   const [content, setContent] = React.useState('');
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -90,7 +97,9 @@ const Add = ({ currentUser }: Props) => {
   const [category, setCategory] = React.useState<Array<string>>([]);
   const [unlisted, setUnlisted] = React.useState<boolean>(false);
 
-  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDescriptionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setDescription(event.target.value);
   };
 
@@ -131,7 +140,7 @@ const Add = ({ currentUser }: Props) => {
       description: description,
       contentType: type,
       content: content,
-      image: 'lol',
+      image: images ? images[0] : undefined,
       categories: category,
       count: 5,
       published: new Date(),
@@ -139,13 +148,25 @@ const Add = ({ currentUser }: Props) => {
       unlisted: unlisted,
     };
     // debugger;
-    api.authors.withId('' + currentUser?.id).posts.create(post);
+    const formData = new FormData();
+    let key: keyof typeof post;
+    for (key in post) {
+      formData.append(key, post[key]);
+    }
+    api.authors
+    .withId('' + currentUser?.id)
+    .posts
+    .create(formData)
+    .then(()=>handlePostsChanged())
+    .catch((error) => console.log(error));
   };
 
   React.useEffect(() => {
     if (images.length < 1) return;
     var allImages: any = [];
-    images.forEach((image: Blob | MediaSource) => allImages.push(URL.createObjectURL(image)));
+    images.forEach((image: Blob | MediaSource) =>
+      allImages.push(URL.createObjectURL(image))
+    );
     setRenderImages(allImages);
   }, [images]);
 
@@ -156,9 +177,9 @@ const Add = ({ currentUser }: Props) => {
         <ContentType>Title</ContentType>
         <TextField
           sx={{ width: '40%' }}
-          id="standard-basic"
+          id='standard-basic'
           required
-          label="Title"
+          label='Title'
           value={title}
           onChange={handleTitleChange}
           fullWidth
@@ -166,50 +187,48 @@ const Add = ({ currentUser }: Props) => {
         <ContentType>Description</ContentType>
         <TextField
           sx={{ width: '40%' }}
-          id="standard-basic"
-          label="Description"
+          id='standard-basic'
+          label='Description'
           value={description}
           onChange={handleDescriptionChange}
           fullWidth
         />
         <ContentType>Type</ContentType>
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="demo-simple-select-standard-label" required>
+        <FormControl variant='standard' sx={{ m: 1, minWidth: 120 }}>
+          <InputLabel id='demo-simple-select-standard-label' required>
             Type
           </InputLabel>
           <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
+            labelId='demo-simple-select-standard-label'
+            id='demo-simple-select-standard'
             value={type}
             onChange={handleType}
-            label="Type"
-          >
-            <MenuItem value="text/plain">Plain</MenuItem>
-            <MenuItem value="text/markdown">Markdown</MenuItem>
-            <MenuItem value="image">Image</MenuItem>
+            label='Type'>
+            <MenuItem value='text/plain'>Plain</MenuItem>
+            <MenuItem value='text/markdown'>Markdown</MenuItem>
+            <MenuItem value='image'>Image</MenuItem>
           </Select>
         </FormControl>
         <ContentType>Visibility</ContentType>
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="demo-simple-select-standard-label" required>
+        <FormControl variant='standard' sx={{ m: 1, minWidth: 120 }}>
+          <InputLabel id='demo-simple-select-standard-label' required>
             Visibility
           </InputLabel>
           <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
+            labelId='demo-simple-select-standard-label'
+            id='demo-simple-select-standard'
             value={visibility}
             onChange={handleVisibility}
-            label="Visibility"
-          >
-            <MenuItem value="PUBLIC">Public</MenuItem>
-            <MenuItem value="FRIENDS">Friends</MenuItem>
+            label='Visibility'>
+            <MenuItem value='PUBLIC'>Public</MenuItem>
+            <MenuItem value='FRIENDS'>Friends</MenuItem>
           </Select>
         </FormControl>
         <ContentType>Category</ContentType>
         <TextField
           sx={{ width: '40%' }}
-          id="standard-basic"
-          label="Category"
+          id='standard-basic'
+          label='Category'
           value={category}
           onChange={handleCategory}
           fullWidth
@@ -221,22 +240,19 @@ const Add = ({ currentUser }: Props) => {
           {' '}
           <WriteOrPreview>
             <ButtonGroup
-              variant="text"
-              color="inherit"
-              size="large"
-              sx={{ p: 1, borderBottom: '1px solid black' }}
-            >
+              variant='text'
+              color='inherit'
+              size='large'
+              sx={{ p: 1, borderBottom: '1px solid black' }}>
               <CustomButton
                 onClick={() => setOpenWrite(true)}
-                sx={{ background: openWrite ? '#b5b5b5' : 'white' }}
-              >
+                sx={{ background: openWrite ? '#b5b5b5' : 'white' }}>
                 {' '}
                 Write{' '}
               </CustomButton>
               <CustomButton
                 onClick={() => setOpenWrite(false)}
-                sx={{ background: !openWrite ? '#b5b5b5' : 'white' }}
-              >
+                sx={{ background: !openWrite ? '#b5b5b5' : 'white' }}>
                 {' '}
                 Preview
               </CustomButton>
@@ -246,8 +262,8 @@ const Add = ({ currentUser }: Props) => {
                 <>
                   <TextField
                     required
-                    id="multiline-flexible"
-                    label="Content"
+                    id='multiline-flexible'
+                    label='Content'
                     multiline
                     fullWidth
                     maxRows={10}
@@ -255,14 +271,24 @@ const Add = ({ currentUser }: Props) => {
                     onChange={handleTextChange}
                   />
                   <CustomButton>
-                    <input type="file" accept="image/*" multiple onChange={handleUpload} />
+                    <input
+                      type='file'
+                      accept='image/*'
+                      name='image'
+                      multiple
+                      onChange={handleUpload}
+                    />
                   </CustomButton>
                 </>
               ) : (
                 <>
                   <ReactMarkdown>{content}</ReactMarkdown>
                   {renderImages.map((image: string | undefined) => (
-                    <img style={{ width: '400px', height: '400px' }} src={image} alt="Uploaded" />
+                    <img
+                      style={{ width: '400px', height: '400px' }}
+                      src={image}
+                      alt='Uploaded'
+                    />
                   ))}
                 </>
               )}
@@ -271,10 +297,13 @@ const Add = ({ currentUser }: Props) => {
         </Content>
       </Block>
       <Fab
-        color="primary"
-        aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' } }}
-      >
+        color='primary'
+        aria-label='check'
+        sx={{
+          color: 'black',
+          background: '#46ECA6',
+          '&:hover': { background: '#18E78F' },
+        }}>
         <CheckIcon onClick={createPost} />
       </Fab>
     </EditContainer>

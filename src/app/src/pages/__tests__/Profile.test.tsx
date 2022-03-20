@@ -1,16 +1,22 @@
-import React from 'react';
-import { unmountComponentAtNode } from 'react-dom';
-import renderer from 'react-test-renderer';
+import React from "react";
+import { unmountComponentAtNode } from "react-dom";
+import renderer from "react-test-renderer";
 
-import Profile from '../Profile';
+import Profile from "../Profile";
 
 let container: any = null;
 //issues with container type and its methods
-const testUser = {"id":"","displayName":"","github":" ","profileImage":" "}
+const testUser = {
+  id: "",
+  displayName: "",
+  github: " ",
+  profileImage: " ",
+  isAdmin: false,
+};
 
 beforeEach(() => {
   // setup a DOM element as a render target
-  container = document?.createElement('div');
+  container = document?.createElement("div");
   document?.body?.appendChild(container);
 });
 
@@ -21,9 +27,9 @@ afterEach(() => {
   container = null;
 });
 
-describe('Profile suite', () => {
-  it('Renders correctly', () => {
-    const tree = renderer.create(<Profile currentUser={testUser}/>).toJSON();
+describe("Profile suite", () => {
+  it("Renders correctly", () => {
+    const tree = renderer.create(<Profile currentUser={testUser} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 });
