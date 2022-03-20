@@ -49,7 +49,7 @@ function App() {
           path="/profile/:id"
           element={<Profile currentUser={currentUser} />}
         />
-        <Route path="/admin" element={currentUser ? <Admin /> : null} />
+        <Route path="/admin" element={currentUser && currentUser.isAdmin ? <Admin /> : <ErrorPage errorType="NotFound" />} />
         <Route path="*" element={<ErrorPage errorType="NotFound" />} />
       </Routes>
     </BrowserRouter>

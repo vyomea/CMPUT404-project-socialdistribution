@@ -161,7 +161,7 @@ export default function AdminAuthorCard({
                             </DialogTitle>
                             <DialogContent>
                             <DialogContentText id="alert-dialog-description">
-                                Delete author from server?
+                                Delete author {author.displayName} from server?
                             </DialogContentText>
                             </DialogContent>
                             <DialogActions>
