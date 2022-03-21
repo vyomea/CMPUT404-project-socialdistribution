@@ -1,4 +1,6 @@
 export default interface Comment {
   id: string;
-  // TODO
+  comment: string;
+  contentType: 'text/markdown' | 'text/plain';
+  published: Date;
 }

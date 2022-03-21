@@ -24,6 +24,7 @@ class Post extends Model {
   declare unlisted: boolean;
   static Author: BelongsTo;
   declare author: Author;
+  declare comments: string;
 }
 
 Post.init(
@@ -108,6 +109,10 @@ Post.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    comments: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
