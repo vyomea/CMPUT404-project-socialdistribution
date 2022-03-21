@@ -48,7 +48,7 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
         image: Buffer.from(req.file.buffer).toString('base64'),
       }),
       content: content,
-      categories: categories ? categories : [],
+      categories: categories ? JSON.parse(categories) : [],
       visibility: visibility,
     });
     author.addPost(post);
@@ -207,7 +207,9 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
       ...(contentType === 'image' && {
         image: Buffer.from(req.file.buffer).toString('base64'),
       }),
-      ...(categories && { categories: categories ? categories : [] }),
+      ...(categories && {
+        categories: categories ? JSON.parse(categories) : [],
+      }),
       ...(visibility && { visibility: visibility }),
     });
   } catch (error) {
