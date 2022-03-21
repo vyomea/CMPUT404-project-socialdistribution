@@ -7,8 +7,8 @@ import db from './db';
 import { authenticate } from './middlewares/auth.middlewares';
 
 import auth from './routes/auth.routes';
-import author from './routes/author.routes';
-import node from './routes/node.routes';
+import authors from './routes/author.routes';
+import nodes from './routes/node.routes';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not set');
@@ -24,8 +24,8 @@ app.use(authenticate);
 
 db.sync({ alter: true }).then(() => {
   app.use(auth);
-  app.use('/authors', author);
-  app.use('/nodes', node);
+  app.use('/authors', authors);
+  app.use('/nodes', nodes);
 
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../../build')));
