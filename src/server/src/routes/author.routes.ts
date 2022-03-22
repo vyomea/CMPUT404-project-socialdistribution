@@ -7,6 +7,7 @@ import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
 
 import posts from './post.routes';
+import followers from './follower.routes';
 
 import {
   getAllAuthors,
@@ -15,7 +16,8 @@ import {
   updateProfile,
 } from '../controllers/author.controllers';
 
-router.use('/:id/posts', posts);
+router.use('/:id/posts', validate([param('id').isUUID()]), posts);
+router.use('/:id/followers', validate([param('id').isUUID()]), followers);
 
 router.get('/', paginate, getAllAuthors);
 router.get('/me', requiredLoggedIn, getCurrentAuthor);
