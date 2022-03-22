@@ -58,7 +58,7 @@ const api = {
   },
 
   /**
-   * Actions on authors.
+   * Actions on nodes.
    */
   nodes: {
     /**
