@@ -145,8 +145,9 @@ const UserPost: React.FC<postItem> = (props?) => {
     setOpen(!open);
   };
 
+  //Navigate to user's profile from userpost
   const HandleNavigation = () => { 
-    navigate(`/profile/${props?.postAuthor?.id}`) 
+    navigate(`/profile/${props?.postAuthor?.id.split('/').pop()}`) 
   };
 
   return (
