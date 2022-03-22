@@ -80,7 +80,7 @@ export default function AdminNodeCard({
                             aria-describedby="alert-dialog-description"
                         >
                             <DialogTitle id="alert-dialog-title">
-                            {"Delete Author"}
+                            {"Delete Node"}
                             </DialogTitle>
                             <DialogContent>
                             <DialogContentText id="alert-dialog-description">
