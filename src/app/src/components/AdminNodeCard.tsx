@@ -1,11 +1,37 @@
 import * as React from "react"
-import { Card, CardContent, Button, Box, Typography} from "@mui/material"
+import { Card, CardContent, Button, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material"
+import Node from "../api/models/Node";
+import api from "../api/api";
 
 export default function AdminNodeCard({
     node,
+    handleNodesChanged
 }: {
-    node: {id:string, username:string}
+    node: Node,
+    handleNodesChanged: any
 }): JSX.Element {
+
+    //Open dialog for deleting a node
+    const [deleteOpen, setDeleteOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setDeleteOpen(true);
+    };
+  
+    const handleClickClose = () => {
+        setDeleteOpen(false);
+    };
+
+    //Handle deleting of node
+    const handleDelete = () => {
+        api.nodes
+        .withId(node.id)
+        .delete()
+        .then(()=>{handleNodesChanged()})
+        .catch((e) => console.log(e.response))
+
+        handleClickClose();
+    };
 
     return (
         <Card 
@@ -43,10 +69,29 @@ export default function AdminNodeCard({
                         width: '50%',
                         alignItems: 'center',
                     }}>
-                        <Button variant="contained" size="large" onClick={()=>alert('Deleted node')}>
+                        <Button variant="contained" size="large" onClick={handleClickOpen}>
                             Delete
                         </Button>
 
+                        <Dialog
+                            open={deleteOpen}
+                            onClose={handleClickClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">
+                            {"Delete Author"}
+                            </DialogTitle>
+                            <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                Delete {node.username} from server?
+                            </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                            <Button onClick={handleClickClose}>Cancel</Button>
+                            <Button onClick={handleDelete} autoFocus>Ok</Button>
+                            </DialogActions>
+                        </Dialog>
                     </Box>
                 </Box>
             </CardContent>
