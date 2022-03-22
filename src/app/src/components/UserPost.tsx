@@ -10,6 +10,7 @@ import Post from '../api/models/Post';
 import { Avatar, Box } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from 'react-markdown';
 
 interface postItem {
   post: Post | undefined;
@@ -218,9 +219,11 @@ const UserPost: React.FC<postItem> = (props?) => {
               ):null}
 
             </TopRowContainer>
-            <ContentContainer>{props?.post?.content}</ContentContainer>
+            <ContentContainer>
+              <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>
+            </ContentContainer>
             <LikesCommentsContainer>
-              <LikesContainer onClick={()=>setLikes(likes+1)} style={{cursor:'pointer'}}>{likes} Likes</LikesContainer>
+              <LikesContainer onClick={() => setLikes(likes + 1)}>{likes} Likes</LikesContainer>
               <CommentsContainer>{props?.post?.count} Comments</CommentsContainer>
             </LikesCommentsContainer>
           </PostDetailsContainer>
