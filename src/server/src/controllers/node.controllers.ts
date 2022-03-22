@@ -28,6 +28,11 @@ const addNode = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
+const getAllNodes = async (req: AuthenticatedRequest, res: Response) => {
+  const nodes = await Node.findAll();
+  res.send(nodes);
+};
+
 const removeNode = async (req: AuthenticatedRequest, res: Response) => {
   const node = await Node.findOne({
     where: { id: req.params.node_id },
@@ -46,4 +51,4 @@ const removeNode = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
-export { addNode, removeNode };
+export { addNode, getAllNodes, removeNode };

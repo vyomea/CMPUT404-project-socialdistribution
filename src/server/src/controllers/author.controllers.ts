@@ -4,7 +4,13 @@ import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 import { getHost } from '../utilities/host';
 
-const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
+const authorPublicAttributes = [
+  'id',
+  'displayName',
+  'github',
+  'profileImage',
+  'isAdmin',
+];
 
 const getAllAuthors = async (req: PaginationRequest, res: Response) => {
   const authors = await Author.findAll({

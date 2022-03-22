@@ -4,8 +4,10 @@ const router = express.Router();
 
 import { validate } from '../middlewares/validator.middlewares';
 
-import { addNode, removeNode } from '../controllers/node.controllers';
+import { addNode, getAllNodes, removeNode } from '../controllers/node.controllers';
 import { adminOnly } from '../middlewares/auth.middlewares';
+
+router.get('/', adminOnly, getAllNodes);
 
 router.post(
   '/',
