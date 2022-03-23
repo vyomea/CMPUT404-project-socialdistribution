@@ -8,7 +8,7 @@ import { unauthorized } from '../handlers/auth.handlers';
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
 const addFollower = async (req: AuthenticatedRequest, res: Response) => {
-  if (req.params.id !== req.authorId) {
+  if (req.params.id !== req.params.foreign_author_id) {
     unauthorized(res);
     return;
   }
