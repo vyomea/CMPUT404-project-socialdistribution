@@ -11,7 +11,7 @@ import { Avatar, Box } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
-
+import api from '../api/api';
 interface postItem {
   post: Post | undefined;
   currentUser: Author | undefined;
@@ -133,6 +133,14 @@ const UserPost: React.FC<postItem> = (props?) => {
   const navigate = useNavigate();
 
   let showButtons = false;
+  const handleDelete = () => {
+       api.authors
+      .withId('' + props.currentUser?.id)
+      .posts.withId('' + props?.post?.id)
+      .delete()
+      .then(()=>props?.handlePostsChanged())
+      .catch((e) => console.log(e.response));
+  }
 
   if((props?.postAuthor && props?.currentUser)&&(props.currentUser.id===props.postAuthor.id)){
     showButtons = true;
@@ -214,7 +222,7 @@ const UserPost: React.FC<postItem> = (props?) => {
               {showButtons?(
                 <EditDeleteButtonContainer>
                   <EditButton onClick={handleToggle}>Edit</EditButton>
-                  <DeleteButton>Delete</DeleteButton>
+                  <DeleteButton onClick={handleDelete}>Delete</DeleteButton>
                 </EditDeleteButtonContainer>
               ):null}
 
