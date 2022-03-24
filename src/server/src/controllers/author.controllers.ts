@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Author from '../models/Author';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
+import { getHost } from '../utilities/host';
 
 const authorPublicAttributes = [
   'id',
@@ -20,7 +21,13 @@ const getAllAuthors = async (req: PaginationRequest, res: Response) => {
   res.send({
     type: 'authors',
     items: authors.map((author) => {
-      return { type: 'author', ...author.toJSON() };
+      return {
+        type: 'author',
+        ...author.toJSON(),
+        id: getHost(req) + req.baseUrl + '/' + author.id,
+        url: getHost(req) + req.baseUrl + '/' + author.id,
+        host: getHost(req) + '/',
+      };
     }),
   });
 };
@@ -34,7 +41,13 @@ const getAuthor = async (req: Request, res: Response) => {
     res.status(404).send();
     return;
   }
-  res.send({ type: 'author', ...author.toJSON() });
+  res.send({
+    type: 'author',
+    ...author.toJSON(),
+    id: getHost(req) + req.baseUrl + '/' + author.id,
+    url: getHost(req) + req.baseUrl + '/' + author.id,
+    host: getHost(req) + '/',
+  });
 };
 
 const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
@@ -46,7 +59,13 @@ const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
     res.status(400).send();
     return;
   }
-  res.send({ type: 'author', ...author.toJSON() });
+  res.send({
+    type: 'author',
+    ...author.toJSON(),
+    id: getHost(req) + req.baseUrl + '/' + author.id,
+    url: getHost(req) + req.baseUrl + '/' + author.id,
+    host: getHost(req) + '/',
+  });
 };
 
 const updateProfile = async (req: Request, res: Response) => {
