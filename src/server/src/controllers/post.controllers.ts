@@ -52,7 +52,7 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
       categories: categories ? JSON.parse(categories) : [],
       visibility: visibility,
     });
-    author.addPost(post);
+    await author.addPost(post);
   } catch (error) {
     console.log(error);
     res.status(500).send({ error: error });
