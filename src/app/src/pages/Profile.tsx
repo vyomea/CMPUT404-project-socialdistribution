@@ -1,20 +1,30 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, IconButton, Avatar, List, Button, Typography } from '@mui/material';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import PersonIcon from '@mui/icons-material/Person';
-import NavBar from '../components/NavBar';
-import Author from '../api/models/Author';
-import Post from '../api/models/Post';
-import UserPost from '../components/UserPost';
-import api from '../api/api';
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import {
+  Box,
+  IconButton,
+  Avatar,
+  List,
+  Button,
+  Typography,
+} from "@mui/material";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import PersonIcon from "@mui/icons-material/Person";
+import NavBar from "../components/NavBar";
+import Author from "../api/models/Author";
+import Post from "../api/models/Post";
+import UserPost from "../components/UserPost";
+import localApi, { makeApi } from "../api/api";
 
 interface Props {
   currentUser?: Author;
 }
 
 export default function Profile({ currentUser }: Props): JSX.Element {
+  const location = useLocation();
+  const node = new URLSearchParams(location.search).get("node");
+
   //Get ID from params
   const { id } = useParams() as { id: string };
 
@@ -22,14 +32,12 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   const [author, setAuthor] = useState<Author | undefined>(undefined);
 
   useEffect(() => {
+    const api = node ? makeApi(node) : localApi;
     api.authors
       .withId(id)
       .get()
-      .then((data) => setAuthor(data))
-      .catch((error) => {
-        console.log('No author');
-      });
-  }, [id]);
+      .then((data) => setAuthor(data));
+  }, [id, node]);
 
   //Get author's posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
@@ -40,14 +48,12 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   };
 
   useEffect(() => {
+    const api = node ? makeApi(node) : localApi;
     api.authors
       .withId(id)
       .posts.list(1, 5)
-      .then((data) => setPosts(data))
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [id,postsChanged]);
+      .then((data) => setPosts(data));
+  }, [id, node, postsChanged]);
 
   // If it's your profle - Edit
   let myProfile = false;
