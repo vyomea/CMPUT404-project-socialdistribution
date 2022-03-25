@@ -37,9 +37,9 @@ export type PostResponse = Omit<Post, "id" | "author"> & {
 };
 
 export const postFromResponse = (data: PostResponse): Post => {
-  const match = /\/posts\/([^/]+)\/?$/.exec(data.id);
+  const match = /\/posts?\/([^/]+)\/?$/.exec(data.id);
   if (match === null) {
-    throw new Error("Invalid post URL");
+    throw new Error(`Invalid post URL ${data.id}`);
   }
   return {
     ...data,

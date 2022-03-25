@@ -220,7 +220,9 @@ const UserPost: React.FC<postItem> = (props?) => {
 
             </TopRowContainer>
             <ContentContainer>
-              <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>
+              <ReactMarkdown>{`${
+                props?.post?.content ?? props?.post?.description
+              }`}</ReactMarkdown>
             </ContentContainer>
             <LikesCommentsContainer>
               <LikesContainer onClick={() => setLikes(likes + 1)}>{likes} Likes</LikesContainer>
