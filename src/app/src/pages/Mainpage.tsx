@@ -68,7 +68,21 @@ export default function Mainpage({ currentUser }: Props) {
   const handlePostsChanged = () => {
     setpostsChanged(!postsChanged);
   };
-
+  const mockPost = {
+      id: "5",
+      title: "title",
+      source: 'www.google.com',
+      origin: 'www.lol.com',
+      description: "description",
+      contentType: "text/markdown",
+      content: "# Lmao",
+      image: undefined,
+      categories: "JSON.stringify(category)",
+      count: 5,
+      published: new Date(),
+      visibility: "visibility",
+      unlisted: "unlisted",
+    };
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
@@ -128,7 +142,15 @@ export default function Mainpage({ currentUser }: Props) {
       ) : (
         <MainPageContentContainer>
           <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
-            {posts?.map((post) => (
+            <UserPost
+                post={mockPost}
+                currentUser={currentUser}
+                postAuthor={currentUser}
+                likes={0}
+                handlePostsChanged={handlePostsChanged}
+                key={mockPost.id}
+              />
+            {/* {posts?.map((post) => (
               <UserPost
                 post={post}
                 currentUser={currentUser}
@@ -137,7 +159,7 @@ export default function Mainpage({ currentUser }: Props) {
                 handlePostsChanged={handlePostsChanged}
                 key={post.id}
               />
-            ))}
+            ))} */}
           </List>
           <GitContainer>
             <Github username={currentUser?.displayName} />

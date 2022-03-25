@@ -16,7 +16,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
 interface postItem {
-  post: Post | undefined;
+  post: any | Post | undefined;
   currentUser: Author | undefined;
   postAuthor: Author | undefined;
   likes: number;
@@ -137,9 +137,11 @@ const UserPost: React.FC<postItem> = (props?) => {
   const navigate = useNavigate();
 
   const handleLikes = () => {
+    debugger;
     setLiked(!liked);
+    
     likes < 0 ? setLikes(0) : setLikes(likes);
-    !liked ? setLikes(likes + 1) : setLikes(likes - 1);
+    liked ? setLikes(likes + 1) : setLikes(likes - 1 > 0? likes - 1 : 0 );
   }
   let showButtons = false;
   const handleDelete = () => {
@@ -240,7 +242,7 @@ const UserPost: React.FC<postItem> = (props?) => {
               <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>
             </ContentContainer>
             <LikesCommentsContainer>
-              <LikesContainer onClick={handleLikes}>{likes} { !liked ? <FavoriteBorderIcon/> : <FavoriteIcon sx={{color:"red"}}/> }
+              <LikesContainer onClick={handleLikes}>{likes} { liked ? <FavoriteBorderIcon/> : <FavoriteIcon sx={{color:"red"}}/> }
               </LikesContainer>
               <CommentsContainer>{props?.post?.count} Comments</CommentsContainer>
             </LikesCommentsContainer>
