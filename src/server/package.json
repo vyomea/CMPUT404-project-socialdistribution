@@ -9,7 +9,7 @@
     "create-admin": "tsc && node dist/src/create-admin.js",
     "lint": "eslint src/ --ext .ts",
     "format": "prettier --write ./src",
-    "test": "jest"
+    "test": "jest --no-cache --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/multer": "^1.4.7",
     "@types/node": "^17.0.21",
+    "@types/supertest": "^2.0.12",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
@@ -52,6 +53,12 @@
     "testEnvironment": "node",
     "coveragePathIgnorePatterns": [
       "/node_modules/"
+    ],
+    "testPathIgnorePatterns": [
+      "/dist/"
+    ],
+    "setupFilesAfterEnv": [
+      "./src/db.ts"
     ]
   }
 }
