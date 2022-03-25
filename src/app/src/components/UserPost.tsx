@@ -12,6 +12,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import api from '../api/api';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+
 interface postItem {
   post: Post | undefined;
   currentUser: Author | undefined;
@@ -130,8 +133,14 @@ const cursorStyle = {
 const UserPost: React.FC<postItem> = (props?) => {
   const [open, setOpen] = React.useState(false);
   const [likes, setLikes] = React.useState(props?.likes);
+  const [liked, setLiked] = React.useState(false);
   const navigate = useNavigate();
 
+  const handleLikes = () => {
+    setLiked(!liked);
+    likes < 0 ? setLikes(0) : setLikes(likes);
+    !liked ? setLikes(likes + 1) : setLikes(likes - 1);
+  }
   let showButtons = false;
   const handleDelete = () => {
        api.authors
@@ -231,7 +240,8 @@ const UserPost: React.FC<postItem> = (props?) => {
               <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>
             </ContentContainer>
             <LikesCommentsContainer>
-              <LikesContainer onClick={() => setLikes(likes + 1)}>{likes} Likes</LikesContainer>
+              <LikesContainer onClick={handleLikes}>{likes} { !liked ? <FavoriteBorderIcon/> : <FavoriteIcon sx={{color:"red"}}/> }
+              </LikesContainer>
               <CommentsContainer>{props?.post?.count} Comments</CommentsContainer>
             </LikesCommentsContainer>
           </PostDetailsContainer>
