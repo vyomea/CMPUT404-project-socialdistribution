@@ -3,6 +3,7 @@ import Author from './models/Author';
 import Comment from './models/Comment';
 import Like from './models/Like';
 import Post from './models/Post';
+import Node from './models/Node';
 
 const axios = Axios.create({
   baseURL:
@@ -54,6 +55,40 @@ const api = {
    */
   logout: () => {
     localStorage.removeItem('token');
+  },
+
+  /**
+   * Actions on nodes.
+   */
+  nodes: {
+    /**
+    * Fetches a list of all nodes on the server.
+    * @returns a list of nodes
+    */
+    list: async (): Promise<Node[]> =>
+      (await axios.get(`/nodes`)).data,
+    
+    /**
+     * Creates a node.
+     * @param username the username of the node.
+     * @param password the password of the node.
+     * @returns TODO
+     */
+    create: async (username:string, password:string): Promise<unknown> =>
+      (await axios.post(`/nodes`,{username,password})).data,
+
+    /**
+     * Actions on the node with ID `nodeId`.
+     */
+    withId: (nodeId:string) => ({
+      /**
+       * Deletes the node.
+       * @returns TODO
+       */
+      delete: async (): Promise<unknown> =>
+        (await axios.delete(`/nodes/${nodeId}`)).data
+    })
+
   },
 
   /**
