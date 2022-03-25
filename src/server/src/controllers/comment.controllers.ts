@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import Author from '../models/Author';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { AuthenticatedRequest } from '../types/auth';
@@ -16,43 +15,24 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
     }
   }
 
-  const {
-    title,
-    description,
-    source,
-    origin,
-    contentType,
-    content,
-    categories,
-    visibility,
-  } = req.body;
+  const { commentStr, contentType } = req.body;
 
-  const author = await Author.findOne({
+  const post = await Post.findOne({
     where: {
-      id: req.params.id,
+      id: req.params.post_id,
     },
   });
-  if (author === null) {
+  if (post === null) {
     res.status(404).send();
     return;
   }
   try {
-    const post = await Post.create({
-      ...(req.params.post_id && { id: req.params.post_id }),
-      title: title,
-      description: description,
-      source: source,
-      origin: origin,
-      contentType:
-        contentType === 'image' ? `${req.file.mimetype};base64` : contentType,
-      ...(contentType === 'image' && {
-        image: Buffer.from(req.file.buffer).toString('base64'),
-      }),
-      content: content,
-      categories: categories ? categories : [],
-      visibility: visibility,
+    const comment = await Comment.create({
+      ...(req.params.comment_id && { id: req.params.comment_id }),
+      comment: commentStr,
+      contentType: contentType,
     });
-    author.addPost(post);
+    post.addComment(comment);
   } catch (error) {
     console.log(error);
     res.status(500).send({ error: error });
@@ -62,167 +42,86 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
-const deleteAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
-  const post = await Post.findOne({
-    where: { id: req.params.post_id, author_id: req.params.id },
-    include: { model: Author, as: 'author' },
-  });
-  if (post === null) {
-    res.status(404).send();
-    return;
-  }
-  try {
-    await post.destroy();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: error });
-    return;
-  }
-  res.status(200).send();
-};
 
-const getAuthorPost = async (req: Request, res: Response) => {
-  const post = await Post.findOne({
-    attributes: [
-      'id',
-      'title',
-      'source',
-      'origin',
-      'description',
-      'contentType',
-      'content',
-      'categories',
-      'count',
-      'published',
-      'visibility',
-      'unlisted',
-    ],
+const getPostComment = async (req: Request, res: Response) => {
+  const comment = await Comment.findOne({
+    attributes: ['comment', 'contentType', 'published', 'id'],
     where: {
-      id: req.params.post_id,
-      author_id: req.params.id,
+      id: req.params.comment_id,
+      post_id: req.params.post_id,
     },
     include: {
-      model: Author,
-      attributes: ['id', 'displayName', 'github', 'profileImage'],
-      as: 'author',
+      model: Post,
+      attributes: [
+        'id',
+        'title',
+        'source',
+        'origin',
+        'description',
+        'contentType',
+        'content',
+        'categories',
+        'count',
+        'published',
+        'visibility',
+        'unlisted',
+      ],
+      as: 'post',
     },
   });
-  if (post === null) {
+  if (comment === null) {
     res.status(404).send();
     return;
   }
   res.send({
-    type: 'post',
-    ...post.toJSON(),
-    author: { type: 'author', ...post.toJSON().author },
+    type: 'comment',
+    ...comment.toJSON(),
+    post: { type: 'post', ...comment.toJSON().post },
   });
 };
 
-const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
-  const posts = await Post.findAll({
-    attributes: [
-      'id',
-      'title',
-      'source',
-      'origin',
-      'description',
-      'contentType',
-      'content',
-      'categories',
-      'count',
-      'published',
-      'visibility',
-      'unlisted',
-    ],
+const getPostComments = async (req: PaginationRequest, res: Response) => {
+  const comments = await Comment.findAll({
+    attributes: ['comment', 'contentType', 'published', 'id'],
     where: {
-      author_id: req.params.id,
+      post_id: req.params.post_id,
     },
     include: {
-      model: Author,
-      attributes: ['id', 'displayName', 'github', 'profileImage'],
-      as: 'author',
+      model: Post,
+      attributes: [
+        'id',
+        'title',
+        'source',
+        'origin',
+        'description',
+        'contentType',
+        'content',
+        'categories',
+        'count',
+        'published',
+        'visibility',
+        'unlisted',
+      ],
+      as: 'post',
     },
     offset: req.offset,
     limit: req.limit,
   });
   res.send({
-    type: 'posts',
-    items: posts.map((post) => {
+    type: 'comments',
+    items: comments.map((comment) => {
       return {
-        type: 'post',
-        ...post.toJSON(),
-        author: { type: 'author', ...post.toJSON().author },
+        type: 'comment',
+        ...comment.toJSON(),
+        author: { type: 'post', ...comment.toJSON().post },
       };
     }),
   });
 };
 
-const getPostImage = async (req: Request, res: Response) => {
-  const post = await Post.findOne({
-    attributes: ['contentType', 'image'],
-    where: {
-      id: req.params.post_id,
-      author_id: req.params.id,
-    },
-  });
-  if (post === null || !post.contentType.includes('image')) {
-    res.sendStatus(404);
-    return;
-  }
-  const image = Buffer.from(post.image.toString(), 'base64');
-  res.setHeader('Content-Type', post.contentType.split(';')[0]);
-  res.setHeader('Content-Length', image.byteLength);
-  res.send(image);
-};
-
-const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
-  const post = await Post.findOne({
-    where: { id: req.params.post_id, author_id: req.params.id },
-  });
-  if (post === null) {
-    res.status(404).send();
-    return;
-  }
-  const {
-    title,
-    description,
-    source,
-    origin,
-    contentType,
-    content,
-    categories,
-    visibility,
-  } = req.body;
-
-  try {
-    await post.update({
-      ...(title && { title: title }),
-      ...(description && { description: description }),
-      ...(source && { source: source }),
-      ...(origin && { origin: origin }),
-      ...(contentType && {
-        contentType:
-          contentType === 'image' ? `${req.file.mimetype};base64` : contentType,
-      }),
-      ...(content && { content: content }),
-      ...(contentType === 'image' && {
-        image: Buffer.from(req.file.buffer).toString('base64'),
-      }),
-      ...(categories && { categories: categories ? categories : [] }),
-      ...(visibility && { visibility: visibility }),
-    });
-  } catch (error) {
-    res.status(500).send({ error: error });
-    return;
-  }
-  res.status(200).send();
-};
 
 export {
-  createPost,
-  deleteAuthorPost,
-  getAuthorPost,
-  getAuthorPosts,
-  getPostImage,
-  updateAuthorPost,
+  createComment,
+  getPostComment,
+  getPostComments,
 };

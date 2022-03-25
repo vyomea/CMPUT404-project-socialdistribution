@@ -2,6 +2,7 @@ import { BelongsTo, DataTypes, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
+import Comment from './Comment';
 
 class Post extends Model {
   declare id: typeof uuidv4;
@@ -25,6 +26,7 @@ class Post extends Model {
   static Author: BelongsTo;
   declare author: Author;
   declare comments: string;
+  declare addComment: (comment: Comment) => void;
 }
 
 Post.init(
