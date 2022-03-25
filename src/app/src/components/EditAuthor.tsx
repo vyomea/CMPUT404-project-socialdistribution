@@ -69,6 +69,7 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
 
   const handleEdit = () => {
     const author = {
+      type: data.type,
       id: data.id,
       displayName: displayName,
       github: ((github.trim()==="")||(github.trim().length===0))?undefined:github,
