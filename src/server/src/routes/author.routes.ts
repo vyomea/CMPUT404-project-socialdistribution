@@ -32,7 +32,6 @@ router.post(
     body('displayName').isString().optional(),
     body('github').isURL().optional(),
     body('profileImage').isURL().optional(),
-    body('isAdmin').isBoolean().optional(),
   ]),
   updateProfile
 );

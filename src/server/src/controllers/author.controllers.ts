@@ -69,7 +69,7 @@ const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 const updateProfile = async (req: Request, res: Response) => {
-  const { email, displayName, github, profileImage, isAdmin } = req.body;
+  const { email, displayName, github, profileImage } = req.body;
   const author = await Author.findOne({ where: { id: req.params.id } });
   if (author === null) {
     res.status(404).send();
@@ -82,7 +82,6 @@ const updateProfile = async (req: Request, res: Response) => {
       ...(displayName && { displayName: displayName }),
       ...(github && { github: github }),
       ...(profileImage && { profileImage: profileImage }),
-      ...(isAdmin && { isAdmin: isAdmin }),
     });
   } catch (error) {
     console.error(error);
