@@ -20,458 +20,469 @@ import InboxItem, {
 import Like, { likeFromResponse, LikeResponse } from "./models/Like";
 import Node from "./models/Node";
 
-const baseUrl =
+const localBaseUrl =
   process.env.NODE_ENV === "development" ? "http://localhost:3001" : "/";
 
-const axios = Axios.create({
-  baseURL: baseUrl,
-});
+export const makeApi = (baseUrl: string) => {
+  const axios = Axios.create({
+    baseURL: baseUrl,
+  });
 
-axios.interceptors.request.use((config) => {
-  config.headers = config.headers || {};
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
-  return config;
-});
-
-const api = {
-  /**
-   * Log into an existing author's account.
-   * @returns the author
-   */
-  login: async (email: string, password: string): Promise<Author> => {
-    const result = await axios.post("/login", { email, password });
-    localStorage.setItem("token", result.data.token);
-    return result.data.author;
-  },
-
-  /**
-   * Register and log into a new author's account.
-   * @returns the new author
-   */
-  register: async (
-    email: string,
-    password: string,
-    displayName: string
-  ): Promise<Author> => {
-    const result = await axios.post("/register", {
-      email,
-      password,
-      displayName,
+  if (baseUrl === localBaseUrl) {
+    axios.interceptors.request.use((config) => {
+      config.headers = config.headers || {};
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+      }
+      return config;
     });
-    localStorage.setItem("token", result.data.token);
-    return result.data.author;
-  },
+  }
 
-  /**
-   * Log out of the current author's account.
-   */
-  logout: () => {
-    localStorage.removeItem("token");
-  },
-
-  /**
-   * Get an Author, Post, Comment, or Comments by its URL.
-   * @param url the URL to the object
-   * @returns the object
-   */
-  getObjectFromUrl: async (
-    url: string
-  ): Promise<Author | Post | Comment | Comment[]> => {
-    const responseData = (
-      await axios.get<
-        AuthorResponse | PostResponse | CommentResponse | CommentsResponse
-      >(url)
-    ).data;
-    if (responseData.type === "author") {
-      return authorFromResponse(responseData);
-    } else if (responseData.type === "post") {
-      return postFromResponse(responseData);
-    } else if (responseData.type === "comment") {
-      return commentFromResponse(responseData);
-    } else if (responseData.type === "comments") {
-      return commentsFromResponse(responseData);
-    } else {
-      throw new Error("Invalid object type");
-    }
-  },
-
-  /**
-   * Actions on nodes.
-   */
-  nodes: {
+  return {
     /**
-     * Fetches a list of all nodes on the server.
-     * @returns a list of nodes
+     * Log into an existing author's account.
+     * @returns the author
      */
-    list: async (): Promise<Node[]> => (await axios.get(`/nodes`)).data,
+    login: async (email: string, password: string): Promise<Author> => {
+      const result = await axios.post("/login", { email, password });
+      localStorage.setItem("token", result.data.token);
+      return result.data.author;
+    },
 
     /**
-     * Creates a node.
-     * @param username the username of the node.
-     * @param password the password of the node.
-     * @returns TODO
+     * Register and log into a new author's account.
+     * @returns the new author
      */
-    create: async (username: string, password: string): Promise<unknown> =>
-      (await axios.post(`/nodes`, { username, password })).data,
+    register: async (
+      email: string,
+      password: string,
+      displayName: string
+    ): Promise<Author> => {
+      const result = await axios.post("/register", {
+        email,
+        password,
+        displayName,
+      });
+      localStorage.setItem("token", result.data.token);
+      return result.data.author;
+    },
 
     /**
-     * Actions on the node with ID `nodeId`.
+     * Log out of the current author's account.
      */
-    withId: (nodeId: string) => ({
+    logout: () => {
+      localStorage.removeItem("token");
+    },
+
+    /**
+     * Get an Author, Post, Comment, or Comments by its URL.
+     * @param url the URL to the object
+     * @returns the object
+     */
+    getObjectFromUrl: async (
+      url: string
+    ): Promise<Author | Post | Comment | Comment[]> => {
+      const responseData = (
+        await axios.get<
+          AuthorResponse | PostResponse | CommentResponse | CommentsResponse
+        >(url)
+      ).data;
+      if (responseData.type === "author") {
+        return authorFromResponse(responseData);
+      } else if (responseData.type === "post") {
+        return postFromResponse(responseData);
+      } else if (responseData.type === "comment") {
+        return commentFromResponse(responseData);
+      } else if (responseData.type === "comments") {
+        return commentsFromResponse(responseData);
+      } else {
+        throw new Error("Invalid object type");
+      }
+    },
+
+    /**
+     * Actions on nodes.
+     */
+    nodes: {
       /**
-       * Deletes the node.
+       * Fetches a list of all nodes on the server.
+       * @returns a list of nodes
+       */
+      list: async (): Promise<Node[]> => (await axios.get(`/nodes`)).data,
+
+      /**
+       * Creates a node.
+       * @param username the username of the node.
+       * @param password the password of the node.
        * @returns TODO
        */
-      delete: async (): Promise<unknown> =>
-        (await axios.delete(`/nodes/${nodeId}`)).data,
-    }),
-  },
+      create: async (username: string, password: string): Promise<unknown> =>
+        (await axios.post(`/nodes`, { username, password })).data,
 
-  /**
-   * Actions on authors.
-   */
-  authors: {
-    /**
-     * Fetches a paginated list of all authors on the server.
-     * @param page the page to return
-     * @param size the number of authors per page
-     * @returns a list of authors
-     */
-    list: async (page?: number, size?: number): Promise<Author[]> =>
-      (
-        await axios.get<{ items: AuthorResponse[] }>("/authors", {
-          params: { page, size },
-        })
-      ).data.items.map(authorFromResponse),
-
-    /**
-     * Gets data about the currently logged-in author.
-     */
-    getCurrent: async (): Promise<Author> =>
-      authorFromResponse((await axios.get<AuthorResponse>("/authors/me")).data),
-
-    /**
-     * Actions on the author with ID `authorId`.
-     */
-    withId: (authorId: string) => ({
       /**
-       * Fetches the profile of the author.
-       * @returns profile of the author
+       * Actions on the node with ID `nodeId`.
        */
-      get: async (): Promise<Author> =>
+      withId: (nodeId: string) => ({
+        /**
+         * Deletes the node.
+         * @returns TODO
+         */
+        delete: async (): Promise<unknown> =>
+          (await axios.delete(`/nodes/${nodeId}`)).data,
+      }),
+    },
+
+    /**
+     * Actions on authors.
+     */
+    authors: {
+      /**
+       * Fetches a paginated list of all authors on the server.
+       * @param page the page to return
+       * @param size the number of authors per page
+       * @returns a list of authors
+       */
+      list: async (page?: number, size?: number): Promise<Author[]> =>
+        (
+          await axios.get<{ items: AuthorResponse[] }>("/authors", {
+            params: { page, size },
+          })
+        ).data.items.map(authorFromResponse),
+
+      /**
+       * Gets data about the currently logged-in author.
+       */
+      getCurrent: async (): Promise<Author> =>
         authorFromResponse(
-          (await axios.get<AuthorResponse>(`/authors/${authorId}`)).data
+          (await axios.get<AuthorResponse>("/authors/me")).data
         ),
 
       /**
-       * Updates the profile of the author.
-       * @param author the new profile data of the author
-       * @returns TODO
+       * Actions on the author with ID `authorId`.
        */
-      update: async (author: Author): Promise<unknown> =>
-        (
-          await axios.post(
-            `/authors/${authorId}`,
-            authorToRequest(author, baseUrl)
-          )
-        ).data,
-
-      /**
-       * Actions relating to the author's inbox.
-       */
-      inbox: {
+      withId: (authorId: string) => ({
         /**
-         * Fetches a paginated list of items in the author's inbox.
-         * @param page the page to return
-         * @param size the number of authors per page
-         * @returns a list of items in the inbox
+         * Fetches the profile of the author.
+         * @returns profile of the author
          */
-        list: async (page?: number, size?: number): Promise<InboxItem[]> =>
-          (
-            await axios.get<{ items: InboxItemResponse[] }>(
-              `/authors/${authorId}/inbox`,
-              {
-                params: { page, size },
-              }
-            )
-          ).data.items.map(inboxItemFromResponse),
+        get: async (): Promise<Author> =>
+          authorFromResponse(
+            (await axios.get<AuthorResponse>(`/authors/${authorId}`)).data
+          ),
 
         /**
-         * Send an item to the author's inbox.
+         * Updates the profile of the author.
+         * @param author the new profile data of the author
          * @returns TODO
          */
-        send: async (item: InboxItem): Promise<unknown> =>
+        update: async (author: Author): Promise<unknown> =>
           (
             await axios.post(
-              `/authors/${authorId}/inbox`,
-              inboxItemToRequest(item, baseUrl)
+              `/authors/${authorId}`,
+              authorToRequest(author, baseUrl)
             )
           ).data,
 
         /**
-         * Clear the author's inbox.
-         * @returns TODO
+         * Actions relating to the author's inbox.
          */
-        clear: async (): Promise<unknown> =>
-          (await axios.delete(`/authors/${authorId}/inbox`)).data,
-      },
-
-      /**
-       * Actions relating to the author's likes.
-       */
-      likes: {
-        /**
-         * Fetches a list of items the author has liked.
-         */
-        list: async (): Promise<(Post | Comment)[]> => {
-          const items = (
-            await axios.get<{
-              items: (PostResponse | CommentResponse)[];
-            }>(`/authors/${authorId}/likes`)
-          ).data.items;
-          return items.map((itemData) => {
-            if (itemData.type === "post") {
-              return postFromResponse(itemData);
-            } else if (itemData.type === "comment") {
-              return commentFromResponse(itemData);
-            }
-            throw new Error(`Unknown item type ${(itemData as any)?.type}`);
-          });
-        },
-      },
-
-      /**
-       * Actions on the existing or potential followers of this author.
-       */
-      followers: {
-        /**
-         * Lists the followers of the author.
-         * @returns a list of the profiles of the followers
-         */
-        list: async (): Promise<Author[]> =>
-          (
-            await axios.get<{ items: AuthorResponse[] }>(
-              `/authors/${authorId}/followers`
-            )
-          ).data.items.map(authorFromResponse),
-
-        /**
-         * Actions on the existing or potential follower with ID `followerId` of the author.
-         */
-        withId: (followerId: string) => ({
+        inbox: {
           /**
-           * Checks if this author is in fact a follower.
-           * @returns true if this author is a follower, false otherwise
+           * Fetches a paginated list of items in the author's inbox.
+           * @param page the page to return
+           * @param size the number of authors per page
+           * @returns a list of items in the inbox
            */
-          isAFollower: async (): Promise<boolean> =>
+          list: async (page?: number, size?: number): Promise<InboxItem[]> =>
             (
-              await axios.get<boolean>(
-                `/authors/${authorId}/followers/${followerId}`
+              await axios.get<{ items: InboxItemResponse[] }>(
+                `/authors/${authorId}/inbox`,
+                {
+                  params: { page, size },
+                }
+              )
+            ).data.items.map(inboxItemFromResponse),
+
+          /**
+           * Send an item to the author's inbox.
+           * @returns TODO
+           */
+          send: async (item: InboxItem): Promise<unknown> =>
+            (
+              await axios.post(
+                `/authors/${authorId}/inbox`,
+                inboxItemToRequest(item, baseUrl)
               )
             ).data,
 
           /**
-           * Makes this author a follower.
+           * Clear the author's inbox.
            * @returns TODO
            */
-          follow: async (): Promise<unknown> =>
-            (await axios.put(`/authors/${authorId}/followers/${followerId}`))
-              .data,
+          clear: async (): Promise<unknown> =>
+            (await axios.delete(`/authors/${authorId}/inbox`)).data,
+        },
 
-          /**
-           * Makes this author not a follower.
-           * @returns TODO
-           */
-          unfollow: async (): Promise<unknown> =>
-            (await axios.delete(`/authors/${authorId}/followers/${followerId}`))
-              .data,
-        }),
-      },
-
-      /**
-       * Actions on the posts of this author.
-       */
-      posts: {
         /**
-         * Fetches a paginated list of posts by this author.
-         * @param page the page to return
-         * @param size the number of posts per page
-         * @returns a list of posts
+         * Actions relating to the author's likes.
          */
-        list: async (page?: number, size?: number): Promise<Post[]> =>
-          (
-            await axios.get<{ items: PostResponse[] }>(
-              `/authors/${authorId}/posts`,
-              {
-                params: { page, size },
+        likes: {
+          /**
+           * Fetches a list of items the author has liked.
+           */
+          list: async (): Promise<(Post | Comment)[]> => {
+            const items = (
+              await axios.get<{
+                items: (PostResponse | CommentResponse)[];
+              }>(`/authors/${authorId}/likes`)
+            ).data.items;
+            return items.map((itemData) => {
+              if (itemData.type === "post") {
+                return postFromResponse(itemData);
+              } else if (itemData.type === "comment") {
+                return commentFromResponse(itemData);
               }
-            )
-          ).data.items.map(postFromResponse),
-
-        /**
-         * Creates a post with a random ID.
-         * @param data the data of the post
-         * @returns TODO
-         */
-        create: async (data: FormData): Promise<unknown> =>
-          (await axios.post(`/authors/${authorId}/posts`, data)).data,
-
-        /**
-         * Actions on the post with ID `postId`.
-         */
-        withId: (postId: string) => ({
-          /**
-           * Fetches the post.
-           * @returns the post
-           */
-          get: async (): Promise<Post> =>
-            postFromResponse(
-              (
-                await axios.get<PostResponse>(
-                  `/authors/${authorId}/posts/${postId}`
-                )
-              ).data
-            ),
-
-          /**
-           * Updates the post with new data.
-           * @param data the data to update the post with
-           * @returns TODO
-           */
-          update: async (data: FormData): Promise<unknown> =>
-            (await axios.post(`/authors/${authorId}/posts/${postId}`, data))
-              .data,
-
-          /**
-           * Creates the post.
-           * @param data the data of the post
-           * @returns TODO
-           */
-          create: async (data: FormData): Promise<unknown> =>
-            (await axios.put(`/authors/${authorId}/posts/${postId}`, data))
-              .data,
-
-          /**
-           * Deletes the post.
-           * @returns TODO
-           */
-          delete: async (): Promise<unknown> =>
-            (await axios.delete(`/authors/${authorId}/posts/${postId}`)).data,
-
-          /**
-           * Fetches the image of this post.
-           * @returns the image of this post if it exists
-           */
-          image: async (): Promise<Post> =>
-            postFromResponse(
-              (
-                await axios.get<PostResponse>(
-                  `/authors/${authorId}/posts/${postId}/image`
-                )
-              ).data
-            ),
-
-          /**
-           * Actions relating to likes on the post.
-           */
-          likes: {
-            /**
-             * List the likes on this post.
-             * @returns a list of the likes on the post
-             */
-            list: async (): Promise<Like[]> =>
-              (
-                await axios.get<{ items: LikeResponse[] }>(
-                  `/authors/${authorId}/posts/${postId}/likes`
-                )
-              ).data.items.map(likeFromResponse),
-
-            /**
-             * Like the post.
-             * @returns TODO
-             */
-            like: async (): Promise<unknown> =>
-              await axios.post(
-                `/authors/${authorId}/inbox`,
-                (() => {
-                  throw new Error("not implemented");
-                })()
-              ),
+              throw new Error(`Unknown item type ${(itemData as any)?.type}`);
+            });
           },
+        },
+
+        /**
+         * Actions on the existing or potential followers of this author.
+         */
+        followers: {
+          /**
+           * Lists the followers of the author.
+           * @returns a list of the profiles of the followers
+           */
+          list: async (): Promise<Author[]> =>
+            (
+              await axios.get<{ items: AuthorResponse[] }>(
+                `/authors/${authorId}/followers`
+              )
+            ).data.items.map(authorFromResponse),
 
           /**
-           * Actions on the comments of this post.
+           * Actions on the existing or potential follower with ID `followerId` of the author.
            */
-          comments: {
+          withId: (followerId: string) => ({
             /**
-             * Gets a paginated list of comments on this post.
-             * @param page the page number
-             * @param size the number of comments per page
-             * @returns a list of comments in the page
+             * Checks if this author is in fact a follower.
+             * @returns true if this author is a follower, false otherwise
              */
-            list: async (page?: number, size?: number): Promise<Comment[]> =>
+            isAFollower: async (): Promise<boolean> =>
               (
-                await axios.get<{ items: CommentResponse[] }>(
-                  `/authors/${authorId}/posts/${postId}/comments`,
-                  {
-                    params: { page, size },
-                  }
-                )
-              ).data.items.map(commentFromResponse),
-
-            /**
-             * Creates a comment on the post with a random ID.
-             * @param comment the comment data
-             * @returns TODO
-             */
-            create: async (comment: Comment): Promise<unknown> =>
-              (
-                await axios.post(
-                  `/authors/${authorId}/posts/${postId}/comments`,
-                  commentToRequest(comment, baseUrl)
+                await axios.get<boolean>(
+                  `/authors/${authorId}/followers/${followerId}`
                 )
               ).data,
 
             /**
-             * Actions on the comment with ID `commentId`.
+             * Makes this author a follower.
+             * @returns TODO
              */
-            withId: (commentId: string) => ({
-              /**
-               * Actions relating to likes on the comment.
-               */
-              likes: {
-                /**
-                 * List the likes on this post.
-                 * @returns a list of the likes on the post
-                 */
-                list: async (): Promise<Like[]> =>
-                  (
-                    await axios.get<{ items: LikeResponse[] }>(
-                      `/authors/${authorId}/posts/${postId}/comments/${commentId}/likes`
-                    )
-                  ).data.items,
+            follow: async (): Promise<unknown> =>
+              (await axios.put(`/authors/${authorId}/followers/${followerId}`))
+                .data,
 
-                /**
-                 * Like the post.
-                 * @returns TODO
-                 */
-                like: async (): Promise<unknown> =>
+            /**
+             * Makes this author not a follower.
+             * @returns TODO
+             */
+            unfollow: async (): Promise<unknown> =>
+              (
+                await axios.delete(
+                  `/authors/${authorId}/followers/${followerId}`
+                )
+              ).data,
+          }),
+        },
+
+        /**
+         * Actions on the posts of this author.
+         */
+        posts: {
+          /**
+           * Fetches a paginated list of posts by this author.
+           * @param page the page to return
+           * @param size the number of posts per page
+           * @returns a list of posts
+           */
+          list: async (page?: number, size?: number): Promise<Post[]> =>
+            (
+              await axios.get<{ items: PostResponse[] }>(
+                `/authors/${authorId}/posts`,
+                {
+                  params: { page, size },
+                }
+              )
+            ).data.items.map(postFromResponse),
+
+          /**
+           * Creates a post with a random ID.
+           * @param data the data of the post
+           * @returns TODO
+           */
+          create: async (data: FormData): Promise<unknown> =>
+            (await axios.post(`/authors/${authorId}/posts`, data)).data,
+
+          /**
+           * Actions on the post with ID `postId`.
+           */
+          withId: (postId: string) => ({
+            /**
+             * Fetches the post.
+             * @returns the post
+             */
+            get: async (): Promise<Post> =>
+              postFromResponse(
+                (
+                  await axios.get<PostResponse>(
+                    `/authors/${authorId}/posts/${postId}`
+                  )
+                ).data
+              ),
+
+            /**
+             * Updates the post with new data.
+             * @param data the data to update the post with
+             * @returns TODO
+             */
+            update: async (data: FormData): Promise<unknown> =>
+              (await axios.post(`/authors/${authorId}/posts/${postId}`, data))
+                .data,
+
+            /**
+             * Creates the post.
+             * @param data the data of the post
+             * @returns TODO
+             */
+            create: async (data: FormData): Promise<unknown> =>
+              (await axios.put(`/authors/${authorId}/posts/${postId}`, data))
+                .data,
+
+            /**
+             * Deletes the post.
+             * @returns TODO
+             */
+            delete: async (): Promise<unknown> =>
+              (await axios.delete(`/authors/${authorId}/posts/${postId}`)).data,
+
+            /**
+             * Fetches the image of this post.
+             * @returns the image of this post if it exists
+             */
+            image: async (): Promise<Post> =>
+              postFromResponse(
+                (
+                  await axios.get<PostResponse>(
+                    `/authors/${authorId}/posts/${postId}/image`
+                  )
+                ).data
+              ),
+
+            /**
+             * Actions relating to likes on the post.
+             */
+            likes: {
+              /**
+               * List the likes on this post.
+               * @returns a list of the likes on the post
+               */
+              list: async (): Promise<Like[]> =>
+                (
+                  await axios.get<{ items: LikeResponse[] }>(
+                    `/authors/${authorId}/posts/${postId}/likes`
+                  )
+                ).data.items.map(likeFromResponse),
+
+              /**
+               * Like the post.
+               * @returns TODO
+               */
+              like: async (): Promise<unknown> =>
+                await axios.post(
+                  `/authors/${authorId}/inbox`,
+                  (() => {
+                    throw new Error("not implemented");
+                  })()
+                ),
+            },
+
+            /**
+             * Actions on the comments of this post.
+             */
+            comments: {
+              /**
+               * Gets a paginated list of comments on this post.
+               * @param page the page number
+               * @param size the number of comments per page
+               * @returns a list of comments in the page
+               */
+              list: async (page?: number, size?: number): Promise<Comment[]> =>
+                (
+                  await axios.get<{ items: CommentResponse[] }>(
+                    `/authors/${authorId}/posts/${postId}/comments`,
+                    {
+                      params: { page, size },
+                    }
+                  )
+                ).data.items.map(commentFromResponse),
+
+              /**
+               * Creates a comment on the post with a random ID.
+               * @param comment the comment data
+               * @returns TODO
+               */
+              create: async (comment: Comment): Promise<unknown> =>
+                (
                   await axios.post(
-                    `/authors/${authorId}/inbox`,
-                    (() => {
-                      throw new Error("not implemented");
-                    })()
-                  ),
-              },
-            }),
-          },
-        }),
-      },
-    }),
-  },
+                    `/authors/${authorId}/posts/${postId}/comments`,
+                    commentToRequest(comment, baseUrl)
+                  )
+                ).data,
+
+              /**
+               * Actions on the comment with ID `commentId`.
+               */
+              withId: (commentId: string) => ({
+                /**
+                 * Actions relating to likes on the comment.
+                 */
+                likes: {
+                  /**
+                   * List the likes on this post.
+                   * @returns a list of the likes on the post
+                   */
+                  list: async (): Promise<Like[]> =>
+                    (
+                      await axios.get<{ items: LikeResponse[] }>(
+                        `/authors/${authorId}/posts/${postId}/comments/${commentId}/likes`
+                      )
+                    ).data.items,
+
+                  /**
+                   * Like the post.
+                   * @returns TODO
+                   */
+                  like: async (): Promise<unknown> =>
+                    await axios.post(
+                      `/authors/${authorId}/inbox`,
+                      (() => {
+                        throw new Error("not implemented");
+                      })()
+                    ),
+                },
+              }),
+            },
+          }),
+        },
+      }),
+    },
+  };
 };
+
+const api = makeApi(localBaseUrl);
 
 export default api;
