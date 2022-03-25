@@ -12,16 +12,7 @@ import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { List } from '@mui/material';
-
-const items2 = [
-  {
-    Text: "Logout",
-    handleClick: () => {
-      api.logout();
-      window?.location?.reload();
-    },
-  },
-];
+import { useNavigate } from 'react-router-dom';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -56,6 +47,23 @@ export default function Mainpage({ currentUser }: Props) {
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [postsChanged, setpostsChanged] = useState(false);
+  const navigate = useNavigate();
+
+  const items2 = [
+    {
+      Text: 'Home',
+      handleClick: () => {
+        navigate('/');
+      },
+    },
+    {
+      Text: 'Logout',
+      handleClick: () => {
+        api.logout();
+        window?.location?.reload();
+      },
+    },
+  ];
 
   const handleClose = () => {
     setOpen(false);
@@ -69,20 +77,20 @@ export default function Mainpage({ currentUser }: Props) {
     setpostsChanged(!postsChanged);
   };
   const mockPost = {
-      id: "5",
-      title: "title",
-      source: 'www.google.com',
-      origin: 'www.lol.com',
-      description: "description",
-      contentType: "text/markdown",
-      content: "# Lmao",
-      image: undefined,
-      categories: "JSON.stringify(category)",
-      count: 5,
-      published: new Date(),
-      visibility: "visibility",
-      unlisted: "unlisted",
-    };
+    id: '5',
+    title: 'title',
+    source: 'www.google.com',
+    origin: 'www.lol.com',
+    description: 'description',
+    contentType: 'text/markdown',
+    content: '# Lmao',
+    image: undefined,
+    categories: 'JSON.stringify(category)',
+    count: 5,
+    published: new Date(),
+    visibility: 'visibility',
+    unlisted: 'unlisted',
+  };
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
@@ -143,13 +151,13 @@ export default function Mainpage({ currentUser }: Props) {
         <MainPageContentContainer>
           <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
             <UserPost
-                post={mockPost}
-                currentUser={currentUser}
-                postAuthor={currentUser}
-                likes={0}
-                handlePostsChanged={handlePostsChanged}
-                key={mockPost.id}
-              />
+              post={mockPost}
+              currentUser={currentUser}
+              postAuthor={currentUser}
+              likes={0}
+              handlePostsChanged={handlePostsChanged}
+              key={mockPost.id}
+            />
             {/* {posts?.map((post) => (
               <UserPost
                 post={post}
