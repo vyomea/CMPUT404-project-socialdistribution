@@ -69,7 +69,7 @@ const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 const updateProfile = async (req: Request, res: Response) => {
-  const { email, displayName, github, profileImage } = req.body;
+  const { email, displayName, github, profileImage, isAdmin } = req.body;
   const author = await Author.findOne({ where: { id: req.params.id } });
   if (author === null) {
     res.status(404).send();
@@ -82,6 +82,7 @@ const updateProfile = async (req: Request, res: Response) => {
       ...(displayName && { displayName: displayName }),
       ...(github && { github: github }),
       ...(profileImage && { profileImage: profileImage }),
+      ...(isAdmin && { isAdmin: isAdmin }),
     });
   } catch (error) {
     console.error(error);
@@ -91,4 +92,24 @@ const updateProfile = async (req: Request, res: Response) => {
   res.status(200).send();
 };
 
-export { getAllAuthors, getAuthor, getCurrentAuthor, updateProfile };
+const deleteAuthor = async (req: AuthenticatedRequest, res: Response) => {
+  const author = await Author.findOne({
+    attributes: authorPublicAttributes,
+    where: { id: req.params.id },
+  });
+  if (author === null) {
+    res.status(404).send();
+    return;
+  }
+  try {
+    await author.destroy();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: error });
+    return;
+  }
+  res.status(200).send();
+};
+
+
+export { getAllAuthors, getAuthor, getCurrentAuthor, updateProfile, deleteAuthor };

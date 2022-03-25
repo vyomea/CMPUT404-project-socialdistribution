@@ -5,6 +5,7 @@ const router = express.Router();
 import { requiredLoggedIn } from '../middlewares/auth.middlewares';
 import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
+import { adminOnly } from '../middlewares/auth.middlewares';
 
 import posts from './post.routes';
 import followers from './follower.routes';
@@ -14,6 +15,7 @@ import {
   getAuthor,
   getCurrentAuthor,
   updateProfile,
+  deleteAuthor
 } from '../controllers/author.controllers';
 
 router.use('/:id/posts', validate([param('id').isUUID()]), posts);
@@ -30,8 +32,10 @@ router.post(
     body('displayName').isString().optional(),
     body('github').isURL().optional(),
     body('profileImage').isURL().optional(),
+    body('isAdmin').isBoolean().optional(),
   ]),
   updateProfile
 );
+router.delete('/:id', adminOnly, validate([param('id').isUUID()]), deleteAuthor);
 
 export default router;
