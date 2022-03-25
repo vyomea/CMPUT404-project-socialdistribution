@@ -52,7 +52,7 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
       categories: categories ? JSON.parse(categories) : [],
       visibility: visibility,
     });
-    author.addPost(post);
+    await author.addPost(post);
   } catch (error) {
     console.log(error);
     res.status(500).send({ error: error });
@@ -118,8 +118,8 @@ const getAuthorPost = async (req: Request, res: Response) => {
     author: {
       type: 'author',
       ...post.toJSON().author,
-      id: getHost(req) + '/author/' + post.author.id,
-      url: getHost(req) + '/author/' + post.author.id,
+      id: getHost(req) + '/authors/' + post.author.id,
+      url: getHost(req) + '/authors/' + post.author.id,
       host: getHost(req) + '/',
     },
   });
@@ -162,8 +162,8 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
         author: {
           type: 'author',
           ...post.toJSON().author,
-          id: getHost(req) + '/author/' + post.author.id,
-          url: getHost(req) + '/author/' + post.author.id,
+          id: getHost(req) + '/authors/' + post.author.id,
+          url: getHost(req) + '/authors/' + post.author.id,
           host: getHost(req) + '/',
         },
       };

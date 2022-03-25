@@ -7,15 +7,21 @@ import AdminPostCard from "../components/AdminPostCard";
 import AdminNodeCard from "../components/AdminNodeCard";
 import Author from "../api/models/Author";
 import Post from "../api/models/Post";
+import Node from "../api/models/Node";
 import api from "../api/api";
 import { useState, useEffect } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import { CloseRounded } from '@mui/icons-material';
+import AddNode from '../components/AddNode';
 import AddAuthor from '../components/AddAuthor';
 
 export default function Admin(): JSX.Element {
+
+    //Toggles for adding new authors and/or nodes
     const [open, setOpen] = useState(false);
+    const [nodesChanged, setNodesChanged] = useState(false);
     const [authorsChanged, setAuthorsChanged] = useState(false);
+
 
     const handleClose = () => {
         setOpen(false);
@@ -23,10 +29,6 @@ export default function Admin(): JSX.Element {
 
     const handleToggle = () => {
         setOpen(!open);
-    };
-
-    const handleAuthorsChanged = () => {
-        setAuthorsChanged(!authorsChanged);
     };
     
     //Some fake data to help with layouts
@@ -41,23 +43,26 @@ export default function Admin(): JSX.Element {
         },
     ];
 
-    //Get author from backend
+    //Get list of authors from backend
     const [authors, setAuthors] = useState<Author[] | undefined>(undefined)
+
+    const handleAuthorsChanged = () => {
+        setAuthorsChanged(!authorsChanged);
+    };
     
     useEffect(() => {
         api.authors
         .list(1,10)
         .then((data)=>setAuthors(data))
-        .catch((error) => {console.log('No authors')})
+        .catch((e) => console.log(e.response))
     }, [authorsChanged])
 
-    //Need to be able to get all posts
-    const [posts, setPosts] = useState<Post[] | undefined>(undefined)
-    
     //Temporary posts for now
     //Want to get all posts if no filter is applied
     //Filter should be a list of authors to click,
     //when selected show all posts from authors who are friends with the selected author
+    const [posts, setPosts] = useState<Post[] | undefined>(undefined)
+    
     const id = "dd1258c7-2853-4f17-bd96-6ff10c2ffb24";
     useEffect(() => {
         api.authors
@@ -65,25 +70,37 @@ export default function Admin(): JSX.Element {
         .posts
         .list(1,10)
         .then((data)=>setPosts(data))
-        .catch((error) => {console.log(error)})
+        .catch((e) => console.log(e.response))
     }, [id])
 
-    const nodes=[
-        {
-        id:"07a931d8-b181-473d-8838-22dfb5c81416",
-        username:"NodeOne",
-        }
-    ];
 
-    // Get length for badges
+
+    //Get list of all nodes from backend
+    //If node created or deleted, fetch from backend again
+    const [nodes, setNodes] = useState<Node[] | undefined>(undefined)
+    
+    const handleNodesChanged = () => {
+        setNodesChanged(!nodesChanged);
+    };
+
+    useEffect(() => {
+        api.nodes
+        .list()
+        .then((data)=>setNodes(data))
+        .catch((e) => console.log(e.response))
+    }, [nodesChanged])
+
+
+    // Get length of lists for badges
     const totalRequests = signupRequests.length;
     const totalAuthors = (authors)?authors.length:0;
     const totalPosts = (posts)?posts.length:0;
-    const totalNodes = nodes.length;
+    const totalNodes = (nodes)?nodes.length:0;
 
-    //Set which to display
+    //Set which list to display
     const [listDisplay, setListDisplay] = React.useState({id:0,title:'Requests', count:totalRequests});
 
+    //Button styling
     const buttonStyle = {
         justifyContent:"space-between", 
         display: "flex"
@@ -113,8 +130,8 @@ export default function Admin(): JSX.Element {
         posts?.map((post) => (
             <AdminPostCard post={post} key={post.id}/>
         )),
-        nodes.map((node) => (
-            <AdminNodeCard node={node} key={node.id}/>
+        nodes?.map((node) => (
+            <AdminNodeCard node={node} handleNodesChanged={handleNodesChanged} key={node.id}/>
         ))
     ];
       
@@ -144,7 +161,14 @@ export default function Admin(): JSX.Element {
                     border: '1px solid white',
                     }}
                 />
-                <AddAuthor handleAuthorsChanged={handleAuthorsChanged} handleClose={handleClose}/>
+                {listDisplay.title==='Nodes'?(
+                    <AddNode handleNodesChanged={handleNodesChanged} handleClose={handleClose}/>
+                ):null}
+
+                {listDisplay.title==='Authors'?(
+                    <AddAuthor handleAuthorsChanged={handleAuthorsChanged} handleClose={handleClose}/>
+                ):null}
+
                 </Backdrop>
             ) : (
                     <Box sx={{ height: window.innerHeight,width: window.innerWidth}}>
@@ -181,12 +205,8 @@ export default function Admin(): JSX.Element {
 
                                 </ButtonGroup>
                                 
-                                {listDisplay.title ==='Authors'?(
+                                {(listDisplay.title ==='Authors' || listDisplay.title==='Nodes')?(
                                     <Button onClick={handleToggle} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
-                                ):null}
-
-                                {listDisplay.title==='Nodes'?(
-                                    <Button onClick={()=>alert("Add Node Page")} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
                                 ):null}
                     
                             </Box>
