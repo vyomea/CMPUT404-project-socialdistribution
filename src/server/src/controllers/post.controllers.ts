@@ -22,7 +22,7 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
     origin,
     contentType,
     content,
-    categories,
+    // categories,
     visibility,
   } = req.body;
 
@@ -48,7 +48,7 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
         image: Buffer.from(req.file.buffer).toString('base64'),
       }),
       content: content,
-      categories: categories ? categories : [],
+      categories: [], // TODO: set categories
       visibility: visibility,
     });
     author.addPost(post);
