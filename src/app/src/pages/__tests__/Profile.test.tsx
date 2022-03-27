@@ -1,12 +1,14 @@
 import React from "react";
 import { unmountComponentAtNode } from "react-dom";
 import renderer from "react-test-renderer";
+import Author from "../../api/models/Author";
 
 import Profile from "../Profile";
 
 let container: any = null;
 //issues with container type and its methods
-const testUser = {
+const testUser: Author = {
+  type: "author",
   id: "",
   displayName: "",
   github: " ",

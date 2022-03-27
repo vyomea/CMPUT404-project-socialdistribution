@@ -126,7 +126,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
       contentType: type,
       content: content,
       image: images ? images[0] : undefined,
-      categories: (Array.isArray(category)?category:category.split(',')),
+      categories: (Array.isArray(category)?JSON.stringify(category):JSON.stringify(category.split(','))),
       count: 5,
       published: new Date(),
       visibility: visibility,
