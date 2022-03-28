@@ -93,12 +93,9 @@ export default function Mainpage({ currentUser }: Props) {
   };
   useEffect(() => {
     api.authors
-      .withId('' + currentUser?.id)
+      .withId("" + currentUser?.id)
       .posts.list(1, 10)
-      .then((data) => {
-        setPosts(data);
-      })
-      .catch((error) => {});
+      .then((data) => setPosts(data));
   }, [currentUser?.id, postsChanged]);
 
   return (

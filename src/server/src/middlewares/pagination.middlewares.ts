@@ -6,24 +6,28 @@ const paginate = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.query.page && req.query.size) {
-    if (
-      isNaN(parseInt(req.query.page.toString())) ||
-      isNaN(parseInt(req.query.size.toString()))
-    ) {
-      res
-        .status(400)
-        .send({ error: 'Parameter page and size must be an integer' });
+  let page = 1;
+  let size = 10;
+
+  if (req.query.size) {
+    size = parseInt(req.query.size.toString());
+    if (isNaN(size) || size < 1) {
+      res.status(400).send({ error: 'size must be a positive integer' });
       return;
     }
-    req.limit = parseInt(req.query.size.toString());
-    req.offset = (parseInt(req.query.page.toString()) - 1) * req.limit;
-    next();
-    return;
   }
-  res.status(400).send({
-    error: 'This request must be paginated using the parameter page and size',
-  });
+
+  if (req.query.page) {
+    page = parseInt(req.query.page.toString());
+    if (isNaN(page) || page < 1) {
+      res.status(400).send({ error: 'page must be a positive integer' });
+      return;
+    }
+  }
+
+  req.limit = size;
+  req.offset = (page - 1) * req.limit;
+  next();
 };
 
 export { paginate };
