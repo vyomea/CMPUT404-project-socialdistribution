@@ -2,8 +2,8 @@ export default interface Author {
   type: "author";
   id: string;
   displayName: string;
-  github: string;
-  profileImage: string;
+  github?: string;
+  profileImage?: string;
   isAdmin: boolean;
 }
 

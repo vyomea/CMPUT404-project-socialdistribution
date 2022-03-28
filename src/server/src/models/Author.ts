@@ -64,7 +64,7 @@ Author.init(
   }
 );
 
-Author.Posts = Author.hasMany(Post);
+Author.Posts = Author.hasMany(Post, { onDelete: 'cascade', hooks:true });
 Post.Author = Post.belongsTo(Author, { as: 'author' });
 Author.Followers = Author.hasMany(Author);
 Author.belongsToMany(Author, { through: 'followers', as: 'follower' });

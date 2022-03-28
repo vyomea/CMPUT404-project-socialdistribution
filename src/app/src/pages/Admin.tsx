@@ -13,12 +13,15 @@ import { useState, useEffect } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import { CloseRounded } from '@mui/icons-material';
 import AddNode from '../components/AddNode';
+import AddAuthor from '../components/AddAuthor';
 
 export default function Admin(): JSX.Element {
 
     //Toggles for adding new authors and/or nodes
     const [open, setOpen] = useState(false);
     const [nodesChanged, setNodesChanged] = useState(false);
+    const [authorsChanged, setAuthorsChanged] = useState(false);
+
 
     const handleClose = () => {
         setOpen(false);
@@ -28,7 +31,7 @@ export default function Admin(): JSX.Element {
         setOpen(!open);
     };
     
-    //Some fake signup request data to help with layouts
+    //Some fake data to help with layouts
     const signupRequests = [
         {
         id:"07a931d8-b181-473d-8838-22dfb5c81416",
@@ -42,13 +45,17 @@ export default function Admin(): JSX.Element {
 
     //Get list of authors from backend
     const [authors, setAuthors] = useState<Author[] | undefined>(undefined)
+
+    const handleAuthorsChanged = () => {
+        setAuthorsChanged(!authorsChanged);
+    };
     
     useEffect(() => {
         api.authors
         .list(1,10)
         .then((data)=>setAuthors(data))
         .catch((e) => console.log(e.response))
-    }, [])
+    }, [authorsChanged])
 
     //Temporary posts for now
     //Want to get all posts if no filter is applied
@@ -118,7 +125,7 @@ export default function Admin(): JSX.Element {
             <AdminRequestCard request={request} key={request.id}/>
         )),
         authors?.map((author) => (
-            <AdminAuthorCard author={author} key={author.id}/>
+            <AdminAuthorCard author={author} handleAuthorsChanged={handleAuthorsChanged} key={author.id}/>
         )),
         posts?.map((post) => (
             <AdminPostCard post={post} key={post.id}/>
@@ -158,6 +165,10 @@ export default function Admin(): JSX.Element {
                     <AddNode handleNodesChanged={handleNodesChanged} handleClose={handleClose}/>
                 ):null}
 
+                {listDisplay.title==='Authors'?(
+                    <AddAuthor handleAuthorsChanged={handleAuthorsChanged} handleClose={handleClose}/>
+                ):null}
+
                 </Backdrop>
             ) : (
                     <Box sx={{ height: window.innerHeight,width: window.innerWidth}}>
@@ -194,7 +205,7 @@ export default function Admin(): JSX.Element {
 
                                 </ButtonGroup>
                                 
-                                {(listDisplay.title ==='Authors'||listDisplay.title==='Nodes')?(
+                                {(listDisplay.title ==='Authors' || listDisplay.title==='Nodes')?(
                                     <Button onClick={handleToggle} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
                                 ):null}
                     
