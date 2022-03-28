@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, List, ButtonGroup, Button , Badge, Typography, Divider} from "@mui/material";
+import { Box, List, ButtonGroup, Button , Badge, Typography, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 import NavBar from "../components/NavBar";
 import AdminRequestCard from "../components/AdminRequestCard";
 import AdminAuthorCard from "../components/AdminAuthorCard";
@@ -57,21 +57,26 @@ export default function Admin(): JSX.Element {
         .catch((e) => console.log(e.response))
     }, [authorsChanged])
 
+    //Get all posts of first author
+    const [posts, setPosts] = useState<Post[] | undefined>(undefined)
+    const [authorID, setAuthorID] = React.useState(authors?authors[0].id :'');
+    
+    const handleChange = (event: SelectChangeEvent) => {
+        setAuthorID(event.target.value as string);
+    };
+    
     //Temporary posts for now
     //Want to get all posts if no filter is applied
     //Filter should be a list of authors to click,
     //when selected show all posts from authors who are friends with the selected author
-    const [posts, setPosts] = useState<Post[] | undefined>(undefined)
-    
-    const id = "dd1258c7-2853-4f17-bd96-6ff10c2ffb24";
     useEffect(() => {
         api.authors
-        .withId(id)
+        .withId(authorID)
         .posts
         .list(1,10)
         .then((data)=>setPosts(data))
         .catch((e) => console.log(e.response))
-    }, [id])
+    }, [authorID])
 
 
 
@@ -208,6 +213,22 @@ export default function Admin(): JSX.Element {
                                 {(listDisplay.title ==='Authors' || listDisplay.title==='Nodes')?(
                                     <Button onClick={handleToggle} variant='contained' fullWidth={true} sx={{mt:5}}>Add</Button>
                                 ):null}
+
+                                {listDisplay.title==='Posts'?(
+                                    <FormControl fullWidth margin='normal'>
+                                    <InputLabel id="demo-simple-select-label">Author</InputLabel>
+                                    <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={authorID}
+                                    label="author"
+                                    onChange={handleChange}
+                                    >
+                                        {authors?.map((author) => (
+                                            <MenuItem value={author.id}>{author.id} ({author.displayName})</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>):null}
                     
                             </Box>
 
