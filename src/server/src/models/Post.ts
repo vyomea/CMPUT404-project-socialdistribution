@@ -26,7 +26,7 @@ class Post extends Model {
   static Author: BelongsTo;
   declare author: Author;
   static Comments: BelongsTo;
-  declare comments: string[];
+  declare comments: Comment[];
   declare addComment: (comment: Comment) => void;
 }
 
