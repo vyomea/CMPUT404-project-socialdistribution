@@ -22,7 +22,8 @@ const NavContainer = styled.div`
   position: fixed;
   text-align: center;
   height: 5%;
-  border-bottom: 1px solid;
+  border-bottom: 1px;
+  background-color: #f4e6d7;
 `;
 
 const NavItemsContainer = styled.div`
@@ -35,9 +36,9 @@ const NavItemsContainer = styled.div`
 
 const ColorButton = Styled(Button)<ButtonProps>(({ theme }) => ({
   color: theme.palette.getContrastText('#e6c9a8'),
-  backgroundColor: 'white',
+  backgroundColor: '#f4e6d7',
   '&:hover': {
-    backgroundColor: '#F9F7F5',
+    backgroundColor: '#E8CEB0',
   },
 }));
 
