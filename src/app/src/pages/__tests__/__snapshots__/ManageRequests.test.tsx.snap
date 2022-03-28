@@ -13,13 +13,13 @@ exports[`ManageRequests suite Renders correctly 1`] = `
     }
   >
     <div
-      className="sc-bdvvtL dVmOGZ"
+      className="sc-bdvvtL mzSdo"
     >
       <div
         className="sc-gsDKAQ dokASy"
       >
         <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-79h83g-MuiButtonBase-root-MuiButton-root"
+          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
           disabled={false}
           onBlur={[Function]}
           onClick={[Function]}

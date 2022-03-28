@@ -126,7 +126,9 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
       contentType: type,
       content: content,
       image: images ? images[0] : undefined,
-      categories: (Array.isArray(category)?JSON.stringify(category):JSON.stringify(category.split(','))),
+      categories: Array.isArray(category)
+        ? JSON.stringify(category)
+        : JSON.stringify(category.split(',')),
       count: 5,
       published: new Date(),
       visibility: visibility,
@@ -142,7 +144,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
       .withId('' + currentUser?.id)
       .posts.withId('' + id)
       .update(formData)
-      .then(()=>handlePostsChanged())
+      .then(() => handlePostsChanged())
       .catch((e) => console.log(e.response));
   };
 
@@ -190,7 +192,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
           >
             <MenuItem value="text/plain">Plain</MenuItem>
             <MenuItem value="text/markdown">Markdown</MenuItem>
-            <MenuItem value="image">Image</MenuItem>
+            <MenuItem value="image/png;base64">Image</MenuItem>
           </Select>
         </FormControl>
         <ContentType>Visibility</ContentType>
@@ -259,7 +261,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
                     onChange={handleTextChange}
                   />
                   <CustomButton>
-                    <input type="file" accept="image/*" name="image" multiple onChange={handleUpload} />
+                    <input type="file" accept="image/*" name="image" onChange={handleUpload} />
                   </CustomButton>
                 </>
               ) : (
