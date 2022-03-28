@@ -12,6 +12,21 @@ const authorPublicAttributes = [
   'isAdmin',
 ];
 
+const deleteAuthor = async (req: AuthenticatedRequest, res: Response) => {
+  const author = await Author.findByPk(req.params.id);
+  if (author === null) {
+    res.status(404).send();
+    return;
+  }
+  try {
+    await author.destroy();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: error });
+  }
+  res.status(200).send();
+};
+
 const getAllAuthors = async (req: PaginationRequest, res: Response) => {
   const authors = await Author.findAll({
     attributes: authorPublicAttributes,
@@ -91,24 +106,10 @@ const updateProfile = async (req: Request, res: Response) => {
   res.status(200).send();
 };
 
-const deleteAuthor = async (req: AuthenticatedRequest, res: Response) => {
-  const author = await Author.findOne({
-    attributes: authorPublicAttributes,
-    where: { id: req.params.id },
-  });
-  if (author === null) {
-    res.status(404).send();
-    return;
-  }
-  try {
-    await author.destroy();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: error });
-    return;
-  }
-  res.status(200).send();
+export {
+  deleteAuthor,
+  getAllAuthors,
+  getAuthor,
+  getCurrentAuthor,
+  updateProfile,
 };
-
-
-export { getAllAuthors, getAuthor, getCurrentAuthor, updateProfile, deleteAuthor };
