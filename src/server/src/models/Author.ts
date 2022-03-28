@@ -2,6 +2,7 @@ import { DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Post from './Post';
+import Comment from './Comment';
 
 class Author extends Model {
   declare id: typeof uuidv4;
@@ -12,6 +13,7 @@ class Author extends Model {
   declare profileImage: string;
   declare isAdmin: boolean;
   static Posts: HasMany;
+  static Comments: HasMany;
   declare addPost: (post: Post) => void;
 }
 
@@ -59,5 +61,8 @@ Author.init(
 
 Author.Posts = Author.hasMany(Post);
 Post.Author = Post.belongsTo(Author, { as: 'author' });
+
+Author.Comments = Author.hasMany(Comment);
+Comment.Author = Comment.belongsTo(Author, { as: 'author' });
 
 export default Author;

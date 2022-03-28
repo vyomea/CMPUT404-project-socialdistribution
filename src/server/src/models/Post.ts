@@ -25,7 +25,8 @@ class Post extends Model {
   declare unlisted: boolean;
   static Author: BelongsTo;
   declare author: Author;
-  declare comments: string;
+  static Comments: BelongsTo;
+  declare comments: string[];
   declare addComment: (comment: Comment) => void;
 }
 
@@ -123,5 +124,8 @@ Post.init(
     underscored: true,
   }
 );
+
+Post.Comments = Post.hasMany(Comment);
+Comment.Post = Comment.belongsTo(Post, { as: 'post' });
 
 export default Post;

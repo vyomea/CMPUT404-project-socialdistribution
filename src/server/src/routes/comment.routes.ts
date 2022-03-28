@@ -9,18 +9,17 @@ import { requiredLoggedIn } from '../middlewares/auth.middlewares';
 
 import {
     createComment,
-    getPostComment,
     getPostComments,
 } from '../controllers/comment.controllers';
 
-router.get('/:comment_id', validate([param('comment_id').isUUID()]), getPostComment);
+
+router.get('/', validate([param('post_id').isUUID()]), getPostComments);
 
 router.post(
-  '/:post_id',
+  '/',
   [
     requiredLoggedIn,
     validate([
-      param('comment_id').isUUID(),
       body('comment').isString(),
       body('contentType').isIn([
         'text/markdown',

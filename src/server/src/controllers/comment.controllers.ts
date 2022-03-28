@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import Author from '../models/Author';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { AuthenticatedRequest } from '../types/auth';
@@ -10,12 +11,13 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
       where: { id: req.params.post_id },
     });
     if (comment_exists !== null) {
-      res.status(400).send({ error: 'Post already exists' });
+      res.status(400).send({ error: 'Comment already exists' });
       return;
     }
   }
 
-  const { commentStr, contentType } = req.body;
+  const { comment, contentType } = req.body;
+  const commentStr = comment;
 
   const post = await Post.findOne({
     where: {
@@ -47,26 +49,12 @@ const getPostComment = async (req: Request, res: Response) => {
   const comment = await Comment.findOne({
     attributes: ['comment', 'contentType', 'published', 'id'],
     where: {
-      id: req.params.comment_id,
       post_id: req.params.post_id,
     },
     include: {
-      model: Post,
-      attributes: [
-        'id',
-        'title',
-        'source',
-        'origin',
-        'description',
-        'contentType',
-        'content',
-        'categories',
-        'count',
-        'published',
-        'visibility',
-        'unlisted',
-      ],
-      as: 'post',
+      model: Author,
+      attributes: ['id', 'displayName', 'github', 'profileImage'],
+      as: 'author',
     },
   });
   if (comment === null) {
@@ -76,7 +64,7 @@ const getPostComment = async (req: Request, res: Response) => {
   res.send({
     type: 'comment',
     ...comment.toJSON(),
-    post: { type: 'post', ...comment.toJSON().post },
+    author: { type: 'author', ...comment.toJSON().author },
   });
 };
 
@@ -87,33 +75,20 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
       post_id: req.params.post_id,
     },
     include: {
-      model: Post,
-      attributes: [
-        'id',
-        'title',
-        'source',
-        'origin',
-        'description',
-        'contentType',
-        'content',
-        'categories',
-        'count',
-        'published',
-        'visibility',
-        'unlisted',
-      ],
-      as: 'post',
+      model: Author,
+      attributes: ['id', 'displayName', 'github', 'profileImage'],
+      as: 'author',
     },
     offset: req.offset,
     limit: req.limit,
   });
   res.send({
     type: 'comments',
-    items: comments.map((comment) => {
+    comments: comments.map((comment) => {
       return {
         type: 'comment',
         ...comment.toJSON(),
-        author: { type: 'post', ...comment.toJSON().post },
+        author: { type: 'author', ...comment.toJSON().author },
       };
     }),
   });

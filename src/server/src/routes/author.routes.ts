@@ -7,6 +7,7 @@ import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
 
 import posts from './post.routes';
+import comments from './comment.routes';
 
 import {
   getAllAuthors,
@@ -16,6 +17,7 @@ import {
 } from '../controllers/author.controllers';
 
 router.use('/:id/posts', posts);
+router.use('/:id/posts/:post_id/comments', comments);
 
 router.get('/', paginate, getAllAuthors);
 router.get('/me', requiredLoggedIn, getCurrentAuthor);

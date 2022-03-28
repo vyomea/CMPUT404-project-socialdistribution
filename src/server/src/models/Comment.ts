@@ -2,10 +2,13 @@ import { BelongsTo, DataTypes, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
+import Post from './Post';
 
 class Comment extends Model {
   static Author: BelongsTo;
   declare author: Author;
+  static Post: BelongsTo;
+  declare post: Post;
   declare comment: string;
   declare contentType: 'text/markdown' | 'text/plain';
   declare published: Date;
