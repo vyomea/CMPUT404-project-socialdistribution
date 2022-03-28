@@ -12,7 +12,6 @@ import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { List } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -47,13 +46,12 @@ export default function Mainpage({ currentUser }: Props) {
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [postsChanged, setpostsChanged] = useState(false);
-  const navigate = useNavigate();
 
   const items2 = [
     {
       Text: 'Home',
       handleClick: () => {
-        navigate('/');
+        // navigate('/');
       },
     },
     {
