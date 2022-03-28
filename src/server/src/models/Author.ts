@@ -18,7 +18,7 @@ class Author extends Model {
   static Followers: HasMany;
   declare followers: Follower[];
   declare posts: Post[];
-  declare addComment: (comment: Comment) => void;
+  declare addComment: (comment: Comment) => Promise<void>;
   declare addPost: (post: Post) => Promise<void>;
   declare addFollower: (author: Author) => Promise<void>;
   declare hasFollower: (author: Author) => Promise<boolean>;
