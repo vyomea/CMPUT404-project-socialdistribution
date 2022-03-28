@@ -13,7 +13,7 @@ import {
 } from '../controllers/comment.controllers';
 
 
-router.get('/', validate([param('post_id').isUUID()]), paginate, getPostComments);
+router.get('/', [paginate, validate([param('post_id').isUUID()])], getPostComments);
 
 router.post(
   '/',
@@ -29,6 +29,5 @@ router.post(
   ],
   createComment
 );
-router.get('/', paginate, getPostComments);
 
 export default router;

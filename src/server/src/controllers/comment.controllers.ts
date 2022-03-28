@@ -4,18 +4,9 @@ import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
+import { getHost } from '../utilities/host';
 
 const createComment = async (req: AuthenticatedRequest, res: Response) => {
-  if (req.params.comment_id) {
-    const comment_exists = await Comment.findOne({
-      where: { id: req.params.post_id },
-    });
-    if (comment_exists !== null) {
-      res.status(400).send({ error: 'Comment already exists' });
-      return;
-    }
-  }
-
   const { comment, contentType } = req.body;
   const commentStr = comment;
 
@@ -27,15 +18,14 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
   const author = await Author.findOne({
     where: {
       id: req.params.id,
-    }
-  })
+    },
+  });
   if (post === null) {
     res.status(404).send();
     return;
   }
   try {
     const comment = await Comment.create({
-      ...(req.params.comment_id && { id: req.params.comment_id }),
       comment: commentStr,
       contentType: contentType,
     });
@@ -49,7 +39,6 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
 
   res.status(200).send();
 };
-
 
 const getPostComment = async (req: Request, res: Response) => {
   const comment = await Comment.findOne({
@@ -70,7 +59,18 @@ const getPostComment = async (req: Request, res: Response) => {
   res.send({
     type: 'comment',
     ...comment.toJSON(),
-    author: { type: 'author', ...comment.toJSON().author },
+    author: {
+      type: 'author',
+      ...comment.toJSON().author,
+      id:
+        getHost(req) +
+        req.baseUrl.substring(0, req.baseUrl.search('posts') - 1),
+      url:
+        getHost(req) +
+        req.baseUrl.substring(0, req.baseUrl.search('posts') - 1),
+      host: getHost(req) + '/',
+    },
+    id: getHost(req) + req.baseUrl + '/' + comment.toJSON().id,
   });
 };
 
@@ -94,15 +94,21 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
       return {
         type: 'comment',
         ...comment.toJSON(),
-        author: { type: 'author', ...comment.toJSON().author },
+        author: {
+          type: 'author',
+          ...comment.toJSON().author,
+          id:
+            getHost(req) +
+            req.baseUrl.substring(0, req.baseUrl.search('posts') - 1),
+          url:
+            getHost(req) +
+            req.baseUrl.substring(0, req.baseUrl.search('posts') - 1),
+          host: getHost(req) + '/',
+        },
+        id: getHost(req) + req.baseUrl + '/' + comment.toJSON().id,
       };
     }),
   });
 };
 
-
-export {
-  createComment,
-  getPostComment,
-  getPostComments,
-};
+export { createComment, getPostComment, getPostComments };
