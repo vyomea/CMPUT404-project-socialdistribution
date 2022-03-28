@@ -169,6 +169,7 @@ const UserPost: React.FC<postItem> = (props?) => {
       case 'text/plain':
         return props?.post?.content;
       case 'image/png;base64':
+      case 'image/jpeg;base64':
         debugger;
         return (
           <div
