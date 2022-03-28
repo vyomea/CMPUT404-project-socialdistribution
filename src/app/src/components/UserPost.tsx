@@ -133,7 +133,7 @@ const cursorStyle = {
 const UserPost: React.FC<postItem> = (props?) => {
   const [open, setOpen] = React.useState(false);
   const [likes, setLikes] = React.useState(props?.likes);
-  const [liked, setLiked] = React.useState(false);
+  const [liked, setLiked] = React.useState(likes === 0 ? true : false);
   const navigate = useNavigate();
 
   const handleLikes = () => {
@@ -156,18 +156,30 @@ const UserPost: React.FC<postItem> = (props?) => {
   }
 
   const renderContent = (contentType: any) => {
-    switch (props?.post?.contentType) {
+    // HACK
+    let f = '/posts/' + props?.post?.id + '/image';
+    let x = props?.currentUser?.id + f;
+    let h = window.location.href + 'authors/' + x;
+    // Will work if running frontend on 3001
+    // h = h.replace('3002', '3001');
+    debugger;
+    switch (contentType) {
       case 'text/markdown':
         return <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>;
       case 'text/plain':
         return props?.post?.content;
-      case 'application/base64' || 'image/png;base64' || 'image/jpeg;base64':
+      case 'image/png;base64':
+        debugger;
         return (
-          <img
-            style={{ width: '400px', height: '400px' }}
-            src={props?.post?.image}
-            alt="Uploaded"
-          />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignContent: 'center',
+            }}
+          >
+            <img style={{ width: '180px', height: '180px' }} src={h} alt="Unavailable" />
+          </div>
         );
     }
   };
