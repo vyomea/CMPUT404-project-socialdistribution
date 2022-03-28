@@ -113,10 +113,6 @@ Post.init(
       allowNull: false,
       defaultValue: false,
     },
-    comments: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
   },
   {
     sequelize: db,
