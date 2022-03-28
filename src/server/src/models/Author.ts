@@ -15,6 +15,7 @@ class Author extends Model {
   static Posts: HasMany;
   static Comments: HasMany;
   declare addPost: (post: Post) => void;
+  declare addComment: (comment: Comment) => void;
 }
 
 Author.init(

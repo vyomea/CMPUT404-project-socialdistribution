@@ -24,6 +24,11 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
       id: req.params.post_id,
     },
   });
+  const author = await Author.findOne({
+    where: {
+      id: req.params.id,
+    }
+  })
   if (post === null) {
     res.status(404).send();
     return;
@@ -35,6 +40,7 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
       contentType: contentType,
     });
     post.addComment(comment);
+    author.addComment(comment);
   } catch (error) {
     console.log(error);
     res.status(500).send({ error: error });
