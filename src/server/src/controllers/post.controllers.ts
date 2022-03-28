@@ -3,6 +3,7 @@ import Author from '../models/Author';
 import Post from '../models/Post';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
+import { getHost } from '../utilities/host';
 
 const createPost = async (req: AuthenticatedRequest, res: Response) => {
   if (req.params.post_id) {
@@ -48,10 +49,10 @@ const createPost = async (req: AuthenticatedRequest, res: Response) => {
         image: Buffer.from(req.file.buffer).toString('base64'),
       }),
       content: content,
-      categories: categories ? categories : [],
+      categories: categories ? JSON.parse(categories) : [],
       visibility: visibility,
     });
-    author.addPost(post);
+    await author.addPost(post);
   } catch (error) {
     console.log(error);
     res.status(500).send({ error: error });
@@ -113,7 +114,14 @@ const getAuthorPost = async (req: Request, res: Response) => {
   res.send({
     type: 'post',
     ...post.toJSON(),
-    author: { type: 'author', ...post.toJSON().author },
+    id: getHost(req) + req.baseUrl + '/' + post.id,
+    author: {
+      type: 'author',
+      ...post.toJSON().author,
+      id: getHost(req) + '/authors/' + post.author.id,
+      url: getHost(req) + '/authors/' + post.author.id,
+      host: getHost(req) + '/',
+    },
   });
 };
 
@@ -150,7 +158,14 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
       return {
         type: 'post',
         ...post.toJSON(),
-        author: { type: 'author', ...post.toJSON().author },
+        id: getHost(req) + req.baseUrl + '/' + post.id,
+        author: {
+          type: 'author',
+          ...post.toJSON().author,
+          id: getHost(req) + '/authors/' + post.author.id,
+          url: getHost(req) + '/authors/' + post.author.id,
+          host: getHost(req) + '/',
+        },
       };
     }),
   });
@@ -207,7 +222,9 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
       ...(contentType === 'image' && {
         image: Buffer.from(req.file.buffer).toString('base64'),
       }),
-      ...(categories && { categories: categories ? categories : [] }),
+      ...(categories && {
+        categories: categories ? JSON.parse(categories) : [],
+      }),
       ...(visibility && { visibility: visibility }),
     });
   } catch (error) {

@@ -27,7 +27,7 @@ WORKDIR /data/src/server/
 
 COPY src/server/ ./
 
-RUN cp -r ../app/build ./
+# RUN ls -al ../app/ && cp -r ../app/build ./
 
 WORKDIR /data/
 

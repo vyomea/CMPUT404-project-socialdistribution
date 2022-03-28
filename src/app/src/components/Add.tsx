@@ -141,7 +141,7 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
       contentType: type,
       content: content,
       image: images ? images[0] : undefined,
-      categories: category,
+      categories: JSON.stringify(category),
       count: 5,
       published: new Date(),
       visibility: visibility,

@@ -3,6 +3,7 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import Author from '../models/Author';
 import { JwtPayload } from '../types/auth';
+import Node from '../models/Node';
 
 const loginUser = async (
   author: Author,
@@ -24,4 +25,20 @@ const unauthorized = (res: Response): void => {
   res.status(401).send();
 };
 
-export { loginUser, unauthorized };
+const validNode = async (username: string, password: string) => {
+  const node = await Node.findOne({
+    where: {
+      username: username,
+    },
+  });
+  if (node === null) {
+    return false;
+  }
+  const passwordIsCorrect = await argon2.verify(node.passwordHash, password);
+  if (!passwordIsCorrect) {
+    return false;
+  }
+  return true;
+};
+
+export { loginUser, unauthorized, validNode };

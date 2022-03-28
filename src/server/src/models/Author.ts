@@ -3,6 +3,7 @@ import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Post from './Post';
 import Comment from './Comment';
+import Follower from './Follower';
 
 class Author extends Model {
   declare id: typeof uuidv4;
@@ -14,8 +15,14 @@ class Author extends Model {
   declare isAdmin: boolean;
   static Posts: HasMany;
   static Comments: HasMany;
-  declare addPost: (post: Post) => void;
+  static Followers: HasMany;
+  declare followers: Follower[];
+  declare posts: Post[];
   declare addComment: (comment: Comment) => void;
+  declare addPost: (post: Post) => Promise<void>;
+  declare addFollower: (author: Author) => Promise<void>;
+  declare hasFollower: (author: Author) => Promise<boolean>;
+  declare removeFollower: (author: Author) => Promise<void>;
 }
 
 Author.init(
@@ -62,6 +69,12 @@ Author.init(
 
 Author.Posts = Author.hasMany(Post);
 Post.Author = Post.belongsTo(Author, { as: 'author' });
+Author.Followers = Author.hasMany(Author);
+Author.belongsToMany(Author, { through: 'followers', as: 'follower' });
+Follower.Author = Follower.belongsTo(Author, {
+  as: 'author',
+  foreignKey: 'followerId',
+});
 
 Author.Comments = Author.hasMany(Comment);
 Comment.Author = Comment.belongsTo(Author, { as: 'author' });

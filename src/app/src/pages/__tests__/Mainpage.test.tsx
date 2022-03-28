@@ -1,11 +1,13 @@
 import React from "react";
 import { unmountComponentAtNode } from "react-dom";
 import renderer from "react-test-renderer";
+import Author from "../../api/models/Author";
 
 import Mainpage from "../Mainpage";
 
 let container: any = null;
-const testUser = {
+const testUser: Author = {
+  type: "author",
   id: "",
   displayName: "",
   github: " ",
