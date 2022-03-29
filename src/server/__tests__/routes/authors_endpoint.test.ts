@@ -18,14 +18,6 @@ describe('Authors', () => {
 
   afterAll(async () => await author.destroy());
 
-  it('should require pagination', async () => {
-    const res = await request(app).get('/authors');
-    expect(res.statusCode).toBe(400);
-    expect(res.body).toMatchObject({
-      error: 'This request must be paginated using the parameter page and size',
-    });
-  });
-
   it('should return all authors', async () => {
     const res = await request(app).get('/authors?page=1&size=5');
     expect(res.statusCode).toBe(200);
