@@ -9,8 +9,8 @@
     "create-admin": "tsc && node dist/src/create-admin.js",
     "lint": "eslint src/ --ext .ts",
     "format": "prettier --write ./src",
-    "pretest": "ts-node ./src/setup-db.ts",
-    "test": "jest --no-cache --runInBand --ci --forceExit --verbose"
+    "pretest": "NODE_ENV=test ts-node ./src/setup-db.ts",
+    "test": "NODE_ENV=test jest --no-cache --runInBand --ci --forceExit --verbose"
   },
   "keywords": [],
   "author": "",
