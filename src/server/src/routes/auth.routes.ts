@@ -15,8 +15,8 @@ router.post(
   '/register',
   validate([
     body('email').isEmail(),
-    body('password').isString(),
-    body('displayName').isString(),
+    body('password').isString().notEmpty(),
+    body('displayName').isString().notEmpty(),
   ]),
   register
 );
