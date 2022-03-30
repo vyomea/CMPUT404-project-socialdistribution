@@ -12,6 +12,10 @@ import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { List } from '@mui/material';
+import Like from '../api/models/Like';
+import MainLike from '../components/MainLike';
+import Comment from '../api/models/Comment';
+import MainComment from '../components/MainComment';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -82,6 +86,31 @@ export default function Mainpage({ currentUser }: Props) {
       .then((data) => setPosts(data));
   }, [currentUser?.id, postsChanged]);
 
+  //Fake data to show likes/comments
+  const likeAuthor: Author = {
+    type: "author",
+    id: 'http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e',
+    displayName: 'Lara Croft',
+    isAdmin: false,
+  };
+
+  const like: Like = {
+    type: "Like",
+    summary: 'Lara Croft liked your post',
+    author: likeAuthor,
+    object: 'http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013'
+  }
+
+  const comment: Comment = {
+    type: "comment",
+    id: 'http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013/comments/f6255bb01c648fe967714d52a89e8e9c',
+    author: likeAuthor,
+    comment: 'Wow!',
+    contentType: 'text/plain',
+    published: '2015-03-09T13:07:04+00:00',
+    postId: 'http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013'
+  }
+
   return (
     <MainPageContainer>
       <NavBarContainer>
@@ -141,9 +170,18 @@ export default function Mainpage({ currentUser }: Props) {
                 key={post.id}
               />
             ))}
+              <MainLike 
+                key={like.author.id}
+                like={like}
+              />
+
+              <MainComment 
+                key={comment.author.id}
+                comment={comment}
+              />
           </List>
           <GitContainer>
-            <Github username={currentUser?.displayName} />
+            <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
           </GitContainer>
         </MainPageContentContainer>
       )}
