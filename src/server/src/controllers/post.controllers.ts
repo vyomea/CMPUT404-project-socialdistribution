@@ -5,6 +5,54 @@ import Comment from '../models/Comment';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 import { getHost } from '../utilities/host';
+import { pick } from '../utilities/pick';
+import { serializeAuthor } from './author.controllers';
+import { serializeComment } from './comment.controllers';
+
+const publicAttributes = [
+  'id',
+  'title',
+  'source',
+  'origin',
+  'description',
+  'contentType',
+  'content',
+  'categories',
+  'count',
+  'published',
+  'visibility',
+  'unlisted',
+];
+
+export const serializePost = (
+  post: Post,
+  req: Request,
+  comments?: Comment[]
+): Record<string, unknown> => ({
+  type: 'post',
+  ...pick(post.toJSON(), publicAttributes),
+  id: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}`,
+  url: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}`,
+  host: `${getHost(req)}/`,
+  comments: `${getHost(req)}/authors/${post.author.id}/posts/${
+    post.id
+  }/comments`,
+  author: serializeAuthor(post.author, req),
+  ...(comments
+    ? {
+        commentsSrc: {
+          type: 'comments',
+          post: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}`,
+          id: `${getHost(req)}/authors/${post.author.id}/posts/${
+            post.id
+          }/comments`,
+          page: 1,
+          size: comments.length,
+          comments: comments.map((comment) => serializeComment(comment, req)),
+        },
+      }
+    : {}),
+});
 
 const createPost = async (req: AuthenticatedRequest, res: Response) => {
   if (req.params.post_id) {
@@ -84,20 +132,7 @@ const deleteAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
 
 const getAuthorPost = async (req: Request, res: Response) => {
   const post = await Post.findOne({
-    attributes: [
-      'id',
-      'title',
-      'source',
-      'origin',
-      'description',
-      'contentType',
-      'content',
-      'categories',
-      'count',
-      'published',
-      'visibility',
-      'unlisted',
-    ],
+    attributes: publicAttributes,
     where: {
       id: req.params.post_id,
       author_id: req.params.id,
@@ -113,71 +148,36 @@ const getAuthorPost = async (req: Request, res: Response) => {
     where: {
       post_id: req.params.post_id,
     },
-    include: {
-      model: Author,
-      attributes: ['id', 'displayName', 'github', 'profileImage'],
-      as: 'author',
-    },
+    include: [
+      {
+        model: Author,
+        attributes: ['id', 'displayName', 'github', 'profileImage'],
+        as: 'author',
+      },
+      {
+        model: Post,
+        attributes: ['id'],
+        as: 'post',
+        include: [
+          {
+            model: Author,
+            attributes: ['id'],
+            as: 'author',
+          },
+        ],
+      },
+    ],
   });
   if (post === null) {
     res.status(404).send();
     return;
   }
-  res.send({
-    type: 'post',
-    ...post.toJSON(),
-    id: getHost(req) + req.baseUrl + '/' + post.id,
-    commentsSrc: {
-      type: 'comment',
-      page: req.params.page,
-      size: req.params.size,
-      post: getHost(req) + req.baseUrl + '/' + post.id,
-      id: getHost(req) + req.baseUrl + '/' + post.id + '/comments',
-      comments: comments.map((comment) => {
-        return {
-          type: 'comment',
-          ...comment.toJSON(),
-          author: {
-            type: 'author',
-            ...comment.toJSON().author,
-            id:
-              getHost(req) +
-              req.baseUrl.substring(0, req.baseUrl.search('posts') - 1),
-            url:
-              getHost(req) +
-              req.baseUrl.substring(0, req.baseUrl.search('posts') - 1),
-            host: getHost(req) + '/',
-          },
-          id: getHost(req) + req.baseUrl + '/' + comment.toJSON().id,
-        };
-      }),
-    },
-    author: {
-      type: 'author',
-      ...post.toJSON().author,
-      id: getHost(req) + '/authors/' + post.author.id,
-      url: getHost(req) + '/authors/' + post.author.id,
-      host: getHost(req) + '/',
-    },
-  });
+  res.send(serializePost(post, req, comments));
 };
 
 const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
   const posts = await Post.findAll({
-    attributes: [
-      'id',
-      'title',
-      'source',
-      'origin',
-      'description',
-      'contentType',
-      'content',
-      'categories',
-      'count',
-      'published',
-      'visibility',
-      'unlisted',
-    ],
+    attributes: publicAttributes,
     where: {
       author_id: req.params.id,
     },
@@ -191,20 +191,7 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
   });
   res.send({
     type: 'posts',
-    items: posts.map((post) => {
-      return {
-        type: 'post',
-        ...post.toJSON(),
-        id: getHost(req) + req.baseUrl + '/' + post.id,
-        author: {
-          type: 'author',
-          ...post.toJSON().author,
-          id: getHost(req) + '/authors/' + post.author.id,
-          url: getHost(req) + '/authors/' + post.author.id,
-          host: getHost(req) + '/',
-        },
-      };
-    }),
+    items: posts.map((post) => serializePost(post, req)),
   });
 };
 

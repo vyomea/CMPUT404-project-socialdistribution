@@ -40,18 +40,17 @@ if (process.env.NODE_ENV === 'production') {
   );
 }
 
-readdirSync(__dirname + '/models')
-  .filter((file: string) => {
-    return (
+readdirSync(path.join(__dirname + '/models'))
+  .filter(
+    (file: string) =>
       file.indexOf('.') !== 0 &&
       file !== path.basename(__filename) &&
       file.slice(-3) === '.ts'
-    );
-  })
+  )
   .forEach(async (file: string) => {
-    const model: ModelStatic<Model> = await import(
-      path.join(__dirname, '/models', file)
-    );
+    const model: ModelStatic<Model> = (
+      await import(path.join(__dirname, '/models', file))
+    ).default;
     sequelize.modelManager.addModel(model);
   });
 

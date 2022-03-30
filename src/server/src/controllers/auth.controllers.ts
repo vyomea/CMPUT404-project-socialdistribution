@@ -24,7 +24,7 @@ const login = async (req: Request, res: Response) => {
     return;
   }
 
-  await loginUser(author, password, res);
+  await loginUser(author, password, req, res);
 };
 
 /**
@@ -42,14 +42,15 @@ const register = async (req: Request, res: Response) => {
       displayName,
     });
   } catch (e) {
-    const errorMessage = e.name === 'SequelizeUniqueConstraintError'
-      ? 'A user with that email already exists.'
-      : 'An unknown error occurred.';
+    const errorMessage =
+      e.name === 'SequelizeUniqueConstraintError'
+        ? 'A user with that email already exists.'
+        : 'An unknown error occurred.';
     res.status(400).json({ error: errorMessage });
     return;
   }
 
-  await loginUser(author, password, res);
+  await loginUser(author, password, req, res);
 };
 
 export { login, register };

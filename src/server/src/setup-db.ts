@@ -1,3 +1,3 @@
 import db from './db';
 
-db.sync({ alter: true });
+db.sync(process.env.NODE_ENV === 'test' ? { force: true } : { alter: true });
