@@ -28,11 +28,10 @@ app.use('/nodes', nodes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../build')));
+  app.get('/*', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, '../../build', 'index.html'));
+  });
 }
-
-app.all('*', (req: Request, res: Response) => {
-  res.status(404).send();
-});
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
