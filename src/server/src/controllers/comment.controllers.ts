@@ -7,8 +7,7 @@ import { PaginationRequest } from '../types/pagination';
 import { getHost } from '../utilities/host';
 
 const createComment = async (req: AuthenticatedRequest, res: Response) => {
-  const { comment, contentType } = req.body;
-  const commentStr = comment;
+  const { commentStr, contentType } = req.body;
 
   const post = await Post.findOne({
     where: {
