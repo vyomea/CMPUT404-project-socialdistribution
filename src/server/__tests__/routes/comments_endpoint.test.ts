@@ -42,14 +42,6 @@ describe('Comments', () => {
     
   });
 
-  it('should require pagination', async () => {
-    const res = await request(app).get(`/authors/${author.id}/posts/${post.id}/comments`);
-    expect(res.statusCode).toBe(400);
-    expect(res.body).toMatchObject({
-      error: 'This request must be paginated using the parameter page and size',
-    });
-  });
-
   it("should return all posts's comments", async () => {
     const res = await request(app).get(
       `/authors/${author.id}/posts/${post.id}/comments?page=1&size=5`
