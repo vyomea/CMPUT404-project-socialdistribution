@@ -2,6 +2,7 @@ import { BelongsTo, DataTypes, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
+import Comment from './Comment';
 
 class Post extends Model {
   declare id: typeof uuidv4;
@@ -24,6 +25,9 @@ class Post extends Model {
   declare unlisted: boolean;
   static Author: BelongsTo;
   declare author: Author;
+  static Comments: BelongsTo;
+  declare comments: Comment[];
+  declare addComment: (comment: Comment) => void;
 }
 
 Post.init(
@@ -116,5 +120,8 @@ Post.init(
     underscored: true,
   }
 );
+
+Post.Comments = Post.hasMany(Comment);
+Comment.Post = Comment.belongsTo(Post, { as: 'post' });
 
 export default Post;

@@ -2,6 +2,7 @@ import { DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Post from './Post';
+import Comment from './Comment';
 import Follower from './Follower';
 
 class Author extends Model {
@@ -13,9 +14,11 @@ class Author extends Model {
   declare profileImage: string;
   declare isAdmin: boolean;
   static Posts: HasMany;
+  static Comments: HasMany;
   static Followers: HasMany;
   declare followers: Follower[];
   declare posts: Post[];
+  declare addComment: (comment: Comment) => Promise<void>;
   declare addPost: (post: Post) => Promise<void>;
   declare addFollower: (author: Author) => Promise<void>;
   declare hasFollower: (author: Author) => Promise<boolean>;
@@ -72,5 +75,8 @@ Follower.Author = Follower.belongsTo(Author, {
   as: 'author',
   foreignKey: 'followerId',
 });
+
+Author.Comments = Author.hasMany(Comment);
+Comment.Author = Comment.belongsTo(Author, { as: 'author' });
 
 export default Author;

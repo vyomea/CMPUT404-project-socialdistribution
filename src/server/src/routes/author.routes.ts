@@ -7,6 +7,7 @@ import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
 
 import posts from './post.routes';
+import comments from './comment.routes';
 import followers from './follower.routes';
 
 import {
@@ -17,6 +18,7 @@ import {
   updateProfile,
 } from '../controllers/author.controllers';
 
+router.use('/:id/posts/:post_id/comments', validate([param('id').isUUID(), param('post_id').isUUID()]), comments);
 router.use('/:id/posts', validate([param('id').isUUID()]), posts);
 router.use('/:id/followers', validate([param('id').isUUID()]), followers);
 
