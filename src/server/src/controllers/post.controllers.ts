@@ -118,7 +118,7 @@ const getAuthorPost = async (req: Request, res: Response) => {
       attributes: ['id', 'displayName', 'github', 'profileImage'],
       as: 'author',
     },
-  })
+  });
   if (post === null) {
     res.status(404).send();
     return;
@@ -128,14 +128,14 @@ const getAuthorPost = async (req: Request, res: Response) => {
     ...post.toJSON(),
     id: getHost(req) + req.baseUrl + '/' + post.id,
     commentsSrc: {
-      type: "comment",
+      type: 'comment',
       page: req.params.page,
       size: req.params.size,
       post: getHost(req) + req.baseUrl + '/' + post.id,
       id: getHost(req) + req.baseUrl + '/' + post.id + '/comments',
       comments: comments.map((comment) => {
         return {
-          type: "comment",
+          type: 'comment',
           ...comment.toJSON(),
           author: {
             type: 'author',
@@ -149,9 +149,8 @@ const getAuthorPost = async (req: Request, res: Response) => {
             host: getHost(req) + '/',
           },
           id: getHost(req) + req.baseUrl + '/' + comment.toJSON().id,
-        }
-      })
-      
+        };
+      }),
     },
     author: {
       type: 'author',
