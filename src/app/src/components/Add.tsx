@@ -22,6 +22,7 @@ import api from '../api/api';
 interface Props {
   currentUser?: Author;
   handlePostsChanged:any;
+  handleClose:any;
 }
 const EditContainer = styled.div`
   background-color: white;
@@ -88,7 +89,7 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
 const fieldStyle = { width: '40%', mt:3 };
 const formStyle = { m: 1, minWidth: 120, width: '40%', mt:2 };
 
-const Add = ({ currentUser, handlePostsChanged }: Props) => {
+const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
   const [content, setContent] = React.useState('');
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -160,7 +161,7 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
     .withId('' + currentUser?.id)
     .posts
     .create(formData)
-    .then(()=>handlePostsChanged())
+    .then(()=>{handlePostsChanged(); handleClose()})
     .catch((error) => console.log(error));
   };
 

@@ -75,7 +75,7 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
 const fieldStyle = { width: '40%', mt:3 };
 const formStyle = { m: 1, minWidth: 120, width: '40%', mt:2 };
 
-const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
+const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) => {
   const [content, setContent] = React.useState(data.content);
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -146,7 +146,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
       .withId('' + currentUser?.id)
       .posts.withId('' + id)
       .update(formData)
-      .then(() => handlePostsChanged())
+      .then(() => {handlePostsChanged(); handleClose()})
       .catch((e) => console.log(e.response));
   };
 
