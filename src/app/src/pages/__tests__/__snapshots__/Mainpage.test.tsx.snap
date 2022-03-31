@@ -119,12 +119,12 @@ exports[`Mainpage suite Renders correctly 1`] = `
         className="sc-fFeiMQ ejkoIZ"
       >
         <div
-          className="sc-bkkeKt bUsYpp"
+          className="sc-bkkeKt Qfuew"
         >
           Github Activity
         </div>
         <div
-          className="sc-bkkeKt bUsYpp"
+          className="sc-bkkeKt Qfuew"
         >
           <span
             className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSuccess css-15u8j6q-MuiCircularProgress-root"
