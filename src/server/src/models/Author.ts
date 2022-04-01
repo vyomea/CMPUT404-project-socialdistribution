@@ -42,16 +42,16 @@ Author.init(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     passwordHash: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     displayName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     github: {
       type: DataTypes.STRING,
@@ -63,7 +63,7 @@ Author.init(
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       defaultValue: false,
     },
     verified: {

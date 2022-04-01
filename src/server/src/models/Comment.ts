@@ -19,11 +19,11 @@ Comment.init(
   {
     comment: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     contentType: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'text/plain',
       validate: {
         customValidator: (value) => {
@@ -36,7 +36,7 @@ Comment.init(
     },
     published: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: DataTypes.NOW,
     },
     id: {
