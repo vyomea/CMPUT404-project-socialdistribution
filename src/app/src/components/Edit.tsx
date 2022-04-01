@@ -19,6 +19,7 @@ const EditContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  border-radius: 10px;
 `;
 const Block = styled.div`
   width: 100%;
@@ -32,8 +33,6 @@ const Block = styled.div`
 `;
 const Header = styled.div`
   margin-top: 1%;
-  text-decoration: underline;
-  font-family: Avenir Next Light;
   font-size: 200%;
   text-align: center;
 `;
@@ -49,7 +48,6 @@ const ContentType = styled.div`
   width: 80%;
   text-align: center;
   margin-top: 2%;
-  font-family: Avenir Next Light;
   font-size: 150%;
 `;
 
@@ -73,7 +71,11 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: '#b5b5b5',
   },
 }));
-const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
+
+const fieldStyle = { width: '40%', mt:3 };
+const formStyle = { m: 1, minWidth: 120, width: '40%', mt:2 };
+
+const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) => {
   const [content, setContent] = React.useState(data.content);
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -144,7 +146,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
       .withId('' + currentUser?.id)
       .posts.withId('' + id)
       .update(formData)
-      .then(() => handlePostsChanged())
+      .then(() => {handlePostsChanged(); handleClose()})
       .catch((e) => console.log(e.response));
   };
 
@@ -158,10 +160,9 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
   return (
     <EditContainer>
       <Block>
-        <Header>Edit</Header>
-        <ContentType>Title</ContentType>
+        <Header>Edit Post</Header>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           required
           label="Title"
@@ -169,17 +170,15 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
           onChange={handleTitleChange}
           fullWidth
         />
-        <ContentType>Description</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           label="Description"
           value={description}
           onChange={handleDescriptionChange}
           fullWidth
         />
-        <ContentType>Type</ContentType>
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant="standard" sx={formStyle}>
           <InputLabel id="demo-simple-select-standard-label" required>
             Type
           </InputLabel>
@@ -195,8 +194,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
             <MenuItem value="image/png;base64">Image</MenuItem>
           </Select>
         </FormControl>
-        <ContentType>Visibility</ContentType>
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant="standard" sx={formStyle}>
           <InputLabel id="demo-simple-select-standard-label" required>
             Visibility
           </InputLabel>
@@ -211,9 +209,8 @@ const Edit = ({ id, currentUser, data, handlePostsChanged }: any) => {
             <MenuItem value="FRIENDS">Friends</MenuItem>
           </Select>
         </FormControl>
-        <ContentType>Categories</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           label="Categories"
           value={category}

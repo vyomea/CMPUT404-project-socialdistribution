@@ -228,6 +228,7 @@ const UserPost: React.FC<postItem> = (props?) => {
             currentUser={props.currentUser}
             data={props?.post}
             handlePostsChanged={props?.handlePostsChanged}
+            handleClose={handleClose}
           />
         </Backdrop>
       ) : (

@@ -18,6 +18,7 @@ const EditContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  border-radius: 10px;
 `;
 const Block = styled.div`
   width: 100%;
@@ -31,19 +32,11 @@ const Block = styled.div`
 `;
 const Header = styled.div`
   margin-top: 1%;
-  text-decoration: underline;
-  font-family: Avenir Next Light;
   font-size: 200%;
   text-align: center;
 `;
 
-const ContentType = styled.div`
-  width: 80%;
-  text-align: center;
-  margin-top: 2%;
-  font-family: Avenir Next Light;
-  font-size: 150%;
-`;
+const fieldStyle = { width: '40%', mt:5 };
 
 const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
   const [username, setName] = React.useState("");
@@ -69,10 +62,9 @@ const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
   return (
     <EditContainer>
       <Block>
-      <Header>Add</Header>
-        <ContentType>Username</ContentType>
+      <Header>Add Node</Header>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           required
           label="username"
@@ -80,9 +72,8 @@ const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
           onChange={handleName}
           fullWidth
         />
-        <ContentType>Password</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           required
           label="password"
@@ -95,7 +86,7 @@ const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
       <Fab
         color="primary"
         aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' } }}
+        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' }, mb: 5 }}
       >
         <CheckIcon onClick={handleEdit} />
       </Fab>

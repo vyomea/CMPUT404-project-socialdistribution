@@ -29,7 +29,6 @@ const GithubHeader = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 150%;
-  font-family: Avenir Next Light;
 `;
 const Github = ({ username }: props) => {
   const [items, setItems] = useState<Array<any>>([]);

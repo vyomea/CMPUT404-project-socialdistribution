@@ -126,7 +126,7 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} />
+          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} handleClose={handleClose}/>
         </Backdrop>
       ) : (
         <MainPageContentContainer>
@@ -143,7 +143,7 @@ export default function Mainpage({ currentUser }: Props) {
             ))}
           </List>
           <GitContainer>
-            <Github username={currentUser?.displayName} />
+            <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
           </GitContainer>
         </MainPageContentContainer>
       )}

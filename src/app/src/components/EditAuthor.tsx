@@ -21,6 +21,7 @@ const EditContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  border-radius: 10px;
 `;
 const Block = styled.div`
   width: 100%;
@@ -34,19 +35,11 @@ const Block = styled.div`
 `;
 const Header = styled.div`
   margin-top: 1%;
-  text-decoration: underline;
-  font-family: Avenir Next Light;
   font-size: 200%;
   text-align: center;
 `;
 
-const ContentType = styled.div`
-  width: 80%;
-  text-align: center;
-  margin-top: 2%;
-  font-family: Avenir Next Light;
-  font-size: 150%;
-`;
+const fieldStyle = { width: '40%', mt:5 };
 
 const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   const [displayName, setName] = React.useState(data.displayName);
@@ -90,10 +83,9 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   return (
     <EditContainer>
       <Block>
-      <Header>Edit</Header>
-        <ContentType>Display Name</ContentType>
+      <Header>Edit Author</Header>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           required
           label="displayName"
@@ -101,18 +93,16 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
           onChange={handleNameChange}
           fullWidth
         />
-        <ContentType>Github</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           label="github"
           value={github}
           onChange={handleGithub}
           fullWidth
         />
-        <ContentType>Profile Image</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id="standard-basic"
           label="imageURL"
           value={profileImage}
@@ -123,7 +113,7 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       <Fab
         color="primary"
         aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' } }}
+        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' }, mb:5 }}
       >
         <CheckIcon onClick={handleEdit} />
       </Fab>
