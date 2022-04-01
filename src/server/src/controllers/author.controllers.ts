@@ -48,9 +48,16 @@ const getAllAuthors = async (req: PaginationRequest, res: Response) => {
     offset: req.offset,
     limit: req.limit,
   });
+
+  const local_authors = []; // only includes local authors: no authors from remote nodes
+  for (let i = 0; i < authors.length; i++) {
+    if (authors[i].email !== null) {
+      local_authors.push(authors[i]);
+    }
+  }
   res.send({
     type: 'authors',
-    items: authors.map((author) => serializeAuthor(author, req)),
+    items: local_authors.map((author) => serializeAuthor(author, req)),
   });
 };
 

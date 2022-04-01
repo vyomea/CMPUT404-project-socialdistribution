@@ -55,6 +55,7 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
+// this should not be used as not in the specs, but is there for testing
 const getPostComment = async (req: Request, res: Response) => {
   const comment = await Comment.findOne({
     attributes: ['comment', 'contentType', 'published', 'id'],
@@ -123,9 +124,17 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
     offset: req.offset,
     limit: req.limit,
   });
+
+  const local_comments = []; // only included local comments: no comments from remote nodes
+  for (let i = 0; i < comments.length; i++) {
+    if (comments[i].comment !== null) {
+      local_comments.push(comments[i]);
+    }
+  }
+
   res.send({
     type: 'comments',
-    comments: comments.map((comment) => serializeComment(comment, req)),
+    comments: local_comments.map((comment) => serializeComment(comment, req)),
   });
 };
 

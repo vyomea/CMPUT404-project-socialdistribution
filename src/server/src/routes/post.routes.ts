@@ -78,21 +78,21 @@ router.post(
   [
     requiredLoggedIn,
     multer().single('image'),
-    validate([
-      body('title').isString(),
-      body('description').isString(),
-      body('source').isURL(),
-      body('origin').isURL(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-        'application/base64',
-        'image',
-      ]),
-      body('content').optional(),
-      body('categories.*').isString(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']),
-    ]),
+    // validate([
+    //   body('title').isString(),
+    //   body('description').isString(),
+    //   body('source').isURL(),
+    //   body('origin').isURL(),
+    //   body('contentType').isIn([
+    //     'text/markdown',
+    //     'text/plain',
+    //     'application/base64',
+    //     'image',
+    //   ]),
+    //   body('content').optional(),
+    //   body('categories.*').isString(),
+    //   body('visibility').isIn(['PUBLIC', 'FRIENDS']),
+    // ]),
   ],
   createPost
 );

@@ -172,6 +172,11 @@ const getAuthorPost = async (req: Request, res: Response) => {
     res.status(404).send();
     return;
   }
+  // to ensure that a remote post is not shown
+  if (post.content === null) {
+    res.status(404).send();
+    return;
+  }
   res.send(serializePost(post, req, comments));
 };
 
@@ -189,9 +194,16 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
     offset: req.offset,
     limit: req.limit,
   });
+
+  const local_posts = []; // only included local posts: no posts from remote nodes
+  for (let i = 0; i < posts.length; i++) {
+    if (posts[i].content !== null) {
+      local_posts.push(posts[i]);
+    }
+  }
   res.send({
     type: 'posts',
-    items: posts.map((post) => serializePost(post, req)),
+    items: local_posts.map((post) => serializePost(post, req)),
   });
 };
 

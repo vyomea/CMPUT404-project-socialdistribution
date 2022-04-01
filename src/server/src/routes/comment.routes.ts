@@ -19,13 +19,13 @@ router.post(
   '/',
   [
     requiredLoggedIn,
-    validate([
-      body('comment').isString(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-      ]),
-    ]),
+    // validate([
+    //   body('comment').isString(),
+    //   body('contentType').isIn([
+    //     'text/markdown',
+    //     'text/plain',
+    //   ]),
+    // ]),
   ],
   createComment
 );
