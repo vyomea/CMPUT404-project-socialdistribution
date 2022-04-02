@@ -7,7 +7,9 @@ class Request extends Model {
   declare authorId: typeof uuidv4;
   declare requestId: typeof uuidv4;
   declare author: Author;
+  declare requestor: Author;
   static Author: BelongsTo;
+  static Requestor: BelongsTo;
 }
 
 Request.init(
