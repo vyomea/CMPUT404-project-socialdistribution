@@ -1,11 +1,10 @@
 import styled from 'styled-components';
-import { TextField } from '@mui/material';
+import { TextField, Checkbox, FormControlLabel } from '@mui/material';
 import React from 'react';
 import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
 import api from '../api/api';
 import Author from '../api/models/Author';
-
 
 interface Props {
   data: Author;
@@ -39,18 +38,20 @@ const Header = styled.div`
   text-align: center;
 `;
 
-const fieldStyle = { width: '40%', mt:5 };
+const fieldStyle = { width: '40%', mt: 5 };
 
 const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   const [displayName, setName] = React.useState(data.displayName);
-  const [github, setGithub] = React.useState((data.github)?data.github:"");
-  const [profileImage, setImage] = React.useState((data.profileImage)?data.profileImage:"");
+  const [github, setGithub] = React.useState(data.github ? data.github : '');
+  const [profileImage, setImage] = React.useState(
+    data.profileImage ? data.profileImage : ''
+  );
+  const [verified, setVerified] = React.useState(data.verified);
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    
     setName(event.target.value);
   };
-  
+
   const handleGithub = (event: React.ChangeEvent<HTMLInputElement>) => {
     setGithub(event.target.value);
   };
@@ -59,62 +60,87 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
     setImage(event.target.value);
   };
 
+  const handleVerified = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVerified(event.target.checked);
+  };
 
   const handleEdit = () => {
     const author = {
       type: data.type,
       id: data.id,
       displayName: displayName,
-      github: ((github.trim()==="")||(github.trim().length===0))?undefined:github,
-      profileImage: ((profileImage.trim()==="")||(profileImage.trim().length===0))?undefined:profileImage,
-      isAdmin: data.isAdmin
+      github:
+        github.trim() === '' || github.trim().length === 0 ? undefined : github,
+      profileImage:
+        profileImage.trim() === '' || profileImage.trim().length === 0
+          ? undefined
+          : profileImage,
+      isAdmin: data.isAdmin,
+      verified: verified,
     };
 
     console.log(author);
-  
+
     api.authors
       .withId(author.id)
       .update(author)
-      .then(()=>{handleAuthorsChanged(); handleClose()})
-      .catch((e) => console.log(e.response));
-  
-    };
+      .then(() => {
+        handleAuthorsChanged();
+        handleClose();
+      })
+      .catch(e => console.log(e.response));
+  };
 
   return (
     <EditContainer>
       <Block>
-      <Header>Edit Author</Header>
+        <Header>Edit Author</Header>
         <TextField
           sx={fieldStyle}
-          id="standard-basic"
+          id='standard-basic'
           required
-          label="displayName"
+          label='displayName'
           value={displayName}
           onChange={handleNameChange}
           fullWidth
         />
         <TextField
           sx={fieldStyle}
-          id="standard-basic"
-          label="github"
+          id='standard-basic'
+          label='github'
           value={github}
           onChange={handleGithub}
           fullWidth
         />
         <TextField
           sx={fieldStyle}
-          id="standard-basic"
-          label="imageURL"
+          id='standard-basic'
+          label='imageURL'
           value={profileImage}
           onChange={handleImage}
           fullWidth
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              id='standard-basic'
+              checked={verified}
+              onChange={handleVerified}
+            />
+          }
+          label='Verified'
+          labelPlacement='start'
+        />
       </Block>
       <Fab
-        color="primary"
-        aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' }, mb:5 }}
-      >
+        color='primary'
+        aria-label='check'
+        sx={{
+          color: 'black',
+          background: '#46ECA6',
+          '&:hover': { background: '#18E78F' },
+          mb: 5,
+        }}>
         <CheckIcon onClick={handleEdit} />
       </Fab>
     </EditContainer>

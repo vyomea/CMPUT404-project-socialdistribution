@@ -13,6 +13,7 @@ describe('/login', () => {
       email,
       passwordHash: await argon2.hash(password),
       displayName: 'Test User',
+      verified: true,
     });
   });
 

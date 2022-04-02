@@ -14,6 +14,7 @@ class Author extends Model {
   declare github: string;
   declare profileImage: string;
   declare isAdmin: boolean;
+  declare verified: boolean;
   static Posts: HasMany;
   static Comments: HasMany;
   static Followers: HasMany;
@@ -61,6 +62,11 @@ Author.init(
       allowNull: true,
     },
     isAdmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    verified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,

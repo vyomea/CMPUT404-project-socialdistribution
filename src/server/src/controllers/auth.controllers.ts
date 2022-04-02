@@ -19,7 +19,7 @@ const login = async (req: Request, res: Response) => {
       email: email,
     },
   });
-  if (author === null) {
+  if (author === null || !author.verified) {
     unauthorized(res);
     return;
   }
