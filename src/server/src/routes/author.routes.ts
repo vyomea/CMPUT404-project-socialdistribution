@@ -17,6 +17,7 @@ import {
   getCurrentAuthor,
   updateProfile,
 } from '../controllers/author.controllers';
+import { getAuthorFollowings } from '../controllers/follower.controllers';
 
 router.use(
   '/:id/posts/:post_id/comments',
@@ -25,6 +26,11 @@ router.use(
 );
 router.use('/:id/posts', validate([param('id').isUUID()]), posts);
 router.use('/:id/followers', validate([param('id').isUUID()]), followers);
+router.use(
+  '/:id/following',
+  validate([param('id').isUUID()]),
+  getAuthorFollowings
+);
 
 router.get('/', paginate, getAllAuthors);
 router.get('/me', requiredLoggedIn, getCurrentAuthor);
