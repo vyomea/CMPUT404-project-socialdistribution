@@ -162,7 +162,6 @@ const UserPost: React.FC<postItem> = (props?) => {
     let h = window.location.href + 'authors/' + x;
     // Will work if running frontend on 3001
     // h = h.replace('3002', '3001');
-    debugger;
     switch (contentType) {
       case 'text/markdown':
         return <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>;
@@ -170,7 +169,6 @@ const UserPost: React.FC<postItem> = (props?) => {
         return props?.post?.content;
       case 'image/png;base64':
       case 'image/jpeg;base64':
-        debugger;
         return (
           <div
             style={{
@@ -193,8 +191,8 @@ const UserPost: React.FC<postItem> = (props?) => {
   };
 
   //Navigate to user's profile from userpost
-  const HandleNavigation = () => { 
-    navigate(`/profile/${props?.postAuthor?.id.split('/').pop()}`) 
+  const HandleNavigation = () => {
+    navigate(`/profile/${props?.postAuthor?.id.split('/').pop()}`);
   };
 
   return (

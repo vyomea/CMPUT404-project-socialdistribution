@@ -1,4 +1,3 @@
-import NavBar from '../components/NavBar';
 import UserPost from '../components/UserPost';
 import Github from '../components/Github';
 import styled from 'styled-components';
@@ -19,11 +18,6 @@ const MainPageContainer = styled.div`
   flex-direction: column;
   height: ${window.innerHeight}px;
   width: ${window.innerWidth}px;
-`;
-
-// This is for the NavBar
-const NavBarContainer = styled.div`
-  margin-bottom: 5%;
 `;
 
 // This is for the posts and New Post Button and Github Activity
@@ -47,22 +41,6 @@ export default function Mainpage({ currentUser }: Props) {
   const [open, setOpen] = useState(false);
   const [postsChanged, setpostsChanged] = useState(false);
 
-  const items2 = [
-    {
-      Text: 'Home',
-      handleClick: () => {
-        // navigate('/');
-      },
-    },
-    {
-      Text: 'Logout',
-      handleClick: () => {
-        api.logout();
-        window?.location?.reload();
-      },
-    },
-  ];
-
   const handleClose = () => {
     setOpen(false);
   };
@@ -84,9 +62,6 @@ export default function Mainpage({ currentUser }: Props) {
 
   return (
     <MainPageContainer>
-      <NavBarContainer>
-        <NavBar items={items2} />
-      </NavBarContainer>
       <Fab
         color="primary"
         aria-label="check"
@@ -126,7 +101,11 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} handleClose={handleClose}/>
+          <Add
+            currentUser={currentUser}
+            handlePostsChanged={handlePostsChanged}
+            handleClose={handleClose}
+          />
         </Backdrop>
       ) : (
         <MainPageContentContainer>
@@ -143,7 +122,9 @@ export default function Mainpage({ currentUser }: Props) {
             ))}
           </List>
           <GitContainer>
-            <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
+            <Github
+              username={currentUser?.github ? `${currentUser.github.split('/').pop()}` : ''}
+            />
           </GitContainer>
         </MainPageContentContainer>
       )}
