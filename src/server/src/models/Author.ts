@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Post from './Post';
 import Comment from './Comment';
 import Follower from './Follower';
+import Request from './Request';
 
 class Author extends Model {
   declare id: typeof uuidv4;
@@ -16,13 +17,18 @@ class Author extends Model {
   static Posts: HasMany;
   static Comments: HasMany;
   static Followers: HasMany;
+  static Requests: HasMany;
   declare followers: Follower[];
   declare posts: Post[];
+  declare requests: Request[];
   declare addComment: (comment: Comment) => Promise<void>;
   declare addPost: (post: Post) => Promise<void>;
   declare addFollower: (author: Author) => Promise<void>;
   declare hasFollower: (author: Author) => Promise<boolean>;
   declare removeFollower: (author: Author) => Promise<void>;
+  declare addRequest: (author: Author) => Promise<void>;
+  declare hasRequest: (author: Author) => Promise<void>;
+  declare removeRequest: (author: Author) => Promise<void>;
 }
 
 Author.init(
@@ -67,13 +73,19 @@ Author.init(
   }
 );
 
-Author.Posts = Author.hasMany(Post, { onDelete: 'cascade', hooks:true });
+Author.Posts = Author.hasMany(Post, { onDelete: 'cascade', hooks: true });
 Post.Author = Post.belongsTo(Author, { as: 'author' });
-Author.Followers = Author.hasMany(Author);
-Author.belongsToMany(Author, { through: 'followers', as: 'follower' });
+
+Author.Followers = Author.belongsToMany(Author, { through: 'followers', as: 'follower' });
 Follower.Author = Follower.belongsTo(Author, {
   as: 'author',
   foreignKey: 'followerId',
+});
+
+Author.Requests = Author.belongsToMany(Author, { through: 'requests', as: 'request' });
+Request.Author = Request.belongsTo(Author, {
+  as: 'author',
+  foreignKey: 'requestId',
 });
 
 Author.Comments = Author.hasMany(Comment);
