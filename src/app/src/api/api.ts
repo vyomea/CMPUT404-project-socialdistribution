@@ -65,22 +65,22 @@ const api = {
     return result.data.author;
   },
 
-    /**
+  /**
    * Create a new author's account via admin.
    * @returns the new author
    */
-    create: async (
-      email: string,
-      password: string,
-      displayName: string
-    ): Promise<Author> => {
-      const result = await axios.post('/register', {
-        email,
-        password,
-        displayName,
-      });
-      return result.data.author;
-    },
+  create: async (
+    email: string,
+    password: string,
+    displayName: string
+  ): Promise<Author> => {
+    const result = await axios.post("/register", {
+      email,
+      password,
+      displayName,
+    });
+    return result.data.author;
+  },
 
   /**
    * Log out of the current author's account.
@@ -316,18 +316,19 @@ const api = {
       },
 
       /**
-       * Actions on the followings of this author.
+       * Actions on the authors that this author follows.
        */
       followings: {
         /**
-         * Lists the followings of the authors.
-         * @returns a list of the pofile of the followings
+         * Lists the authors that this author follows.
+         * @returns a list of the authors that are followed
          */
-        list: async (): Promise<Author[]> => (
-          await axios.get<{items: AuthorResponse[]}>(
-            `/authors/${authorId}/following`
-          )
-        ).data.items.map(authorFromResponse),
+        list: async (): Promise<Author[]> =>
+          (
+            await axios.get<{ items: AuthorResponse[] }>(
+              `/authors/${authorId}/following`
+            )
+          ).data.items.map(authorFromResponse),
       },
 
       /**
