@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Button, ButtonGroup, Card, CardContent, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Card, CardContent } from "@mui/material";
 import FollowRequest from "../api/models/FollowRequest"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 

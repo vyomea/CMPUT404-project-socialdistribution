@@ -92,7 +92,7 @@ const actor: Author = {
   id: 'http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e',
   displayName: 'Lara Croft',
   isAdmin: false,
-  isVerified: true,
+  verified: true,
 };
 
 const followRequest: FollowRequest = {

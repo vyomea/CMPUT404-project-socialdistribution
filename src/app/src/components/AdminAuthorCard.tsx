@@ -142,7 +142,7 @@ export default function AdminAuthorCard({
                                 {author.displayName}
                             </Typography>
                             <Typography>
-                                {author.isVerified ? `Verified`:`Unverified`}
+                                {author.verified ? `Verified`:`Unverified`}
                             </Typography>
                         </Box>
 

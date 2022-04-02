@@ -68,7 +68,7 @@ const EditProfile = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       github: ((github.trim()==="")||(github.trim().length===0))?undefined:github,
       profileImage: ((profileImage.trim()==="")||(profileImage.trim().length===0))?undefined:profileImage,
       isAdmin: data.isAdmin,
-      isVerified: data.isVerified
+      verified: undefined
     };
 
     console.log(author);
