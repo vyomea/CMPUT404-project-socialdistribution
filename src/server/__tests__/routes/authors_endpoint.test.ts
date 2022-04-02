@@ -1,20 +1,25 @@
 import request from 'supertest';
+import jwt from 'jsonwebtoken';
 import { v4 } from 'uuid';
 import app from '../../src/app';
 import Author from '../../src/models/Author';
 
 describe('Authors', () => {
   let author: Author;
+  let token: string;
 
-  beforeAll(
-    async () =>
-      (author = await Author.create({
-        id: v4(),
-        email: 'test@example.com',
-        passwordHash: 'some_hash',
-        displayName: 'Test User',
-      }))
-  );
+  beforeAll(async () => {
+    author = await Author.create({
+      id: v4(),
+      email: 'test@example.com',
+      passwordHash: 'some_hash',
+      displayName: 'Test User',
+    });
+    token = jwt.sign(
+      { authorId: author.id.toString() },
+      process.env.JWT_SECRET
+    );
+  });
 
   afterAll(async () => await author.destroy());
 
@@ -36,6 +41,7 @@ describe('Authors', () => {
   it('should update an author', async () => {
     const res = await request(app)
       .post(`/authors/${author.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ displayName: 'Test User Changed' });
     expect(res.statusCode).toBe(200);
     await author.reload();
