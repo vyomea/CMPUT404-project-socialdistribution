@@ -141,6 +141,9 @@ export default function AdminAuthorCard({
                             <Typography>
                                 {author.displayName}
                             </Typography>
+                            <Typography>
+                                {author.isVerified ? `Verified`:`Unverified`}
+                            </Typography>
                         </Box>
 
                     </Box>

@@ -5,7 +5,8 @@ import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
 import api from '../api/api';
 import Author from '../api/models/Author';
-import Checkbox from '@mui/material/Checkbox';
+
+
 interface Props {
   data: Author;
   handleAuthorsChanged: any;
@@ -38,22 +39,15 @@ const Header = styled.div`
   text-align: center;
 `;
 
-const ContentType = styled.div`
-  width: 80%;
-  text-align: center;
-  margin-top: 2%;
-  font-size: 150%;
-`;
-
 const fieldStyle = { width: '40%', mt:5 };
 
-const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
+const EditProfile = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   const [displayName, setName] = React.useState(data.displayName);
   const [github, setGithub] = React.useState((data.github)?data.github:"");
   const [profileImage, setImage] = React.useState((data.profileImage)?data.profileImage:"");
-  const [isVerified, setVerified] = React.useState(data.isVerified);
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
     setName(event.target.value);
   };
   
@@ -65,9 +59,6 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
     setImage(event.target.value);
   };
 
-  const handleVerify = (event: any) => {
-    setVerified(event.target.checked);
-  };
 
   const handleEdit = () => {
     const author = {
@@ -77,8 +68,10 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       github: ((github.trim()==="")||(github.trim().length===0))?undefined:github,
       profileImage: ((profileImage.trim()==="")||(profileImage.trim().length===0))?undefined:profileImage,
       isAdmin: data.isAdmin,
-      isVerified: isVerified
+      isVerified: data.isVerified
     };
+
+    console.log(author);
   
     api.authors
       .withId(author.id)
@@ -91,7 +84,7 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   return (
     <EditContainer>
       <Block>
-      <Header>Edit Author</Header>
+      <Header>Edit Profile</Header>
         <TextField
           sx={fieldStyle}
           id="standard-basic"
@@ -117,10 +110,6 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
           onChange={handleImage}
           fullWidth
         />
-
-        <ContentType> Verify </ContentType>
-        <Checkbox checked={isVerified} onClick={handleVerify} />
-
       </Block>
       <Fab
         color="primary"
@@ -133,4 +122,4 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
   );
 };
 
-export default EditAuthor;
+export default EditProfile;
