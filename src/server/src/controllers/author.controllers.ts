@@ -81,7 +81,7 @@ const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
 const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
   const { email, displayName, github, profileImage, verified } = req.body;
 
-  if (verified && !(await isAdmin(req.authorId))) {
+  if (verified !== undefined && !(await isAdmin(req.authorId))) {
     unauthorized(res);
     return;
   }
@@ -98,7 +98,7 @@ const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
       ...(displayName && { displayName: displayName }),
       ...(github && { github: github }),
       ...(profileImage && { profileImage: profileImage }),
-      ...(verified && { verified: verified }),
+      ...(verified !== undefined && { verified: verified }),
     });
   } catch (error) {
     console.error(error);
