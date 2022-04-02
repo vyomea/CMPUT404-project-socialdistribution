@@ -5,25 +5,31 @@ import Author from './Author';
 import Post from './Post';
 
 class Comment extends Model {
+  declare id: typeof uuidv4;
+  declare comment: string;
+  declare contentType: 'text/markdown' | 'text/plain';
+  declare published: Date;
   static Author: BelongsTo;
   declare author: Author;
   static Post: BelongsTo;
   declare post: Post;
-  declare comment: string;
-  declare contentType: 'text/markdown' | 'text/plain';
-  declare published: Date;
-  declare id: typeof uuidv4;
 }
 
 Comment.init(
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
     comment: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     contentType: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
       defaultValue: 'text/plain',
       validate: {
         customValidator: (value) => {
@@ -36,14 +42,8 @@ Comment.init(
     },
     published: {
       type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: DataTypes.NOW,
-    },
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      primaryKey: true,
+      defaultValue: DataTypes.NOW,
     },
   },
   {

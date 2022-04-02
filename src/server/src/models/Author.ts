@@ -15,6 +15,7 @@ class Author extends Model {
   declare profileImage: string;
   declare isAdmin: boolean;
   declare verified: boolean;
+  declare serviceUrl: string;
   static Posts: HasMany;
   static Comments: HasMany;
   static Followers: HasMany;
@@ -70,6 +71,10 @@ Author.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    serviceUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

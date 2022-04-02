@@ -23,6 +23,7 @@ class Post extends Model {
   declare published: Date;
   declare visibility: 'PUBLIC' | 'FRIENDS';
   declare unlisted: boolean;
+  declare serviceUrl: string;
   static Author: BelongsTo;
   declare author: Author;
   static Comments: BelongsTo;
@@ -113,6 +114,10 @@ Post.init(
       allowNull: true,
       defaultValue: false,
     },
+    serviceUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize: db,
@@ -121,7 +126,7 @@ Post.init(
   }
 );
 
-Post.Comments = Post.hasMany(Comment);
+Post.Comments = Post.hasMany(Comment, { as: 'comments' });
 Comment.Post = Comment.belongsTo(Post, { as: 'post' });
 
 export default Post;
