@@ -44,7 +44,7 @@ const api = {
   login: async (email: string, password: string): Promise<Author> => {
     const result = await axios.post("/login", { email, password });
     localStorage.setItem("token", result.data.token);
-    return result.data.author;
+    return authorFromResponse(result.data.author);
   },
 
   /**
