@@ -1,16 +1,25 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, IconButton, Avatar, List, Button, Typography, Backdrop } from '@mui/material';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import PersonIcon from '@mui/icons-material/Person';
-import { CloseRounded } from '@mui/icons-material';
-import NavBar from '../components/NavBar';
-import Author from '../api/models/Author';
-import Post from '../api/models/Post';
-import UserPost from '../components/UserPost';
-import api from '../api/api';
-import EditAuthor from '../components/EditAuthor';
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {
+  Box,
+  IconButton,
+  Avatar,
+  List,
+  Button,
+  Typography,
+  Backdrop,
+} from "@mui/material";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import PersonIcon from "@mui/icons-material/Person";
+import { CloseRounded } from "@mui/icons-material";
+import NavBar from "../components/NavBar";
+import Author from "../api/models/Author";
+import Post from "../api/models/Post";
+import UserPost from "../components/UserPost";
+import api from "../api/api";
+import EditAuthor from "../components/EditAuthor";
+import FollowerList from "../components/FollowerList";
 
 interface Props {
   currentUser?: Author;
@@ -21,10 +30,21 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   const [open, setOpen] = React.useState(false);
 
   const handleClose = () => {
-      setOpen(false);
-    };
+    setOpen(false);
+  };
   const handleToggle = () => {
     setOpen(!open);
+  };
+
+  // Follower List
+  const [followerOpen, setFollowerOpen] = React.useState(false);
+
+  const handleFollowerToggle = () => {
+    setFollowerOpen(!followerOpen);
+  };
+
+  const handleFollowerClose = () => {
+    setFollowerOpen(false);
   };
 
   //Get ID from params
@@ -44,7 +64,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       .get()
       .then((data) => setAuthor(data))
       .catch((error) => {
-        console.log('No author');
+        console.log("No author");
       });
   }, [id, authorsChanged]);
 
@@ -64,7 +84,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       .catch((error) => {
         console.log(error);
       });
-  }, [id,postsChanged]);
+  }, [id, postsChanged]);
 
   // If it's your profle - Edit
   let myProfile = false;
@@ -86,158 +106,194 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     setFollowing(false);
   };
 
-  if (author !== undefined && currentUser!==undefined) {
+  if (author !== undefined && currentUser !== undefined) {
     return (
       <>
-      {open ? (
-        <Backdrop
-          sx={{
-            color: '#fff',
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-          open={open}
-        >
-          <CloseRounded
-            onClick={handleClose}
+        {followerOpen ? (
+          <Backdrop
             sx={{
-              '&:hover': {
-                cursor: 'pointer',
-              },
-              marginBottom: '10px',
-              borderRadius: '100%',
-              border: '1px solid white',
+              color: "#fff",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
-          />
-          <EditAuthor
-            data={currentUser}
-            handleAuthorsChanged={handleAuthorsChanged} 
-            handleClose={handleClose}
-          />
-        </Backdrop>
-      ) :(
-        <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-          <Box style={{ height: '5%' }} sx={{ bgcolor: '#fff' }}>
-            <NavBar
-              items={[
-                {
-                  Text: '',
-                  handleClick: () => {
-                    console.log(1);
-                  },
-                },
-              ]}
-            />
-          </Box>
-          <Box style={{ display: 'flex', height: '95%' }} sx={{ bgcolor: '#fff' }}>
-            <Box
-              boxShadow={5}
-              display="flex"
+            open={followerOpen}
+          >
+            <CloseRounded
+              onClick={handleFollowerClose}
               sx={{
-                flexDirection: 'column',
-                width: '30%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                bgcolor: '#fff',
+                "&:hover": {
+                  cursor: "pointer",
+                },
+                marginBottom: "10px",
+                borderRadius: "100%",
+                border: "1px solid white",
               }}
-            >
-            <Avatar sx={{ width: 150, height: 150 }} >
-            {author.profileImage ? 
-              <Box
-                  component="img"
-                  src={author.profileImage}
-                  alt="profile image"
-                  height="100%"
-                  width="100%"
-                  style={{
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                  }}
+            />
+            <FollowerList
+              data={currentUser}
+              handleAuthorsChanged={handleAuthorsChanged}
+              handleClose={handleFollowerClose}
+            />
+          </Backdrop>
+        ) : open ? (
+          <Backdrop
+            sx={{
+              color: "#fff",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+            open={open}
+          >
+            <CloseRounded
+              onClick={handleClose}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                },
+                marginBottom: "10px",
+                borderRadius: "100%",
+                border: "1px solid white",
+              }}
+            />
+            <EditAuthor
+              data={currentUser}
+              handleAuthorsChanged={handleAuthorsChanged}
+              handleClose={handleClose}
+            />
+          </Backdrop>
+        ) : (
+          <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
+            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}>
+              <NavBar
+                items={[
+                  {
+                    Text: "",
+                    handleClick: () => {
+                      console.log(1);
+                    },
+                  },
+                ]}
               />
-            : (
-              <PersonIcon sx={{ width: '75%', height: '75%' }} />
-            )}
-            </Avatar> 
-
-              <Typography variant="h4" align="center">
-                {author.displayName}
-              </Typography>
-              {author.github ? (
-                <IconButton onClick={() => window.open(
-                  `${author.github}`,
-                  "_blank"
-                  )}>
-                  <GitHubIcon />
-                </IconButton>
-              ) : null}
-
+            </Box>
+            <Box
+              style={{ display: "flex", height: "95%" }}
+              sx={{ bgcolor: "#fff" }}
+            >
               <Box
+                boxShadow={5}
+                display="flex"
                 sx={{
-                  marginBottom: 2,
+                  flexDirection: "column",
+                  width: "30%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  bgcolor: "#fff",
                 }}
               >
-                <Typography variant="h6" align="center">
-                  Friends: 2
+                <Avatar sx={{ width: 150, height: 150 }}>
+                  {author.profileImage ? (
+                    <Box
+                      component="img"
+                      src={author.profileImage}
+                      alt="profile image"
+                      height="100%"
+                      width="100%"
+                      style={{
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <PersonIcon sx={{ width: "75%", height: "75%" }} />
+                  )}
+                </Avatar>
+
+                <Typography variant="h4" align="center">
+                  {author.displayName}
                 </Typography>
-                <Typography variant="h6" align="center">
-                  Followers: 5
-                </Typography>
-                <Typography variant="h6" align="center">
-                  Following: 10
-                </Typography>
+                {author.github ? (
+                  <IconButton
+                    onClick={() => window.open(`${author.github}`, "_blank")}
+                  >
+                    <GitHubIcon />
+                  </IconButton>
+                ) : null}
+
+                <Box
+                  sx={{
+                    marginBottom: 2,
+                  }}
+                >
+                  <Typography variant="h6" align="center">
+                    Friends: 2
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    align="center"
+                    onClick={handleFollowerToggle}
+                  >
+                    Followers: 5
+                  </Typography>
+                  <Typography variant="h6" align="center">
+                    Following: 10
+                  </Typography>
+                </Box>
+
+                {myProfile ? (
+                  <Button variant="contained" onClick={handleToggle}>
+                    Edit
+                  </Button>
+                ) : isFollowing ? (
+                  <Button variant="contained" onClick={handleUnfollow}>
+                    Unfollow
+                  </Button>
+                ) : sentRequest ? (
+                  <Button variant="contained" disabled>
+                    Request Sent
+                  </Button>
+                ) : (
+                  <Button variant="contained" onClick={handleFollow}>
+                    Follow
+                  </Button>
+                )}
               </Box>
 
-              {myProfile ? (
-                <Button
-                  variant="contained"
-                  onClick={handleToggle}
+              <Box
+                overflow="auto"
+                display="flex"
+                sx={{
+                  flexDirection: "column",
+                  width: "70%",
+                  alignItems: "center",
+                  mt: 0.5,
+                }}
+              >
+                <List
+                  style={{ maxHeight: "100%", overflow: "auto" }}
+                  sx={{ width: "100%" }}
                 >
-                  Edit
-                </Button>
-              ) : isFollowing ? (
-                <Button variant="contained" onClick={handleUnfollow}>
-                  Unfollow
-                </Button>
-              ) : sentRequest ? (
-                <Button variant="contained" disabled>
-                  Request Sent
-                </Button>
-              ) : (
-                <Button variant="contained" onClick={handleFollow}>
-                  Follow
-                </Button>
-              )}
-            </Box>
-
-            <Box
-              overflow="auto"
-              display="flex"
-              sx={{
-                flexDirection: 'column',
-                width: '70%',
-                alignItems: 'center',
-                mt: 0.5,
-              }}
-            >
-              <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{width:'100%'}}>
-                {posts?.map((post) => (
-                  <UserPost
-                    post={post}
-                    currentUser={currentUser}
-                    postAuthor={author}
-                    likes={0}
-                    handlePostsChanged={handlePostsChanged}
-                    key={post.id}
-                  />
-                ))}
-              </List>
+                  {posts?.map((post) => (
+                    <UserPost
+                      post={post}
+                      currentUser={currentUser}
+                      postAuthor={author}
+                      likes={0}
+                      handlePostsChanged={handlePostsChanged}
+                      key={post.id}
+                    />
+                  ))}
+                </List>
+              </Box>
             </Box>
           </Box>
-        </Box>
         )}
       </>
     );
