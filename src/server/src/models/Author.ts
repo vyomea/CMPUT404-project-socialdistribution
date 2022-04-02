@@ -76,13 +76,15 @@ Author.init(
 Author.Posts = Author.hasMany(Post, { onDelete: 'cascade', hooks: true });
 Post.Author = Post.belongsTo(Author, { as: 'author' });
 
-Author.Followers = Author.belongsToMany(Author, {
-  through: 'followers',
+Author.Followers = Author.hasMany(Author);
+Author.belongsToMany(Author, { through: 'followers', as: 'follower' });
+Follower.Follower = Follower.belongsTo(Author, {
   as: 'follower',
-});
-Follower.Author = Follower.belongsTo(Author, {
-  as: 'author',
   foreignKey: 'followerId',
+});
+Follower.belongsTo(Author, {
+  as: 'author',
+  foreignKey: 'authorId',
 });
 
 Author.Requests = Author.belongsToMany(Author, {
