@@ -7,7 +7,9 @@ class Follower extends Model {
   declare authorId: typeof uuidv4;
   declare followerId: typeof uuidv4;
   declare author: Author;
+  declare follower: Author;
   static Author: BelongsTo;
+  static Follower: BelongsTo;
 }
 
 Follower.init(
