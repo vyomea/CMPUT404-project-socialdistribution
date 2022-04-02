@@ -316,6 +316,21 @@ const api = {
       },
 
       /**
+       * Actions on the followings of this author.
+       */
+      followings: {
+        /**
+         * Lists the followings of the authors.
+         * @returns a list of the pofile of the followings
+         */
+        list: async (): Promise<Author[]> => (
+          await axios.get<{items: AuthorResponse[]}>(
+            `/authors/${authorId}/following`
+          )
+        ).data.items.map(authorFromResponse),
+      },
+
+      /**
        * Actions on the posts of this author.
        */
       posts: {
