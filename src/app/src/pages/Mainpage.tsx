@@ -12,8 +12,6 @@ import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { List } from '@mui/material';
-import FollowRequest from '../api/models/FollowRequest';
-import MainRequest from '../components/MainRequest';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -85,23 +83,6 @@ export default function Mainpage({ currentUser }: Props) {
       .then((data) => setPosts(data));
   }, [currentUser?.id, postsChanged]);
 
-
-//Fake test data
-const actor: Author = {
-  type: "author",
-  id: 'http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e',
-  displayName: 'Lara Croft',
-  isAdmin: false,
-  verified: true,
-};
-
-const followRequest: FollowRequest = {
-  type: "Follow",
-  summary: 'Lara Croft wants to follow you.',
-  actor: actor, //sends request
-  object: actor, //recieves request
-}
-
   return (
     <MainPageContainer>
       <NavBarContainer>
@@ -161,9 +142,6 @@ const followRequest: FollowRequest = {
                 key={post.id}
               />
             ))}
-            <MainRequest
-            followRequest={followRequest}
-            />
           </List>
           <GitContainer>
             <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
