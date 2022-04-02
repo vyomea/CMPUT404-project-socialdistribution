@@ -28,7 +28,7 @@ export const serializeAuthor = (
 });
 
 const deleteAuthor = async (req: AuthenticatedRequest, res: Response) => {
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;
@@ -44,27 +44,24 @@ const deleteAuthor = async (req: AuthenticatedRequest, res: Response) => {
 
 const getAllAuthors = async (req: PaginationRequest, res: Response) => {
   const authors = await Author.findAll({
+    where: {
+      serviceUrl: null,
+    },
     attributes: publicAttributes,
     offset: req.offset,
     limit: req.limit,
   });
 
-  const local_authors = []; // only includes local authors: no authors from remote nodes
-  for (let i = 0; i < authors.length; i++) {
-    if (authors[i].email !== null) {
-      local_authors.push(authors[i]);
-    }
-  }
   res.send({
     type: 'authors',
-    items: local_authors.map((author) => serializeAuthor(author, req)),
+    items: authors.map((author) => serializeAuthor(author, req)),
   });
 };
 
 const getAuthor = async (req: Request, res: Response) => {
   const author = await Author.findOne({
     attributes: publicAttributes,
-    where: { id: req.params.id },
+    where: { id: req.params.authorId },
   });
   if (author === null) {
     res.status(404).send();
@@ -88,12 +85,13 @@ const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
 const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
   const { email, displayName, github, profileImage, verified } = req.body;
 
+  // Only admins can change verified status
   if (verified !== undefined && !(await isAdmin(req.authorId))) {
     unauthorized(res);
     return;
   }
 
-  const author = await Author.findOne({ where: { id: req.params.id } });
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;

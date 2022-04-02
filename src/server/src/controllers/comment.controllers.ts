@@ -8,11 +8,7 @@ import { getHost } from '../utilities/host';
 import { pick } from '../utilities/pick';
 import { serializeAuthor } from './author.controllers';
 
-export const serializeComment = (
-  comment: Comment,
-  //post: Post,
-  req: Request
-) => ({
+export const serializeComment = (comment: Comment, req: Request) => ({
   type: 'comment',
   ...pick(comment.toJSON(), ['comment', 'contentType', 'published']),
   author: serializeAuthor(comment.author, req),
@@ -27,12 +23,12 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
 
   const post = await Post.findOne({
     where: {
-      id: req.params.post_id,
+      id: req.params.postId,
     },
   });
   const author = await Author.findOne({
     where: {
-      id: req.params.id,
+      id: req.params.authorId,
     },
   });
   if (post === null) {
@@ -60,7 +56,7 @@ const getPostComment = async (req: Request, res: Response) => {
   const comment = await Comment.findOne({
     attributes: ['comment', 'contentType', 'published', 'id'],
     where: {
-      post_id: req.params.post_id,
+      post_id: req.params.postId,
     },
     include: [
       {
@@ -91,7 +87,7 @@ const getPostComment = async (req: Request, res: Response) => {
 };
 
 const getPostComments = async (req: PaginationRequest, res: Response) => {
-  const post = await Post.findByPk(req.params.post_id);
+  const post = await Post.findByPk(req.params.postId);
   if (post === null) {
     res.status(404).send({ error: 'Post does not exist' });
     return;
@@ -100,7 +96,7 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
   const comments = await Comment.findAll({
     attributes: ['comment', 'contentType', 'published', 'id'],
     where: {
-      post_id: req.params.post_id,
+      post_id: req.params.postId,
     },
     include: [
       {
@@ -125,16 +121,9 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
     limit: req.limit,
   });
 
-  const local_comments = []; // only included local comments: no comments from remote nodes
-  for (let i = 0; i < comments.length; i++) {
-    if (comments[i].comment !== null) {
-      local_comments.push(comments[i]);
-    }
-  }
-
   res.send({
     type: 'comments',
-    comments: local_comments.map((comment) => serializeComment(comment, req)),
+    comments: comments.map((comment) => serializeComment(comment, req)),
   });
 };
 
