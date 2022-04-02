@@ -42,13 +42,17 @@ router.delete(
 router.get('/:id', validate([param('id').isUUID()]), getAuthor);
 router.post(
   '/:id',
-  validate([
-    param('id').isUUID(),
-    body('email').isEmail().optional(),
-    body('displayName').isString().optional(),
-    body('github').isURL().optional(),
-    body('profileImage').isURL().optional(),
-  ]),
+  [
+    requiredLoggedIn,
+    validate([
+      param('id').isUUID(),
+      body('email').isEmail().optional(),
+      body('displayName').isString().optional(),
+      body('github').isURL().optional(),
+      body('profileImage').isURL().optional(),
+      body('verified').isBoolean().optional(),
+    ]),
+  ],
   updateProfile
 );
 

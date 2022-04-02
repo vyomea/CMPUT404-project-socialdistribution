@@ -14,6 +14,7 @@ class Author extends Model {
   declare github: string;
   declare profileImage: string;
   declare isAdmin: boolean;
+  declare verified: boolean;
   static Posts: HasMany;
   static Comments: HasMany;
   static Followers: HasMany;
@@ -65,6 +66,11 @@ Author.init(
       allowNull: false,
       defaultValue: false,
     },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize: db,
@@ -76,13 +82,15 @@ Author.init(
 Author.Posts = Author.hasMany(Post, { onDelete: 'cascade', hooks: true });
 Post.Author = Post.belongsTo(Author, { as: 'author' });
 
-Author.Followers = Author.hasMany(Author);
-Author.belongsToMany(Author, { through: 'followers', as: 'follower' });
+Author.Followers = Author.belongsToMany(Author, {
+  through: 'followers',
+  as: 'follower',
+});
 Follower.Follower = Follower.belongsTo(Author, {
   as: 'follower',
   foreignKey: 'followerId',
 });
-Follower.belongsTo(Author, {
+Follower.Author = Follower.belongsTo(Author, {
   as: 'author',
   foreignKey: 'authorId',
 });
