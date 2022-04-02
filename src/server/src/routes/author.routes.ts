@@ -18,7 +18,11 @@ import {
   updateProfile,
 } from '../controllers/author.controllers';
 
-router.use('/:id/posts/:post_id/comments', validate([param('id').isUUID(), param('post_id').isUUID()]), comments);
+router.use(
+  '/:id/posts/:post_id/comments',
+  validate([param('id').isUUID(), param('post_id').isUUID()]),
+  comments
+);
 router.use('/:id/posts', validate([param('id').isUUID()]), posts);
 router.use('/:id/followers', validate([param('id').isUUID()]), followers);
 
@@ -32,13 +36,17 @@ router.delete(
 router.get('/:id', validate([param('id').isUUID()]), getAuthor);
 router.post(
   '/:id',
-  validate([
-    param('id').isUUID(),
-    body('email').isEmail().optional(),
-    body('displayName').isString().optional(),
-    body('github').isURL().optional(),
-    body('profileImage').isURL().optional(),
-  ]),
+  [
+    requiredLoggedIn,
+    validate([
+      param('id').isUUID(),
+      body('email').isEmail().optional(),
+      body('displayName').isString().optional(),
+      body('github').isURL().optional(),
+      body('profileImage').isURL().optional(),
+      body('verified').isBoolean().optional(),
+    ]),
+  ],
   updateProfile
 );
 

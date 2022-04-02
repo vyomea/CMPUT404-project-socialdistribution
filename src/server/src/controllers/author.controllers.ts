@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { unauthorized } from '../handlers/auth.handlers';
+import { isAdmin } from '../handlers/author.handlers';
 import Author from '../models/Author';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
@@ -11,6 +13,7 @@ const publicAttributes = [
   'github',
   'profileImage',
   'isAdmin',
+  'verified',
 ];
 
 export const serializeAuthor = (
@@ -75,8 +78,14 @@ const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
   res.send(serializeAuthor(author, req));
 };
 
-const updateProfile = async (req: Request, res: Response) => {
-  const { email, displayName, github, profileImage } = req.body;
+const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
+  const { email, displayName, github, profileImage, verified } = req.body;
+
+  if (verified && !(await isAdmin(req.authorId))) {
+    unauthorized(res);
+    return;
+  }
+
   const author = await Author.findOne({ where: { id: req.params.id } });
   if (author === null) {
     res.status(404).send();
@@ -89,6 +98,7 @@ const updateProfile = async (req: Request, res: Response) => {
       ...(displayName && { displayName: displayName }),
       ...(github && { github: github }),
       ...(profileImage && { profileImage: profileImage }),
+      ...(verified && { verified: verified }),
     });
   } catch (error) {
     console.error(error);
