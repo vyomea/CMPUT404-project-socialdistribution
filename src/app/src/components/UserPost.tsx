@@ -1,26 +1,26 @@
-import React from 'react';
-import Button, { ButtonProps } from '@mui/material/Button';
-import { styled as Styled } from '@mui/material/styles';
-import styled from 'styled-components';
-import { CloseRounded } from '@mui/icons-material';
-import Backdrop from '@mui/material/Backdrop';
-import Edit from './Edit';
-import Author from '../api/models/Author';
-import Post from '../api/models/Post';
-import { Avatar, Box } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import { useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import api from '../api/api';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import React from "react";
+import Button, { ButtonProps } from "@mui/material/Button";
+import { styled as Styled } from "@mui/material/styles";
+import styled from "styled-components";
+import { CloseRounded } from "@mui/icons-material";
+import Backdrop from "@mui/material/Backdrop";
+import Edit from "./Edit";
+import Author from "../api/models/Author";
+import Post from "../api/models/Post";
+import { Avatar, Box } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import api from "../api/api";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 interface postItem {
   post: any | Post | undefined;
-  currentUser: Author | undefined;
-  postAuthor: Author | undefined;
-  likes: number;
-  handlePostsChanged: any;
+  currentUser?: Author | undefined;
+  postAuthor?: Author | undefined;
+  likes?: number;
+  handlePostsChanged?: any;
 }
 
 // This is for the whole Post, which includes the profile picure, content, etc
@@ -107,30 +107,30 @@ const CommentsContainer = styled.div`
 `;
 
 const EditButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText('#e6c9a8'),
-  backgroundColor: 'white',
-  border: '2px solid black',
-  height: '3%',
-  padding: '1%',
-  marginRight: '10px',
-  '&:hover': {
-    backgroundColor: '#F9F7F5',
+  color: theme.palette.getContrastText("#e6c9a8"),
+  backgroundColor: "white",
+  border: "2px solid black",
+  height: "3%",
+  padding: "1%",
+  marginRight: "10px",
+  "&:hover": {
+    backgroundColor: "#F9F7F5",
   },
 }));
 
 const DeleteButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText('#e6c9a8'),
-  backgroundColor: 'white',
-  border: '2px solid black',
-  height: '3%',
-  padding: '1%',
-  '&:hover': {
-    backgroundColor: '#F9F7F5',
+  color: theme.palette.getContrastText("#e6c9a8"),
+  backgroundColor: "white",
+  border: "2px solid black",
+  height: "3%",
+  padding: "1%",
+  "&:hover": {
+    backgroundColor: "#F9F7F5",
   },
 }));
 
 const cursorStyle = {
-  cursor: 'pointer',
+  cursor: "pointer",
 };
 
 const UserPost: React.FC<postItem> = (props?) => {
@@ -140,15 +140,17 @@ const UserPost: React.FC<postItem> = (props?) => {
   const navigate = useNavigate();
 
   const handleLikes = () => {
-    setLiked(!liked);
-    likes < 0 ? setLikes(0) : setLikes(likes);
-    liked ? setLikes(likes + 1) : setLikes(likes - 1 > 0 ? likes - 1 : 0);
+    if (likes !== undefined && likes >= 0) {
+      setLiked(!liked);
+      likes < 0 ? setLikes(0) : setLikes(likes);
+      liked ? setLikes(likes + 1) : setLikes(likes - 1 > 0 ? likes - 1 : 0);
+    }
   };
   let showButtons = false;
   const handleDelete = () => {
     api.authors
-      .withId('' + props.currentUser?.id)
-      .posts.withId('' + props?.post?.id)
+      .withId("" + props.currentUser?.id)
+      .posts.withId("" + props?.post?.id)
       .delete()
       .then(() => props?.handlePostsChanged())
       .catch((e) => console.log(e.response));
@@ -158,29 +160,29 @@ const UserPost: React.FC<postItem> = (props?) => {
     showButtons = true;
   }
 
-  const renderContent = (contentType: any) => {
+  const renderContent = (content: any, contentType: any) => {
     // HACK
-    let f = '/posts/' + props?.post?.id + '/image';
+    let f = "/posts/" + props?.post?.id + "/image";
     let x = props?.currentUser?.id + f;
-    let h = window.location.href + 'authors/' + x;
+    let h = window.location.href + "authors/" + x;
     // Will work if running frontend on 3001
     // h = h.replace('3002', '3001');
     switch (contentType) {
-      case 'text/markdown':
-        return <ReactMarkdown>{`${props?.post?.content}`}</ReactMarkdown>;
-      case 'text/plain':
-        return props?.post?.content;
-      case 'image/png;base64':
-      case 'image/jpeg;base64':
+      case "text/markdown":
+        return <ReactMarkdown>{content}</ReactMarkdown>;
+      case "text/plain":
+        return content;
+      case "image/png;base64":
+      case "image/jpeg;base64":
         return (
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignContent: 'center',
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
             }}
           >
-            <img style={{ width: '180px', height: '180px' }} src={h} alt="Unavailable" />
+            <img style={{ width: "180px", height: "180px" }} src={h} alt="Unavailable" />
           </div>
         );
     }
@@ -195,12 +197,12 @@ const UserPost: React.FC<postItem> = (props?) => {
 
   //Navigate to user's profile from userpost
   const HandleNavigation = () => {
-    navigate(`/profile/${props?.postAuthor?.id.split('/').pop()}`);
+    navigate(`/profile/${props?.postAuthor?.id.split("/").pop()}`);
   };
 
   const navigateToComments = () => {
     navigate(
-      `/authors/${props?.postAuthor?.id.split('/').pop()}/posts/${props?.post?.id}/comments`,
+      `/authors/${props?.postAuthor?.id.split("/").pop()}/posts/${props?.post?.id}/comments`,
     );
   };
 
@@ -209,25 +211,25 @@ const UserPost: React.FC<postItem> = (props?) => {
       {open ? (
         <Backdrop
           sx={{
-            color: '#fff',
+            color: "#fff",
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
           open={open}
         >
           <CloseRounded
             onClick={handleClose}
             sx={{
-              '&:hover': {
-                cursor: 'pointer',
+              "&:hover": {
+                cursor: "pointer",
               },
-              marginBottom: '10px',
-              borderRadius: '100%',
-              border: '1px solid white',
+              marginBottom: "10px",
+              borderRadius: "100%",
+              border: "1px solid white",
             }}
           />
           <Edit
@@ -254,12 +256,12 @@ const UserPost: React.FC<postItem> = (props?) => {
                   height="100%"
                   width="100%"
                   style={{
-                    borderRadius: '50%',
-                    objectFit: 'cover',
+                    borderRadius: "50%",
+                    objectFit: "cover",
                   }}
                 />
               ) : (
-                <PersonIcon sx={{ width: '75%', height: '75%' }} />
+                <PersonIcon sx={{ width: "75%", height: "75%" }} />
               )}
             </Avatar>
           </PostProfilePictureContainer>
@@ -277,24 +279,26 @@ const UserPost: React.FC<postItem> = (props?) => {
                 </EditDeleteButtonContainer>
               ) : null}
             </TopRowContainer>
-            <ContentContainer>{renderContent(props?.post?.contentType)}</ContentContainer>
+            <ContentContainer>
+              {renderContent(props?.post?.content, props?.post?.contentType)}
+            </ContentContainer>
             <LikesCommentsContainer>
               <LikesContainer onClick={handleLikes}>
-                {likes}{' '}
+                {likes}{" "}
                 {liked ? (
                   <FavoriteBorderIcon
                     sx={{
-                      '&:hover': {
-                        cursor: 'pointer',
+                      "&:hover": {
+                        cursor: "pointer",
                       },
                     }}
                   />
                 ) : (
                   <FavoriteIcon
                     sx={{
-                      color: 'red',
-                      '&:hover': {
-                        cursor: 'pointer',
+                      color: "red",
+                      "&:hover": {
+                        cursor: "pointer",
                       },
                     }}
                   />
