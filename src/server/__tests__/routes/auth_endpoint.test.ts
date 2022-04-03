@@ -121,7 +121,5 @@ describe('/register', () => {
       displayName: 'MyName',
     });
     expect(res.statusCode).toBe(200);
-    expect(typeof res.body.token).toBe('string');
-    expect(res.body.author?.type).toBe('author');
   });
 });
