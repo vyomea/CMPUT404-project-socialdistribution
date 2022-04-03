@@ -1,6 +1,9 @@
+import Author from "./Author";
 export default interface FollowRequest {
   type: "Follow";
-  // TODO
+  summary: string;
+  actor: Author; //sends request
+  object: Author; //recieves request
 }
 
 export type FollowRequestResponse = FollowRequest;

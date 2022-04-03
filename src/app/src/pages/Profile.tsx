@@ -1,15 +1,28 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, IconButton, Avatar, List, Button, Typography, Backdrop } from '@mui/material';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import PersonIcon from '@mui/icons-material/Person';
-import { CloseRounded } from '@mui/icons-material';
-import Author from '../api/models/Author';
-import Post from '../api/models/Post';
-import UserPost from '../components/UserPost';
-import api from '../api/api';
-import EditAuthor from '../components/EditAuthor';
+
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {
+  Box,
+  IconButton,
+  Avatar,
+  List,
+  Button,
+  Typography,
+  Backdrop,
+  ListItemButton,
+} from "@mui/material";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import PersonIcon from "@mui/icons-material/Person";
+import { CloseRounded } from "@mui/icons-material";
+import NavBar from "../components/NavBar";
+import Author from "../api/models/Author";
+import Post from "../api/models/Post";
+import UserPost from "../components/UserPost";
+import api from "../api/api";
+import FollowerList from "../components/FollowerList";
+import FollowingList from "../components/FollowingList";
+import EditProfile from "../components/EditProfile";
 
 interface Props {
   currentUser?: Author;
@@ -24,6 +37,28 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   };
   const handleToggle = () => {
     setOpen(!open);
+  };
+
+  // Follower List
+  const [followerOpen, setFollowerOpen] = React.useState(false);
+
+  const handleFollowerToggle = () => {
+    setFollowerOpen(!followerOpen);
+  };
+
+  const handleFollowerClose = () => {
+    setFollowerOpen(false);
+  };
+
+  // Following List
+  const [followingOpen, setFollowingOpen] = React.useState(false);
+
+  const handleFollowingToggle = () => {
+    setFollowingOpen(!followingOpen);
+  };
+
+  const handleFollowingClose = () => {
+    setFollowingOpen(false);
   };
 
   //Get ID from params
@@ -43,7 +78,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       .get()
       .then((data) => setAuthor(data))
       .catch((error) => {
-        console.log('No author');
+        console.log("No author");
       });
   }, [id, authorsChanged]);
 
@@ -85,34 +120,128 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     setFollowing(false);
   };
 
+  const [followersList, setFollowers] = useState<Author[]>([]);
+
+  // get followers list
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = api.authors.withId("" + author?.id).followers.list();
+        res.then((followers) => {
+          setFollowers(followers);
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, [author?.id]);
+
+  const [followingList, setFollowingList] = useState<Author[]>([]);
+
+  // get following list
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = api.authors.withId("" + author?.id).followings.list();
+        res.then((followings) => {
+          setFollowingList(followings);
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, [author?.id]);
+
   if (author !== undefined && currentUser !== undefined) {
     return (
       <>
-        {open ? (
+        {followerOpen ? (
           <Backdrop
             sx={{
-              color: '#fff',
+              color: "#fff",
               zIndex: (theme) => theme.zIndex.drawer + 1,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+            open={followerOpen}
+          >
+            <CloseRounded
+              onClick={handleFollowerClose}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                },
+                marginBottom: "10px",
+                borderRadius: "100%",
+                border: "1px solid white",
+              }}
+            />
+            <FollowerList
+              data={followersList}
+              handleAuthorsChanged={handleAuthorsChanged}
+              handleClose={handleFollowerClose}
+            />
+          </Backdrop>
+        ) : followingOpen ? (
+          <Backdrop
+            sx={{
+              color: "#fff",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+            open={followingOpen}
+          >
+            <CloseRounded
+              onClick={handleFollowingClose}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                },
+                marginBottom: "10px",
+                borderRadius: "100%",
+                border: "1px solid white",
+              }}
+            />
+            <FollowingList
+              data={followingList}
+              handleAuthorsChanged={handleAuthorsChanged}
+              handleClose={handleFollowingClose}
+            />
+          </Backdrop>
+        ) : open ? (
+          <Backdrop
+            sx={{
+              color: "#fff",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
             open={open}
           >
             <CloseRounded
               onClick={handleClose}
               sx={{
-                '&:hover': {
-                  cursor: 'pointer',
+                "&:hover": {
+                  cursor: "pointer",
                 },
-                marginBottom: '10px',
-                borderRadius: '100%',
-                border: '1px solid white',
+                marginBottom: "10px",
+                borderRadius: "100%",
+                border: "1px solid white",
               }}
             />
-            <EditAuthor
+            <EditProfile
               data={currentUser}
               handleAuthorsChanged={handleAuthorsChanged}
               handleClose={handleClose}
@@ -120,17 +249,31 @@ export default function Profile({ currentUser }: Props): JSX.Element {
           </Backdrop>
         ) : (
           <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-            <Box style={{ height: '5%' }} sx={{ bgcolor: '#fff' }}></Box>
-            <Box style={{ display: 'flex', height: '95%' }} sx={{ bgcolor: '#fff' }}>
+            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}>
+              <NavBar
+                items={[
+                  {
+                    Text: "",
+                    handleClick: () => {
+                      console.log(1);
+                    },
+                  },
+                ]}
+              />
+            </Box>
+            <Box
+              style={{ display: "flex", height: "95%" }}
+              sx={{ bgcolor: "#fff" }}
+            >
               <Box
                 boxShadow={5}
                 display="flex"
                 sx={{
-                  flexDirection: 'column',
-                  width: '30%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  bgcolor: '#fff',
+                  flexDirection: "column",
+                  width: "30%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  bgcolor: "#fff",
                 }}
               >
                 <Avatar sx={{ width: 150, height: 150 }}>
@@ -142,12 +285,12 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                       height="100%"
                       width="100%"
                       style={{
-                        borderRadius: '50%',
-                        objectFit: 'cover',
+                        borderRadius: "50%",
+                        objectFit: "cover",
                       }}
                     />
                   ) : (
-                    <PersonIcon sx={{ width: '75%', height: '75%' }} />
+                    <PersonIcon sx={{ width: "75%", height: "75%" }} />
                   )}
                 </Avatar>
 
@@ -155,7 +298,9 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   {author.displayName}
                 </Typography>
                 {author.github ? (
-                  <IconButton onClick={() => window.open(`${author.github}`, '_blank')}>
+                  <IconButton
+                    onClick={() => window.open(`${author.github}`, "_blank")}
+                  >
                     <GitHubIcon />
                   </IconButton>
                 ) : null}
@@ -165,15 +310,12 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                     marginBottom: 2,
                   }}
                 >
-                  <Typography variant="h6" align="center">
-                    Friends: 2
-                  </Typography>
-                  <Typography variant="h6" align="center">
-                    Followers: 5
-                  </Typography>
-                  <Typography variant="h6" align="center">
-                    Following: 10
-                  </Typography>
+                  <ListItemButton onClick={handleFollowerToggle}>
+                    Followers: {followersList.length}
+                  </ListItemButton>
+                  <ListItemButton onClick={handleFollowingToggle}>
+                    Following: {followingList.length}
+                  </ListItemButton>
                 </Box>
 
                 {myProfile ? (
@@ -199,13 +341,16 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                 overflow="auto"
                 display="flex"
                 sx={{
-                  flexDirection: 'column',
-                  width: '70%',
-                  alignItems: 'center',
+                  flexDirection: "column",
+                  width: "70%",
+                  alignItems: "center",
                   mt: 0.5,
                 }}
               >
-                <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '100%' }}>
+                <List
+                  style={{ maxHeight: "100%", overflow: "auto" }}
+                  sx={{ width: "100%" }}
+                >
                   {posts?.map((post) => (
                     <UserPost
                       post={post}
