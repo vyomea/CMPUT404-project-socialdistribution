@@ -2,6 +2,11 @@
 
 exports[`SignUp suite Renders correctly 1`] = `
 Array [
+  <p
+    className="MuiTypography-root MuiTypography-body1 css-1rgbw84-MuiTypography-root"
+  >
+    Sign up successful. Waiting for admin to verify.
+  </p>,
   <div
     className="MuiFormControl-root MuiTextField-root css-1xkbzzz-MuiFormControl-root-MuiTextField-root"
   >
@@ -30,6 +35,7 @@ Array [
         onFocus={[Function]}
         required={false}
         type="text"
+        value=""
       />
     </div>
     <p
@@ -58,7 +64,6 @@ Array [
         aria-invalid={false}
         autoFocus={false}
         className="MuiInput-input MuiInputBase-input css-1x51dt5-MuiInputBase-input-MuiInput-input"
-        defaultValue=""
         disabled={false}
         id="standard-basic"
         onAnimationStart={[Function]}
@@ -67,6 +72,7 @@ Array [
         onFocus={[Function]}
         required={false}
         type="text"
+        value=""
       />
     </div>
   </div>,
@@ -99,6 +105,7 @@ Array [
         onFocus={[Function]}
         required={false}
         type="password"
+        value=""
       />
     </div>
     <p
@@ -109,7 +116,7 @@ Array [
     </p>
   </div>,
   <button
-    className="MuiLoadingButton-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root css-abq3u9-MuiButtonBase-root-MuiButton-root-MuiLoadingButton-root"
+    className="MuiLoadingButton-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root css-dgdza7-MuiButtonBase-root-MuiButton-root-MuiLoadingButton-root"
     disabled={false}
     onBlur={[Function]}
     onClick={[Function]}
