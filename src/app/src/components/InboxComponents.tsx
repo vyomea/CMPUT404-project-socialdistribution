@@ -1,9 +1,6 @@
 import * as React from "react";
+import InboxItem from "../api/models/InboxItem"
 import Author from "../api/models/Author"
-import Post from "../api/models/Post"
-import Like from "../api/models/Like"
-import Comment from "../api/models/Comment"
-import FollowRequest from "../api/models/FollowRequest"
 import MainLike from './MainLike';
 import MainComment from './MainComment';
 import MainRequest from './MainRequest';
@@ -14,7 +11,7 @@ export default function AdminAuthorCard({
     currentUser,
     handlePostsChanged
 }: {
-    item: Post|Like|Comment|FollowRequest 
+    item: InboxItem
     currentUser: Author|undefined
     handlePostsChanged:any
 }): JSX.Element {
@@ -37,9 +34,9 @@ export default function AdminAuthorCard({
         {item.type==="Follow" ? (
             <MainRequest followRequest={item} key={item.object.id}/>
         ):null}
-        {item.type==="comment" ? (
+        {/* {item.type==="comment" ? (
             <MainComment comment={item} key={item.id}/>
-        ):null}
+        ):null} */}
 
     </>
   );
