@@ -109,10 +109,7 @@ function App() {
           }
         />
         <Route path="/profile/:id" element={<Profile currentUser={currentUser} />} />
-        <Route
-          path="/authors/:id/posts/:id/comments"
-          element={<Comments currentUser={currentUser} />}
-        />
+        <Route path="/authors/:id/posts/:id" element={<Comments currentUser={currentUser} />} />
         <Route
           path="/admin"
           element={
