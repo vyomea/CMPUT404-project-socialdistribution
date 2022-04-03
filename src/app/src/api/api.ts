@@ -55,14 +55,12 @@ const api = {
     email: string,
     password: string,
     displayName: string
-  ): Promise<Author> => {
-    const result = await axios.post("/register", {
+  ): Promise<void> => {
+    await axios.post("/register", {
       email,
       password,
       displayName,
     });
-    localStorage.setItem("token", result.data.token);
-    return result.data.author;
   },
 
   /**

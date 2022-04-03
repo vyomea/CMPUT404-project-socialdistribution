@@ -74,7 +74,7 @@ export default function Homepage({ setCurrentUser }: Props) {
         </RightColumn>
       ) : (
         <RightColumn>
-          <SignUp setCurrentUser={setCurrentUser} />
+          <SignUp />
           <Button
             sx={{ marginTop: "5%" }}
             variant="text"
