@@ -14,7 +14,6 @@ import {
 import GitHubIcon from "@mui/icons-material/GitHub";
 import PersonIcon from "@mui/icons-material/Person";
 import { CloseRounded } from "@mui/icons-material";
-import NavBar from "../components/NavBar";
 import Author from "../api/models/Author";
 import Post from "../api/models/Post";
 import UserPost from "../components/UserPost";
@@ -248,18 +247,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
           </Backdrop>
         ) : (
           <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}>
-              <NavBar
-                items={[
-                  {
-                    Text: "",
-                    handleClick: () => {
-                      console.log(1);
-                    },
-                  },
-                ]}
-              />
-            </Box>
+            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}></Box>
             <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
               <Box
                 boxShadow={5}

@@ -1,28 +1,22 @@
-import styled from 'styled-components';
-import {
-  Button,
-  ButtonGroup,
-  ButtonProps,
-  InputLabel,
-  TextField,
-} from '@mui/material';
-import { styled as Styled } from '@mui/material/styles';
-import React from 'react';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Fab from '@mui/material/Fab';
-import CheckIcon from '@mui/icons-material/Check';
-import Checkbox from '@mui/material/Checkbox';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import ReactMarkdown from 'react-markdown';
-import Author from '../api/models/Author';
-import { v4 as uuidv4 } from 'uuid';
-import api from '../api/api';
+import styled from "styled-components";
+import { Button, ButtonGroup, ButtonProps, InputLabel, TextField } from "@mui/material";
+import { styled as Styled } from "@mui/material/styles";
+import React from "react";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Fab from "@mui/material/Fab";
+import CheckIcon from "@mui/icons-material/Check";
+import Checkbox from "@mui/material/Checkbox";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import ReactMarkdown from "react-markdown";
+import Author from "../api/models/Author";
+import { v4 as uuidv4 } from "uuid";
+import api from "../api/api";
 
 interface Props {
   currentUser?: Author;
-  handlePostsChanged:any;
-  handleClose:any;
+  handlePostsChanged: any;
+  handleClose: any;
 }
 const EditContainer = styled.div`
   background-color: white;
@@ -78,32 +72,30 @@ const ActualContent = styled.div`
 `;
 
 const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText('#fff'),
-  padding: '10px',
-  backgroundColor: 'white',
-  '&:hover': {
-    backgroundColor: '#b5b5b5',
+  color: theme.palette.getContrastText("#fff"),
+  padding: "10px",
+  backgroundColor: "white",
+  "&:hover": {
+    backgroundColor: "#b5b5b5",
   },
 }));
 
-const fieldStyle = { width: '40%', mt:3 };
-const formStyle = { m: 1, minWidth: 120, width: '40%', mt:2 };
+const fieldStyle = { width: "40%", mt: 3 };
+const formStyle = { m: 1, minWidth: 120, width: "40%", mt: 2 };
 
 const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
-  const [content, setContent] = React.useState('');
+  const [content, setContent] = React.useState("");
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
   const [renderImages, setRenderImages] = React.useState<any>([]);
-  const [title, setTitle] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [visibility, setVisibility] = React.useState<any>('PUBLIC');
-  const [type, setType] = React.useState<any>('');
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [visibility, setVisibility] = React.useState<any>("PUBLIC");
+  const [type, setType] = React.useState<any>("");
   const [category, setCategory] = React.useState<Array<string>>([]);
   const [unlisted, setUnlisted] = React.useState<boolean>(false);
 
-  const handleDescriptionChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(event.target.value);
   };
 
@@ -116,7 +108,7 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
 
   const handleCategory = (event: React.ChangeEvent<HTMLInputElement>) => {
     let csv = event.target.value;
-    setCategory(csv.split(','));
+    setCategory(csv.split(","));
   };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,8 +131,8 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
     const post = {
       id: uuidv4(),
       title: title,
-      source: 'www.google.com',
-      origin: 'www.lol.com',
+      source: "www.google.com",
+      origin: "www.lol.com",
       description: description,
       contentType: type,
       content: content,
@@ -151,26 +143,25 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
       visibility: visibility,
       unlisted: unlisted,
     };
-    // debugger;
     const formData = new FormData();
     let key: keyof typeof post;
     for (key in post) {
       formData.append(key, post[key]);
     }
     api.authors
-    .withId('' + currentUser?.id)
-    .posts
-    .create(formData)
-    .then(()=>{handlePostsChanged(); handleClose()})
-    .catch((error) => console.log(error));
+      .withId("" + currentUser?.id)
+      .posts.create(formData)
+      .then(() => {
+        handlePostsChanged();
+        handleClose();
+      })
+      .catch((error) => console.log(error));
   };
 
   React.useEffect(() => {
     if (images.length < 1) return;
     var allImages: any = [];
-    images.forEach((image: Blob | MediaSource) =>
-      allImages.push(URL.createObjectURL(image))
-    );
+    images.forEach((image: Blob | MediaSource) => allImages.push(URL.createObjectURL(image)));
     setRenderImages(allImages);
   }, [images]);
 
@@ -180,54 +171,56 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
         <Header>Add Post</Header>
         <TextField
           sx={fieldStyle}
-          id='standard-basic'
+          id="standard-basic"
           required
-          label='Title'
+          label="Title"
           value={title}
           onChange={handleTitleChange}
           fullWidth
         />
         <TextField
           sx={fieldStyle}
-          id='standard-basic'
-          label='Description'
+          id="standard-basic"
+          label="Description"
           value={description}
           onChange={handleDescriptionChange}
           fullWidth
         />
-        <FormControl variant='standard' sx={formStyle}>
-          <InputLabel id='demo-simple-select-standard-label' required>
+        <FormControl variant="standard" sx={formStyle}>
+          <InputLabel id="demo-simple-select-standard-label" required>
             Type
           </InputLabel>
           <Select
-            labelId='demo-simple-select-standard-label'
-            id='demo-simple-select-standard'
+            labelId="demo-simple-select-standard-label"
+            id="demo-simple-select-standard"
             value={type}
             onChange={handleType}
-            label='Type'>
-            <MenuItem value='text/plain'>Plain</MenuItem>
-            <MenuItem value='text/markdown'>Markdown</MenuItem>
-            <MenuItem value='image'>Image</MenuItem>
+            label="Type"
+          >
+            <MenuItem value="text/plain">Plain</MenuItem>
+            <MenuItem value="text/markdown">Markdown</MenuItem>
+            <MenuItem value="image">Image</MenuItem>
           </Select>
         </FormControl>
-        <FormControl variant='standard' sx={formStyle}>
-          <InputLabel id='demo-simple-select-standard-label' required>
+        <FormControl variant="standard" sx={formStyle}>
+          <InputLabel id="demo-simple-select-standard-label" required>
             Visibility
           </InputLabel>
           <Select
-            labelId='demo-simple-select-standard-label'
-            id='demo-simple-select-standard'
+            labelId="demo-simple-select-standard-label"
+            id="demo-simple-select-standard"
             value={visibility}
             onChange={handleVisibility}
-            label='Visibility'>
-            <MenuItem value='PUBLIC'>Public</MenuItem>
-            <MenuItem value='FRIENDS'>Friends</MenuItem>
+            label="Visibility"
+          >
+            <MenuItem value="PUBLIC">Public</MenuItem>
+            <MenuItem value="FRIENDS">Friends</MenuItem>
           </Select>
         </FormControl>
         <TextField
           sx={fieldStyle}
-          id='standard-basic'
-          label='Category'
+          id="standard-basic"
+          label="Category"
           value={category}
           onChange={handleCategory}
           fullWidth
@@ -236,23 +229,26 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
         <ContentType> Unlisted </ContentType>
         <Checkbox defaultChecked={!!unlisted} onChange={handleUnlist} />
         <Content>
-          {' '}
+          {" "}
           <WriteOrPreview>
             <ButtonGroup
-              variant='text'
-              color='inherit'
-              size='large'
-              sx={{ p: 1, borderBottom: '1px solid black' }}>
+              variant="text"
+              color="inherit"
+              size="large"
+              sx={{ p: 1, borderBottom: "1px solid black" }}
+            >
               <CustomButton
                 onClick={() => setOpenWrite(true)}
-                sx={{ background: openWrite ? '#b5b5b5' : 'white' }}>
-                {' '}
-                Write{' '}
+                sx={{ background: openWrite ? "#b5b5b5" : "white" }}
+              >
+                {" "}
+                Write{" "}
               </CustomButton>
               <CustomButton
                 onClick={() => setOpenWrite(false)}
-                sx={{ background: !openWrite ? '#b5b5b5' : 'white' }}>
-                {' '}
+                sx={{ background: !openWrite ? "#b5b5b5" : "white" }}
+              >
+                {" "}
                 Preview
               </CustomButton>
             </ButtonGroup>
@@ -261,8 +257,8 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
                 <>
                   <TextField
                     required
-                    id='multiline-flexible'
-                    label='Content'
+                    id="multiline-flexible"
+                    label="Content"
                     multiline
                     fullWidth
                     maxRows={10}
@@ -271,9 +267,9 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
                   />
                   <CustomButton>
                     <input
-                      type='file'
-                      accept='image/*'
-                      name='image'
+                      type="file"
+                      accept="image/*"
+                      name="image"
                       multiple
                       onChange={handleUpload}
                     />
@@ -283,11 +279,7 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
                 <>
                   <ReactMarkdown>{content}</ReactMarkdown>
                   {renderImages.map((image: string | undefined) => (
-                    <img
-                      style={{ width: '400px', height: '400px' }}
-                      src={image}
-                      alt='Uploaded'
-                    />
+                    <img style={{ width: "400px", height: "400px" }} src={image} alt="Uploaded" />
                   ))}
                 </>
               )}
@@ -296,13 +288,14 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
         </Content>
       </Block>
       <Fab
-        color='primary'
-        aria-label='check'
+        color="primary"
+        aria-label="check"
         sx={{
-          color: 'black',
-          background: '#46ECA6',
-          '&:hover': { background: '#18E78F' },
-        }}>
+          color: "black",
+          background: "#46ECA6",
+          "&:hover": { background: "#18E78F" },
+        }}
+      >
         <CheckIcon onClick={createPost} />
       </Fab>
     </EditContainer>

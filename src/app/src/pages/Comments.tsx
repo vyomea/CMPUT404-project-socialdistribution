@@ -18,6 +18,8 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ReactMarkdown from "react-markdown";
 import { ButtonGroup, ButtonProps, InputLabel, TextField } from "@mui/material";
 import { styled as Styled } from "@mui/material/styles";
+import { useParams } from "react-router-dom";
+
 interface Props {
   currentUser?: Author;
 }
@@ -79,10 +81,7 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
 const formStyle = { m: 1, minWidth: 120, width: "40%", mt: 2 };
 
 export default function Comments({ currentUser }: Props): JSX.Element {
-  const url = new URL(window.location.href).pathname;
-  const postID = url.split("/")[4];
-  const authorID = url.split("/")[2];
-
+  let { postID, authorID } = useParams();
   const [comments, setComments] = useState<Comment[]>([]);
   const [post, setPost] = useState<Post>();
   const [commentsChanged, setCommentsChanged] = useState(false);
@@ -104,13 +103,15 @@ export default function Comments({ currentUser }: Props): JSX.Element {
   useEffect(() => {
     async function fetchData() {
       try {
-        const commentList = api.authors.withId(authorID).posts.withId(postID).comments.list();
-        const post = api.authors.withId(authorID).posts.withId(postID).get();
-        post.then((data) => setPost(data)).catch((err) => console.log(err));
-        commentList.then((comment) => {
-          setComments(comment);
-          setCommentsChanged(false);
-        });
+        if (authorID && postID) {
+          const commentList = api.authors.withId(authorID).posts.withId(postID).comments.list();
+          const post = api.authors.withId(authorID).posts.withId(postID).get();
+          post.then((data) => setPost(data)).catch((err) => console.log(err));
+          commentList.then((comment) => {
+            setComments(comment);
+            setCommentsChanged(false);
+          });
+        }
       } catch (err) {
         console.log(err);
       }
@@ -123,15 +124,17 @@ export default function Comments({ currentUser }: Props): JSX.Element {
     contentType: type,
   };
   const createComment = () => {
-    api.authors
-      .withId(authorID)
-      .posts.withId(postID)
-      .comments.create(comment)
-      .then((res) => {
-        setCommentsChanged(true);
-        setOpen(!open);
-      })
-      .catch((err) => console.log("Hello " + err));
+    if (authorID && postID) {
+      api.authors
+        .withId(authorID)
+        .posts.withId(postID)
+        .comments.create(comment)
+        .then((res) => {
+          setCommentsChanged(true);
+          setOpen(!open);
+        })
+        .catch((err) => console.log("Hello " + err));
+    }
   };
   // createComment();
 
