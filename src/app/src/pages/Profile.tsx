@@ -18,9 +18,9 @@ import Author from "../api/models/Author";
 import Post from "../api/models/Post";
 import UserPost from "../components/UserPost";
 import api from "../api/api";
-import EditAuthor from "../components/EditAuthor";
 import FollowerList from "../components/FollowerList";
 import FollowingList from "../components/FollowingList";
+import EditProfile from "../components/EditProfile";
 
 interface Props {
   currentUser?: Author;
@@ -204,23 +204,23 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                 borderRadius: "100%",
                 border: "1px solid white",
               }}
-            />
-            <EditAuthor
-              data={currentUser}
-              handleAuthorsChanged={handleAuthorsChanged}
-              handleClose={handleClose}
-            />
-          </Backdrop>
-        ) : (
-          <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}>
-              <NavBar
-                items={[
-                  {
-                    Text: "",
-                    handleClick: () => {
-                      console.log(1);
-                    },
+              />
+              <EditProfile
+                data={currentUser}
+                handleAuthorsChanged={handleAuthorsChanged} 
+                handleClose={handleClose}
+              />
+            </Backdrop>
+          ) :(
+            <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
+              <Box style={{ height: '5%' }} sx={{ bgcolor: '#fff' }}>
+                <NavBar
+                  items={[
+                    {
+                      Text: '',
+                      handleClick: () => {
+                        console.log(1);
+                      },
                   },
                 ]}
               />
