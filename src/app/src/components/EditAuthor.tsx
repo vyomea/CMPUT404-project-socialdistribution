@@ -85,8 +85,6 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       verified: verified,
     };
 
-    console.log(author);
-
     api.authors
       .withId(author.id)
       .update(author)

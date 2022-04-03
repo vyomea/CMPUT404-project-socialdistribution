@@ -70,8 +70,6 @@ const EditProfile = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       isAdmin: data.isAdmin,
       verified: undefined
     };
-
-    console.log(author);
   
     api.authors
       .withId(author.id)
