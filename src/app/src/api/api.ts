@@ -9,7 +9,7 @@ import Comment, {
   CommentResponse,
   commentsFromResponse,
   CommentsResponse,
-  commentToRequest,
+  commentCreateToRequest,
 } from "./models/Comment";
 import Post, { postFromResponse, PostResponse } from "./models/Post";
 import InboxItem, {
@@ -453,25 +453,27 @@ const api = {
              * @returns a list of comments in the page
              */
             list: async (page?: number, size?: number): Promise<Comment[]> =>
-              (
-                await axios.get<{ items: CommentResponse[] }>(
-                  `/authors/${authorId}/posts/${postId}/comments`,
-                  {
-                    params: { page, size },
-                  }
-                )
-              ).data.items.map(commentFromResponse),
+              commentsFromResponse(
+                (
+                  await axios.get<CommentsResponse>(
+                    `/authors/${authorId}/posts/${postId}/comments`,
+                    { params: { page, size } }
+                  )
+                ).data
+              ),
 
             /**
              * Creates a comment on the post with a random ID.
              * @param comment the comment data
              * @returns TODO
              */
-            create: async (comment: Comment): Promise<unknown> =>
+            create: async (
+              comment: Pick<Comment, "comment" | "contentType">
+            ): Promise<unknown> =>
               (
                 await axios.post(
                   `/authors/${authorId}/posts/${postId}/comments`,
-                  commentToRequest(comment, baseUrl)
+                  commentCreateToRequest(comment, baseUrl)
                 )
               ).data,
 

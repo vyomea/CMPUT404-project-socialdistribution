@@ -16,19 +16,19 @@ import {
   updateAuthorPost,
 } from '../controllers/post.controllers';
 
-router.get('/:post_id', validate([param('post_id').isUUID()]), getAuthorPost);
+router.get('/:postId', validate([param('postId').isUUID()]), getAuthorPost);
 router.get(
-  '/:post_id/image',
-  validate([param('post_id').isUUID()]),
+  '/:postId/image',
+  validate([param('postId').isUUID()]),
   getPostImage
 );
 router.post(
-  '/:post_id',
+  '/:postId',
   [
     requiredLoggedIn,
     multer().single('image'),
     validate([
-      param('post_id').isUUID(),
+      param('postId').isUUID(),
       body('title').isString().optional(),
       body('description').isString().optional(),
       body('source').isURL().optional(),
@@ -44,17 +44,17 @@ router.post(
   updateAuthorPost
 );
 router.delete(
-  '/:post_id',
-  [requiredLoggedIn, validate([param('post_id').isUUID()])],
+  '/:postId',
+  [requiredLoggedIn, validate([param('postId').isUUID()])],
   deleteAuthorPost
 );
 router.put(
-  '/:post_id',
+  '/:postId',
   [
     requiredLoggedIn,
     multer().single('image'),
     validate([
-      param('post_id').isUUID(),
+      param('postId').isUUID(),
       body('title').isString(),
       body('description').isString(),
       body('source').isURL(),
