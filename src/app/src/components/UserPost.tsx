@@ -201,9 +201,7 @@ const UserPost: React.FC<postItem> = (props?) => {
   };
 
   const navigateToComments = () => {
-    navigate(
-      `/authors/${props?.postAuthor?.id.split("/").pop()}/posts/${props?.post?.id}/comments`,
-    );
+    navigate(`/profile/${props?.postAuthor?.id.split("/").pop()}/post/${props?.post?.id}`);
   };
 
   return (
