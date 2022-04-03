@@ -1,5 +1,4 @@
 import NavBar from '../components/NavBar';
-import UserPost from '../components/UserPost';
 import Github from '../components/Github';
 import styled from 'styled-components';
 import Author from '../api/models/Author';
@@ -12,6 +11,8 @@ import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { List } from '@mui/material';
+import InboxComponents from '../components/InboxComponents';
+import InboxItem from '../api/models/InboxItem';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -43,10 +44,7 @@ interface Props {
 
 
 export default function Mainpage({ currentUser }: Props) {
-  // For now, mainpage just shows your own posts
-  const [posts, setPosts] = useState<Post[] | undefined>(undefined);
   const [open, setOpen] = useState(false);
-  const [postsChanged, setpostsChanged] = useState(false);
 
   const items2 = [
     {
@@ -72,16 +70,19 @@ export default function Mainpage({ currentUser }: Props) {
     setOpen(!open);
   };
 
-  const handlePostsChanged = () => {
-    setpostsChanged(!postsChanged);
+  const [inbox, setInbox] = useState<InboxItem[] | undefined>(undefined);
+  const [inboxChanged, setInboxChanged] = useState(false);
+  const handleInboxChanged = () => {
+    setInboxChanged(!inboxChanged);
   };
 
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
-      .posts.list(1, 10)
-      .then((data) => setPosts(data));
-  }, [currentUser?.id, postsChanged]);
+      .inbox
+      .list()
+      .then((data) => setInbox(data));
+  }, [currentUser?.id, inboxChanged]);
 
   return (
     <MainPageContainer>
@@ -127,21 +128,14 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} handleClose={handleClose}/>
+          <Add currentUser={currentUser} handlePostsChanged={handleInboxChanged} handleClose={handleClose}/>
         </Backdrop>
       ) : (
         <MainPageContentContainer>
           <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
-            {posts?.map((post) => (
-              <UserPost
-                post={post}
-                currentUser={currentUser}
-                postAuthor={currentUser}
-                likes={0}
-                handlePostsChanged={handlePostsChanged}
-                key={post.id}
-              />
-            ))}
+            {inbox?.map((item,index)=>
+              <InboxComponents item={item} currentUser={currentUser} handlePostsChanged={handleInboxChanged} key={index}/>
+            )}
           </List>
           <GitContainer>
             <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
