@@ -9,6 +9,7 @@ import {
   Button,
   Typography,
   Backdrop,
+  ListItemButton,
 } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import PersonIcon from "@mui/icons-material/Person";
@@ -146,7 +147,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
               }}
             />
             <FollowerList
-              data={currentUser}
+              data={author}
               handleAuthorsChanged={handleAuthorsChanged}
               handleClose={handleFollowerClose}
             />
@@ -176,7 +177,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
               }}
             />
             <FollowingList
-              data={currentUser}
+              data={author}
               handleAuthorsChanged={handleAuthorsChanged}
               handleClose={handleFollowingClose}
             />
@@ -274,23 +275,16 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                     marginBottom: 2,
                   }}
                 >
-                  <Typography variant="h6" align="center">
-                    Friends: 2
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    align="center"
+                  <ListItemButton
                     onClick={handleFollowerToggle}
                   >
                     Followers: 5
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    align="center"
+                  </ListItemButton>
+                  <ListItemButton
                     onClick={handleFollowingToggle}
                   >
                     Following: 10
-                  </Typography>
+                  </ListItemButton>
                 </Box>
 
                 {myProfile ? (
