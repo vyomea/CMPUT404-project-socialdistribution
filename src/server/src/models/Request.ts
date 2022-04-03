@@ -3,23 +3,23 @@ import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
 
-class Follower extends Model {
+class Request extends Model {
   declare authorId: typeof uuidv4;
-  declare followerId: typeof uuidv4;
+  declare requestId: typeof uuidv4;
   declare author: Author;
-  declare follower: Author;
+  declare requestor: Author;
   static Author: BelongsTo;
-  static Follower: BelongsTo;
+  static Requestor: BelongsTo;
 }
 
-Follower.init(
+Request.init(
   {
     authorId: {
       type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
     },
-    followerId: {
+    requestId: {
       type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
@@ -27,9 +27,9 @@ Follower.init(
   },
   {
     sequelize: db,
-    modelName: 'Follower',
+    modelName: 'Request',
     underscored: true,
   }
 );
 
-export default Follower;
+export default Request;

@@ -44,7 +44,7 @@ const api = {
   login: async (email: string, password: string): Promise<Author> => {
     const result = await axios.post("/login", { email, password });
     localStorage.setItem("token", result.data.token);
-    return result.data.author;
+    return authorFromResponse(result.data.author);
   },
 
   /**
@@ -62,6 +62,23 @@ const api = {
       displayName,
     });
     localStorage.setItem("token", result.data.token);
+    return result.data.author;
+  },
+
+  /**
+   * Create a new author's account via admin.
+   * @returns the new author
+   */
+  create: async (
+    email: string,
+    password: string,
+    displayName: string
+  ): Promise<Author> => {
+    const result = await axios.post("/register", {
+      email,
+      password,
+      displayName,
+    });
     return result.data.author;
   },
 
@@ -180,6 +197,13 @@ const api = {
         ).data,
 
       /**
+       * Deletes the author.
+       * @returns TODO
+       */
+      delete: async (): Promise<unknown> =>
+        (await axios.delete(`/authors/${authorId}`)).data,
+
+      /**
        * Actions relating to the author's inbox.
        */
       inbox: {
@@ -289,6 +313,22 @@ const api = {
             (await axios.delete(`/authors/${authorId}/followers/${followerId}`))
               .data,
         }),
+      },
+
+      /**
+       * Actions on the authors that this author follows.
+       */
+      followings: {
+        /**
+         * Lists the authors that this author follows.
+         * @returns a list of the authors that are followed
+         */
+        list: async (): Promise<Author[]> =>
+          (
+            await axios.get<{ items: AuthorResponse[] }>(
+              `/authors/${authorId}/following`
+            )
+          ).data.items.map(authorFromResponse),
       },
 
       /**

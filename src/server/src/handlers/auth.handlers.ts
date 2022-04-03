@@ -1,13 +1,15 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import Author from '../models/Author';
 import { JwtPayload } from '../types/auth';
 import Node from '../models/Node';
+import { serializeAuthor } from '../controllers/author.controllers';
 
 const loginUser = async (
   author: Author,
   password: string,
+  req: Request,
   res: Response
 ): Promise<void> => {
   const passwordIsCorrect = await argon2.verify(author.passwordHash, password);
@@ -17,7 +19,7 @@ const loginUser = async (
   }
   const payload: JwtPayload = { authorId: author.id.toString() };
   const token = jwt.sign(payload, process.env.JWT_SECRET);
-  res.json({ token, author });
+  res.json({ token, author: serializeAuthor(author, req) });
 };
 
 const unauthorized = (res: Response): void => {

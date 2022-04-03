@@ -1,25 +1,42 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, IconButton, Avatar, List, Button, Typography } from '@mui/material';
+import { Box, IconButton, Avatar, List, Button, Typography, Backdrop } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PersonIcon from '@mui/icons-material/Person';
+import { CloseRounded } from '@mui/icons-material';
 import NavBar from '../components/NavBar';
 import Author from '../api/models/Author';
 import Post from '../api/models/Post';
 import UserPost from '../components/UserPost';
 import api from '../api/api';
+import EditAuthor from '../components/EditAuthor';
 
 interface Props {
   currentUser?: Author;
 }
 
 export default function Profile({ currentUser }: Props): JSX.Element {
+  //Edit open
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = () => {
+      setOpen(false);
+    };
+  const handleToggle = () => {
+    setOpen(!open);
+  };
+
   //Get ID from params
   const { id } = useParams() as { id: string };
 
   //Get author from backend
   const [author, setAuthor] = useState<Author | undefined>(undefined);
+  const [authorsChanged, setAuthorsChanged] = useState(false);
+
+  const handleAuthorsChanged = () => {
+    setAuthorsChanged(!authorsChanged);
+  };
 
   useEffect(() => {
     api.authors
@@ -29,7 +46,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       .catch((error) => {
         console.log('No author');
       });
-  }, [id]);
+  }, [id, authorsChanged]);
 
   //Get author's posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
@@ -69,9 +86,40 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     setFollowing(false);
   };
 
-  if (author !== undefined) {
+  if (author !== undefined && currentUser!==undefined) {
     return (
       <>
+      {open ? (
+        <Backdrop
+          sx={{
+            color: '#fff',
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+          open={open}
+        >
+          <CloseRounded
+            onClick={handleClose}
+            sx={{
+              '&:hover': {
+                cursor: 'pointer',
+              },
+              marginBottom: '10px',
+              borderRadius: '100%',
+              border: '1px solid white',
+            }}
+          />
+          <EditAuthor
+            data={currentUser}
+            handleAuthorsChanged={handleAuthorsChanged} 
+            handleClose={handleClose}
+          />
+        </Backdrop>
+      ) :(
         <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
           <Box style={{ height: '5%' }} sx={{ bgcolor: '#fff' }}>
             <NavBar
@@ -119,7 +167,10 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                 {author.displayName}
               </Typography>
               {author.github ? (
-                <IconButton onClick={() => window.open(author.github)}>
+                <IconButton onClick={() => window.open(
+                  `${author.github}`,
+                  "_blank"
+                  )}>
                   <GitHubIcon />
                 </IconButton>
               ) : null}
@@ -143,9 +194,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
               {myProfile ? (
                 <Button
                   variant="contained"
-                  onClick={() => {
-                    alert('Clicked Edit Button');
-                  }}
+                  onClick={handleToggle}
                 >
                   Edit
                 </Button>
@@ -189,6 +238,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
             </Box>
           </Box>
         </Box>
+        )}
       </>
     );
   }

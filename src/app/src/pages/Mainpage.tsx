@@ -13,16 +13,6 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import { List } from '@mui/material';
 
-const items2 = [
-  {
-    Text: "Logout",
-    handleClick: () => {
-      api.logout();
-      window?.location?.reload();
-    },
-  },
-];
-
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
   display: flex;
@@ -57,6 +47,22 @@ export default function Mainpage({ currentUser }: Props) {
   const [open, setOpen] = useState(false);
   const [postsChanged, setpostsChanged] = useState(false);
 
+  const items2 = [
+    {
+      Text: 'Home',
+      handleClick: () => {
+        // navigate('/');
+      },
+    },
+    {
+      Text: 'Logout',
+      handleClick: () => {
+        api.logout();
+        window?.location?.reload();
+      },
+    },
+  ];
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -71,7 +77,7 @@ export default function Mainpage({ currentUser }: Props) {
 
   useEffect(() => {
     api.authors
-      .withId("" + currentUser?.id)
+      .withId('' + currentUser?.id)
       .posts.list(1, 10)
       .then((data) => setPosts(data));
   }, [currentUser?.id, postsChanged]);
@@ -120,7 +126,7 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} />
+          <Add currentUser={currentUser} handlePostsChanged={handlePostsChanged} handleClose={handleClose}/>
         </Backdrop>
       ) : (
         <MainPageContentContainer>
@@ -137,7 +143,7 @@ export default function Mainpage({ currentUser }: Props) {
             ))}
           </List>
           <GitContainer>
-            <Github username={currentUser?.displayName} />
+            <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
           </GitContainer>
         </MainPageContentContainer>
       )}

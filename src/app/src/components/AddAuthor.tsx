@@ -6,7 +6,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import api from '../api/api';
 
 interface Props {
-  handleNodesChanged: any;
+  handleAuthorsChanged: any;
   handleClose: any;
 }
 
@@ -38,14 +38,19 @@ const Header = styled.div`
 
 const fieldStyle = { width: '40%', mt:5 };
 
-const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
-  const [username, setName] = React.useState("");
+const AddAuthor = ({ handleAuthorsChanged, handleClose }: Props) => {
+  const [displayName, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
   const handleName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
   
+  const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
   const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
@@ -53,23 +58,31 @@ const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
 
   const handleEdit = () => {
     api
-    .nodes
-    .create(username,password)
-    .then(()=>{handleNodesChanged(); handleClose()})
+    .create(email,password,displayName)
+    .then(()=>{handleAuthorsChanged(); handleClose()})
     .catch((e) => console.log(e.response))
     };
 
   return (
     <EditContainer>
       <Block>
-      <Header>Add Node</Header>
+      <Header>Add Author</Header>
         <TextField
           sx={fieldStyle}
           id="standard-basic"
           required
-          label="username"
-          value={username}
+          label="display name"
+          value={displayName}
           onChange={handleName}
+          fullWidth
+        />
+        <TextField
+          sx={fieldStyle}
+          id="standard-basic"
+          required
+          label="email"
+          value={email}
+          onChange={handleEmail}
           fullWidth
         />
         <TextField
@@ -94,4 +107,4 @@ const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
   );
 };
 
-export default AddNode;
+export default AddAuthor;

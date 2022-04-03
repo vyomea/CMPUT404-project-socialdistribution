@@ -22,6 +22,7 @@ import api from '../api/api';
 interface Props {
   currentUser?: Author;
   handlePostsChanged:any;
+  handleClose:any;
 }
 const EditContainer = styled.div`
   background-color: white;
@@ -31,6 +32,7 @@ const EditContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  border-radius: 10px;
 `;
 const Block = styled.div`
   width: 100%;
@@ -44,8 +46,6 @@ const Block = styled.div`
 `;
 const Header = styled.div`
   margin-top: 1%;
-  text-decoration: underline;
-  font-family: Avenir Next Light;
   font-size: 200%;
   text-align: center;
 `;
@@ -61,7 +61,6 @@ const ContentType = styled.div`
   width: 80%;
   text-align: center;
   margin-top: 2%;
-  font-family: Avenir Next Light;
   font-size: 150%;
 `;
 
@@ -77,6 +76,7 @@ const ActualContent = styled.div`
   margin-top: 2%;
   width: 50%;
 `;
+
 const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
   color: theme.palette.getContrastText('#fff'),
   padding: '10px',
@@ -85,7 +85,11 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: '#b5b5b5',
   },
 }));
-const Add = ({ currentUser, handlePostsChanged }: Props) => {
+
+const fieldStyle = { width: '40%', mt:3 };
+const formStyle = { m: 1, minWidth: 120, width: '40%', mt:2 };
+
+const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
   const [content, setContent] = React.useState('');
   const [openWrite, setOpenWrite] = React.useState(true);
   const [images, setImages] = React.useState<any>([]);
@@ -157,7 +161,7 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
     .withId('' + currentUser?.id)
     .posts
     .create(formData)
-    .then(()=>handlePostsChanged())
+    .then(()=>{handlePostsChanged(); handleClose()})
     .catch((error) => console.log(error));
   };
 
@@ -173,10 +177,9 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
   return (
     <EditContainer>
       <Block>
-        <Header>Add</Header>
-        <ContentType>Title</ContentType>
+        <Header>Add Post</Header>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id='standard-basic'
           required
           label='Title'
@@ -184,17 +187,15 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
           onChange={handleTitleChange}
           fullWidth
         />
-        <ContentType>Description</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id='standard-basic'
           label='Description'
           value={description}
           onChange={handleDescriptionChange}
           fullWidth
         />
-        <ContentType>Type</ContentType>
-        <FormControl variant='standard' sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant='standard' sx={formStyle}>
           <InputLabel id='demo-simple-select-standard-label' required>
             Type
           </InputLabel>
@@ -209,8 +210,7 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
             <MenuItem value='image'>Image</MenuItem>
           </Select>
         </FormControl>
-        <ContentType>Visibility</ContentType>
-        <FormControl variant='standard' sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant='standard' sx={formStyle}>
           <InputLabel id='demo-simple-select-standard-label' required>
             Visibility
           </InputLabel>
@@ -224,9 +224,8 @@ const Add = ({ currentUser, handlePostsChanged }: Props) => {
             <MenuItem value='FRIENDS'>Friends</MenuItem>
           </Select>
         </FormControl>
-        <ContentType>Category</ContentType>
         <TextField
-          sx={{ width: '40%' }}
+          sx={fieldStyle}
           id='standard-basic'
           label='Category'
           value={category}

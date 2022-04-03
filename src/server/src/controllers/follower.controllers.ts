@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import Author from '../models/Author';
 import Follower from '../models/Follower';
 import { AuthenticatedRequest } from '../types/auth';
-import { getHost } from '../utilities/host';
 import { unauthorized } from '../handlers/auth.handlers';
+import { serializeAuthor } from './author.controllers';
 
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
@@ -68,20 +68,34 @@ const getAuthorFollowers = async (req: Request, res: Response) => {
     include: {
       model: Author,
       attributes: authorPublicAttributes,
-      as: 'author',
+      as: 'follower',
     },
   });
   res.send({
     type: 'followers',
-    items: followers.map((follower) => {
-      return {
-        type: 'author',
-        ...follower.toJSON().author,
-        id: getHost(req) + '/author/' + follower.author.id,
-        url: getHost(req) + '/author/' + follower.author.id,
-        host: getHost(req) + '/',
-      };
-    }),
+    items: followers.map((follower) => serializeAuthor(follower.follower, req)),
+  });
+};
+
+const getAuthorFollowings = async (req: Request, res: Response) => {
+  const followings = await Follower.findAll({
+    where: {
+      followerId: req.params.id,
+    },
+    attributes: [],
+    include: [
+      {
+        model: Author,
+        attributes: authorPublicAttributes,
+        as: 'author',
+      },
+    ],
+  });
+  res.send({
+    type: 'following',
+    items: followings.map((following) =>
+      serializeAuthor(following.author, req)
+    ),
   });
 };
 
@@ -115,4 +129,10 @@ const removeFollower = async (req: Request, res: Response) => {
   res.status(200).send();
 };
 
-export { addFollower, checkFollower, getAuthorFollowers, removeFollower };
+export {
+  addFollower,
+  checkFollower,
+  getAuthorFollowers,
+  getAuthorFollowings,
+  removeFollower,
+};

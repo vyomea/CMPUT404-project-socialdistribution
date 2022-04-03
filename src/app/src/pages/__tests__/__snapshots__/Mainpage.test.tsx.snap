@@ -8,13 +8,34 @@ exports[`Mainpage suite Renders correctly 1`] = `
     className="sc-cxpSdN TLJOs"
   >
     <div
-      className="sc-bdvvtL dVmOGZ"
+      className="sc-bdvvtL mzSdo"
     >
       <div
         className="sc-gsDKAQ dokASy"
       >
         <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-79h83g-MuiButtonBase-root-MuiButton-root"
+          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          Home
+        </button>
+        <button
+          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
           disabled={false}
           onBlur={[Function]}
           onClick={[Function]}
@@ -98,12 +119,12 @@ exports[`Mainpage suite Renders correctly 1`] = `
         className="sc-fFeiMQ ejkoIZ"
       >
         <div
-          className="sc-bkkeKt bUsYpp"
+          className="sc-bkkeKt Qfuew"
         >
           Github Activity
         </div>
         <div
-          className="sc-bkkeKt bUsYpp"
+          className="sc-bkkeKt Qfuew"
         >
           <span
             className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSuccess css-15u8j6q-MuiCircularProgress-root"

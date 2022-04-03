@@ -14,6 +14,7 @@ const testUser: Author = {
   github: " ",
   profileImage: " ",
   isAdmin: false,
+  verified: true,
 };
 
 beforeEach(() => {
