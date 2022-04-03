@@ -21,7 +21,10 @@ export const serializeComment = (
   }/comments/${comment.id}`,
 });
 
-const createComment = async (req: AuthenticatedRequest, res: Response) => {
+const createComment = async (
+  req: AuthenticatedRequest & PaginationRequest,
+  res: Response
+) => {
   const { comment, contentType } = req.body;
   const commentStr = comment;
 
@@ -32,7 +35,7 @@ const createComment = async (req: AuthenticatedRequest, res: Response) => {
   });
   const author = await Author.findOne({
     where: {
-      id: req.params.id,
+      id: req.authorId,
     },
   });
   if (post === null) {
