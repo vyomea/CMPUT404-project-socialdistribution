@@ -121,6 +121,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   const [followersList, setFollowers] = useState<Author[]>([]);
 
+  // get followers list
   useEffect(() => {
     async function fetchData() {
       try {
@@ -137,6 +138,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   const [followingList, setFollowingList] = useState<Author[]>([]);
 
+  // get following list
   useEffect(() => {
     async function fetchData() {
       try {
@@ -179,7 +181,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
               }}
             />
             <FollowerList
-              data={author}
+              data={followersList}
               handleAuthorsChanged={handleAuthorsChanged}
               handleClose={handleFollowerClose}
             />
@@ -209,7 +211,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
               }}
             />
             <FollowingList
-              data={author}
+              data={followingList}
               handleAuthorsChanged={handleAuthorsChanged}
               handleClose={handleFollowingClose}
             />

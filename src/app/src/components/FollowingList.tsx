@@ -1,8 +1,5 @@
 import { List, ListItemButton, ListItemText } from "@mui/material";
 import styled from "styled-components";
-import React, { useState, useEffect } from "react";
-
-import api from "../api/api";
 import Author from "../api/models/Author";
 
 const ListContainer = styled.div`
@@ -32,27 +29,12 @@ const Header = styled.div`
 `;
 
 const FollowingList = ({ data }: any) => {
-  const [followingList, setFollowing] = useState<Author[]>([]);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = api.authors.withId("" + data?.id).followings.list();
-        res.then((followings) => {
-          setFollowing(followings);
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    fetchData();
-  }, [data?.id]);
   return (
     <ListContainer>
       <Block>
         <Header>Following</Header>
         <List>
-          {followingList.map((follower) => (
+          {data.map((follower: Author) => (
             <ListItemButton
               component="a"
               href={
