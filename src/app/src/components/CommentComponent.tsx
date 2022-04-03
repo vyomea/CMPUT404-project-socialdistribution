@@ -1,15 +1,7 @@
-import { useState, useEffect } from "react";
-import api from "../api/api";
-import Author from "../api/models/Author";
-import Comment from "../api/models/Comment";
-import Post from "../api/models/Post";
-import UserPost from "./UserPost";
-import AddIcon from "@mui/icons-material/Add";
+import { useState } from "react";
 import { Avatar, Box } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
-import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
-import { List } from "@mui/material";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";

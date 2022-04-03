@@ -5,15 +5,8 @@ import Comment from "../api/models/Comment";
 import Post from "../api/models/Post";
 import UserPost from "../components/UserPost";
 import AddIcon from "@mui/icons-material/Add";
-import { Avatar, Box } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
 import CircularProgress from "@mui/material/CircularProgress";
-import ReactMarkdown from "react-markdown";
 import { List } from "@mui/material";
-import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentComponent from "../components/CommentComponent";
 interface Props {
   currentUser?: Author;
@@ -25,12 +18,13 @@ export default function Comments({ currentUser }: Props): JSX.Element {
   const authorID = url.split("/")[2];
 
   const comment = {
-    comment: "# comment",
-    contentType: "text/markdown",
+    comment: "# THIS IS A COMMENT",
+    contentType: "text/plain",
   };
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [post, setPost] = useState<Post>();
+  const [commentsChanged, setCommentsChanged] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,20 +34,21 @@ export default function Comments({ currentUser }: Props): JSX.Element {
         post.then((data) => setPost(data)).catch((err) => console.log(err));
         commentList.then((comment) => {
           setComments(comment);
+          setCommentsChanged(false);
         });
       } catch (err) {
         console.log(err);
       }
     }
     fetchData();
-  }, [authorID, postID]);
+  }, [authorID, postID, commentsChanged]);
 
   const createComment = () => {
     api.authors
       .withId(authorID)
       .posts.withId(postID)
       .comments.create(comment)
-      .then((res) => console.log(res))
+      .then((res) => setCommentsChanged(true))
       .catch((err) => console.log("Hello " + err));
   };
   // createComment();
@@ -66,6 +61,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
         <CircularProgress color="success" />
       )}
       <List style={{ maxHeight: "100%", overflow: "auto" }} sx={{ width: "70%", ml: 5 }}>
+        <AddIcon onClick={createComment} />
         {comments?.map((i) => {
           return <CommentComponent comm={i} likes={0} />;
         })}
