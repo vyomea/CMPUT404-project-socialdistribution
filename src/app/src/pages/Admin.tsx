@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Box, List, ButtonGroup, Button , Badge, Typography, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 import NavBar from "../components/NavBar";
-import AdminRequestCard from "../components/AdminRequestCard";
 import AdminAuthorCard from "../components/AdminAuthorCard";
 import AdminPostCard from "../components/AdminPostCard";
 import AdminNodeCard from "../components/AdminNodeCard";
@@ -31,18 +30,6 @@ export default function Admin(): JSX.Element {
         setOpen(!open);
     };
     
-    //Some fake data to help with layouts
-    const signupRequests = [
-        {
-        id:"07a931d8-b181-473d-8838-22dfb5c81416",
-        displayName:"Lara Croft",
-        },
-        {
-        id:"c3293ed4-e55e-4986-8311-5ad43a27f5a3",
-        displayName:"Nathan Drake",
-        },
-    ];
-
     //Get list of authors from backend
     const [authors, setAuthors] = useState<Author[] | undefined>(undefined)
 
@@ -59,7 +46,7 @@ export default function Admin(): JSX.Element {
 
     //Get all posts of first author
     const [posts, setPosts] = useState<Post[] | undefined>(undefined)
-    const [authorID, setAuthorID] = React.useState(authors?authors[0].id :'');
+    const [authorID, setAuthorID] = React.useState(authors ? authors[0].id :'');
     
     const handleChange = (event: SelectChangeEvent) => {
         setAuthorID(event.target.value as string);
@@ -97,13 +84,12 @@ export default function Admin(): JSX.Element {
 
 
     // Get length of lists for badges
-    const totalRequests = signupRequests.length;
     const totalAuthors = (authors)?authors.length:0;
     const totalPosts = (posts)?posts.length:0;
     const totalNodes = (nodes)?nodes.length:0;
 
     //Set which list to display
-    const [listDisplay, setListDisplay] = React.useState({id:0,title:'Requests', count:totalRequests});
+    const [listDisplay, setListDisplay] = React.useState({id:0,title:'Authors', count:totalAuthors});
 
     //Button styling
     const buttonStyle = {
@@ -118,17 +104,13 @@ export default function Admin(): JSX.Element {
 
     // Sidebar Button group
     const buttons = [
-        {id:0,title:'Requests', count:totalRequests},
-        {id:1,title:'Authors',count:totalAuthors},
-        {id:2,title:'Posts',count:totalPosts},
-        {id:3,title:'Nodes',count:totalNodes}
+        {id:0,title:'Authors',count:totalAuthors},
+        {id:1,title:'Posts',count:totalPosts},
+        {id:2,title:'Nodes',count:totalNodes}
     ];
 
     // Lists to display per button
     const lists=[
-        signupRequests.map((request) => (
-            <AdminRequestCard request={request} key={request.id}/>
-        )),
         authors?.map((author) => (
             <AdminAuthorCard author={author} handleAuthorsChanged={handleAuthorsChanged} key={author.id}/>
         )),

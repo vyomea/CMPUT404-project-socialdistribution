@@ -10,7 +10,7 @@ import Author from '../api/models/Author';
 import Post from '../api/models/Post';
 import UserPost from '../components/UserPost';
 import api from '../api/api';
-import EditAuthor from '../components/EditAuthor';
+import EditProfile from '../components/EditProfile';
 
 interface Props {
   currentUser?: Author;
@@ -113,7 +113,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
               border: '1px solid white',
             }}
           />
-          <EditAuthor
+          <EditProfile
             data={currentUser}
             handleAuthorsChanged={handleAuthorsChanged} 
             handleClose={handleClose}
