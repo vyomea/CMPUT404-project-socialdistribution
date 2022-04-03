@@ -41,10 +41,7 @@ export type CommentRequest = Omit<Comment, "id" | "author" | "postId"> & {
   author: AuthorRequest;
 };
 
-export const commentToRequest = (
-  comment: Comment,
-  baseUrl: string
-): CommentRequest => {
+export const commentToRequest = (comment: Comment, baseUrl: string): CommentRequest => {
   return {
     ...comment,
     id: `${baseUrl}/authors/${comment.author.id}/posts/${comment.postId}/comments/${comment.id}`,

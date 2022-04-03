@@ -101,6 +101,9 @@ const CommentsContainer = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   width: 130px;
+  &:hover: {
+    cursor: pointer;
+  }
 `;
 
 const EditButton = Styled(Button)<ButtonProps>(({ theme }) => ({
@@ -193,6 +196,12 @@ const UserPost: React.FC<postItem> = (props?) => {
   //Navigate to user's profile from userpost
   const HandleNavigation = () => {
     navigate(`/profile/${props?.postAuthor?.id.split('/').pop()}`);
+  };
+
+  const navigateToComments = () => {
+    navigate(
+      `/authors/${props?.postAuthor?.id.split('/').pop()}/posts/${props?.post?.id}/comments`,
+    );
   };
 
   return (
@@ -291,7 +300,9 @@ const UserPost: React.FC<postItem> = (props?) => {
                   />
                 )}
               </LikesContainer>
-              <CommentsContainer>{props?.post?.count} Comments</CommentsContainer>
+              <CommentsContainer onClick={navigateToComments}>
+                {props?.post?.count} Comments
+              </CommentsContainer>
             </LikesCommentsContainer>
           </PostDetailsContainer>
         </PostContainer>
