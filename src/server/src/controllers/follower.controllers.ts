@@ -12,12 +12,12 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
     unauthorized(res);
     return;
   }
-  if (req.params.id === req.params.foreign_author_id) {
+  if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot follow yourself' });
     return;
   }
 
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;
@@ -42,12 +42,12 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 const checkFollower = async (req: Request, res: Response) => {
-  if (req.params.id === req.params.foreign_author_id) {
+  if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot check if following yourself' });
     return;
   }
 
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;
@@ -62,7 +62,7 @@ const checkFollower = async (req: Request, res: Response) => {
 const getAuthorFollowers = async (req: Request, res: Response) => {
   const followers = await Follower.findAll({
     where: {
-      authorId: req.params.id,
+      authorId: req.params.authorId,
     },
     attributes: [],
     include: {
@@ -80,7 +80,7 @@ const getAuthorFollowers = async (req: Request, res: Response) => {
 const getAuthorFollowings = async (req: Request, res: Response) => {
   const followings = await Follower.findAll({
     where: {
-      followerId: req.params.id,
+      followerId: req.params.authorId,
     },
     attributes: [],
     include: [
@@ -100,11 +100,11 @@ const getAuthorFollowings = async (req: Request, res: Response) => {
 };
 
 const removeFollower = async (req: Request, res: Response) => {
-  if (req.params.id === req.params.foreign_author_id) {
+  if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot unfollow yourself' });
   }
 
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;

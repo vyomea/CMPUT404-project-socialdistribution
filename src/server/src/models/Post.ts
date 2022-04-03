@@ -23,6 +23,7 @@ class Post extends Model {
   declare published: Date;
   declare visibility: 'PUBLIC' | 'FRIENDS';
   declare unlisted: boolean;
+  declare serviceUrl: string;
   static Author: BelongsTo;
   declare author: Author;
   static Comments: BelongsTo;
@@ -40,23 +41,23 @@ Post.init(
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     source: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     origin: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     contentType: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'text/plain',
       validate: {
         customValidator: (value) => {
@@ -83,21 +84,21 @@ Post.init(
     },
     categories: {
       type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false,
+      allowNull: true,
     },
     count: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0,
     },
     published: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: DataTypes.NOW,
     },
     visibility: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'PUBLIC',
       validate: {
         customValidator: (value) => {
@@ -110,8 +111,12 @@ Post.init(
     },
     unlisted: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       defaultValue: false,
+    },
+    serviceUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
@@ -121,7 +126,7 @@ Post.init(
   }
 );
 
-Post.Comments = Post.hasMany(Comment);
+Post.Comments = Post.hasMany(Comment, { as: 'comments' });
 Comment.Post = Comment.belongsTo(Post, { as: 'post' });
 
 export default Post;
