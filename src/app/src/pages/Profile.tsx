@@ -119,6 +119,38 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     setFollowing(false);
   };
 
+  const [followersList, setFollowers] = useState<Author[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = api.authors.withId("" + author?.id).followers.list();
+        res.then((followers) => {
+          setFollowers(followers);
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, [author?.id]);
+
+  const [followingList, setFollowingList] = useState<Author[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = api.authors.withId("" + author?.id).followings.list();
+        res.then((followings) => {
+          setFollowingList(followings);
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, [author?.id]);
+
   if (author !== undefined && currentUser !== undefined) {
     return (
       <>
@@ -205,23 +237,23 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                 borderRadius: "100%",
                 border: "1px solid white",
               }}
-              />
-              <EditProfile
-                data={currentUser}
-                handleAuthorsChanged={handleAuthorsChanged} 
-                handleClose={handleClose}
-              />
-            </Backdrop>
-          ) :(
-            <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-              <Box style={{ height: '5%' }} sx={{ bgcolor: '#fff' }}>
-                <NavBar
-                  items={[
-                    {
-                      Text: '',
-                      handleClick: () => {
-                        console.log(1);
-                      },
+            />
+            <EditProfile
+              data={currentUser}
+              handleAuthorsChanged={handleAuthorsChanged}
+              handleClose={handleClose}
+            />
+          </Backdrop>
+        ) : (
+          <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
+            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}>
+              <NavBar
+                items={[
+                  {
+                    Text: "",
+                    handleClick: () => {
+                      console.log(1);
+                    },
                   },
                 ]}
               />
@@ -275,15 +307,11 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                     marginBottom: 2,
                   }}
                 >
-                  <ListItemButton
-                    onClick={handleFollowerToggle}
-                  >
-                    Followers: 5
+                  <ListItemButton onClick={handleFollowerToggle}>
+                    Followers: {followersList.length}
                   </ListItemButton>
-                  <ListItemButton
-                    onClick={handleFollowingToggle}
-                  >
-                    Following: 10
+                  <ListItemButton onClick={handleFollowingToggle}>
+                    Following: {followingList.length}
                   </ListItemButton>
                 </Box>
 
