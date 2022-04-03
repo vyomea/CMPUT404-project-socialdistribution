@@ -8,12 +8,15 @@ import { validate } from '../middlewares/validator.middlewares';
 import { requiredLoggedIn } from '../middlewares/auth.middlewares';
 
 import {
-    createComment,
-    getPostComments,
+  createComment,
+  getPostComments,
 } from '../controllers/comment.controllers';
 
-
-router.get('/', [paginate, validate([param('post_id').isUUID()])], getPostComments);
+router.get(
+  '/',
+  [paginate, validate([param('postId').isUUID()])],
+  getPostComments
+);
 
 router.post(
   '/',
@@ -21,10 +24,7 @@ router.post(
     requiredLoggedIn,
     validate([
       body('comment').isString(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-      ]),
+      body('contentType').isIn(['text/markdown', 'text/plain']),
     ]),
   ],
   createComment

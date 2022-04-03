@@ -1,9 +1,4 @@
-import Author, {
-  authorFromResponse,
-  AuthorRequest,
-  AuthorResponse,
-  authorToRequest,
-} from "./Author";
+import Author, { authorFromResponse, AuthorResponse } from "./Author";
 
 export default interface Comment {
   type: "comment";
@@ -12,42 +7,46 @@ export default interface Comment {
   comment: string;
   contentType: string;
   published: string;
-  postId: string;
+  readonly postUrl: string; // URL of the API endpoint to get the post
+  readonly postServiceUrl: string; // service URL of the post
+  readonly postId: string; // id of the post the comment is on
 }
 
-export type CommentResponse = Omit<Comment, "id" | "author" | "postId"> & {
+export type CommentCreate = Pick<Comment, "comment" | "contentType">;
+
+export type CommentResponse = Pick<
+  Comment,
+  "type" | "id" | "comment" | "contentType" | "published"
+> & {
   id: string; // URL to the comment
   author: AuthorResponse;
 };
 
 export const commentFromResponse = (data: CommentResponse): Comment => {
-  const match = /\/posts\/([^/]+)\/comments\/([^/]+)\/?$/.exec(data.id);
+  const match = /^((.*?)\/posts\/([^/]+))\/comments\/([^/]+)\/?$/.exec(data.id);
   if (match === null) {
     throw new Error(`Invalid comment URL ${data.id}`);
   }
-  const postId = match[1];
-  const commentId = match[2];
+  const [postUrl, postServiceUrl, postId, commentId] = match.slice(1);
 
   return {
     ...data,
     author: authorFromResponse(data.author),
     id: commentId,
-    postId: postId,
+    postServiceUrl,
+    postId,
+    postUrl,
   };
 };
 
-export type CommentRequest = Omit<Comment, "id" | "author" | "postId"> & {
-  id: string; // URL to the comment
-  author: AuthorRequest;
-};
+export type CommentCreateRequest = CommentCreate;
 
-export const commentToRequest = (comment: Comment, baseUrl: string): CommentRequest => {
-  return {
-    ...comment,
-    id: `${baseUrl}/authors/${comment.author.id}/posts/${comment.postId}/comments/${comment.id}`,
-    author: authorToRequest(comment.author, baseUrl),
-  };
-};
+export const commentCreateToRequest = (
+  comment: CommentCreate,
+  baseUrl: string,
+): CommentCreateRequest => ({
+  ...comment,
+});
 
 export type CommentsResponse = {
   type: "comments";
