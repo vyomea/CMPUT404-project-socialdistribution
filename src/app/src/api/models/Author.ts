@@ -5,7 +5,7 @@ export default interface Author {
   github?: string;
   profileImage?: string;
   isAdmin: boolean;
-  verified: boolean;
+  verified: boolean|undefined;
 }
 
 export type AuthorResponse = Omit<Author, "id"> & {

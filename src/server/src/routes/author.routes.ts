@@ -20,39 +20,39 @@ import {
 import { getAuthorFollowings } from '../controllers/follower.controllers';
 
 router.use(
-  '/:id/posts/:post_id/comments',
-  validate([param('id').isUUID(), param('post_id').isUUID()]),
+  '/:authorId/posts/:postId/comments',
+  validate([param('authorId').isUUID(), param('postId').isUUID()]),
   comments
 );
-router.use('/:id/posts', validate([param('id').isUUID()]), posts);
-router.use('/:id/followers', validate([param('id').isUUID()]), followers);
+router.use('/:authorId/posts', validate([param('authorId').isUUID()]), posts);
 router.use(
-  '/:id/following',
-  validate([param('id').isUUID()]),
+  '/:authorId/followers',
+  validate([param('authorId').isUUID()]),
+  followers
+);
+router.use(
+  '/:authorId/following',
+  validate([param('authorId').isUUID()]),
   getAuthorFollowings
 );
 
 router.get('/', paginate, getAllAuthors);
 router.get('/me', requiredLoggedIn, getCurrentAuthor);
 router.delete(
-  '/:id',
-  [adminOnly, validate([param('id').isUUID()])],
+  '/:authorId',
+  [adminOnly, validate([param('authorId').isUUID()])],
   deleteAuthor
 );
-router.get('/:id', validate([param('id').isUUID()]), getAuthor);
+router.get('/:authorId', validate([param('authorId').isUUID()]), getAuthor);
 router.post(
-  '/:id',
-  [
-    requiredLoggedIn,
-    validate([
-      param('id').isUUID(),
-      body('email').isEmail().optional(),
-      body('displayName').isString().optional(),
-      body('github').isURL().optional(),
-      body('profileImage').isURL().optional(),
-      body('verified').isBoolean().optional(),
-    ]),
-  ],
+  '/:authorId',
+  validate([
+    param('authorId').isUUID(),
+    body('email').isEmail().optional(),
+    body('displayName').isString().optional(),
+    body('github').isURL().optional(),
+    body('profileImage').isURL().optional(),
+  ]),
   updateProfile
 );
 

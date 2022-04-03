@@ -41,6 +41,7 @@ interface Props {
   currentUser?: Author;
 }
 
+
 export default function Mainpage({ currentUser }: Props) {
   // For now, mainpage just shows your own posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);

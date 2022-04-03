@@ -15,6 +15,7 @@ class Author extends Model {
   declare profileImage: string;
   declare isAdmin: boolean;
   declare verified: boolean;
+  declare serviceUrl: string;
   static Posts: HasMany;
   static Comments: HasMany;
   static Followers: HasMany;
@@ -42,16 +43,16 @@ Author.init(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     passwordHash: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     displayName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     github: {
       type: DataTypes.STRING,
@@ -63,13 +64,17 @@ Author.init(
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       defaultValue: false,
     },
     verified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    serviceUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
