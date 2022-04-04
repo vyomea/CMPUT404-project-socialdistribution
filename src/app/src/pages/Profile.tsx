@@ -160,34 +160,23 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     fetchData();
   }, [author?.id]);
 
-  // Get Current User's followers and update isFollwing is the author is being followed by the current user
-  const [currentUserFollowers, setCurrentUserFollowers] = useState<Author[]>(
-    []
-  );
+  // Update isFollowing if the author is being followed by the current user
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = api.authors.withId("" + currentUser?.id).followings.list();
-        res.then((followers) => {
-          setCurrentUserFollowers(followers);
+        const res = api.authors
+          .withId("" + currentUser?.id)
+          .followers.withId("" + author?.id)
+          .isAFollower();
+        res.then((isFollowing) => {
+          setFollowing(isFollowing["result"]);
         });
-        let isFollowing = false;
-        if (currentUserFollowers) {
-          for (let i = 0; i < currentUserFollowers.length; i++) {
-            if (currentUserFollowers[i].id === author?.id) {
-              isFollowing = true;
-              break;
-            }
-          }
-
-          setFollowing(isFollowing);
-        }
       } catch (err) {
         console.log(err);
       }
     }
     fetchData();
-  }, [author?.id, currentUser?.id, currentUserFollowers]);
+  }, [author?.id, currentUser?.id]);
 
   if (author !== undefined && currentUser !== undefined) {
     return (
