@@ -11,7 +11,7 @@ import {
 } from '../controllers/node.controllers';
 import { adminOnly } from '../middlewares/auth.middlewares';
 
-router.get('/', adminOnly, getAllNodes);
+router.get('/', getAllNodes);
 
 const nodeValidations = [
   body('incomingUsername').isString().notEmpty(),

@@ -25,16 +25,18 @@ class Post extends Model {
   declare published: Date;
   declare visibility: 'PUBLIC' | 'FRIENDS';
   declare unlisted: boolean;
+  declare authorId: string;
   static Author: BelongsTo;
   declare author: Author;
   static Comments: HasMany;
   declare comments: Comment[];
   declare addComment: (comment: Comment) => void;
-  declare serviceUrl: string;
   static Node: BelongsTo;
   declare node: Node;
+  declare nodeServiceUrl: string;
   static Likes: HasMany;
   declare likes: PostLike[];
+  declare getNode: () => Promise<Node>;
 }
 
 Post.init(
@@ -120,14 +122,6 @@ Post.init(
       allowNull: true,
       defaultValue: false,
     },
-    serviceUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      references: {
-        model: Node,
-        key: 'serviceUrl',
-      },
-    },
   },
   {
     sequelize: db,
@@ -140,6 +134,7 @@ Post.Comments = Post.hasMany(Comment, { as: 'comments' });
 Comment.Post = Comment.belongsTo(Post, { as: 'post' });
 
 Post.Node = Post.belongsTo(Node, { as: 'node' });
+Node.Posts = Node.hasMany(Post, { as: 'posts' });
 
 Post.Likes = Post.hasMany(PostLike, { as: 'likes' });
 PostLike.Post = PostLike.belongsTo(Post, { as: 'post' });

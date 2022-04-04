@@ -21,7 +21,7 @@ import Like, { likeFromResponse, LikeResponse } from "./models/Like";
 import Node from "./models/Node";
 
 const baseUrl =
-  process.env.NODE_ENV === "development" ? "http://localhost:3001" : "/";
+  process.env.NODE_ENV === "development" ? `http://localhost:${process.env.REACT_APP_API_PORT || 3001}` : "/";
 
 const axios = Axios.create({
   baseURL: baseUrl,

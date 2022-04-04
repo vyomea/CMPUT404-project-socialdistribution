@@ -10,6 +10,7 @@ export default class PostLike extends Model {
   declare postId: string;
   declare post: Post;
   declare createdAt: Date;
+  static Author: BelongsTo;
   static Post: BelongsTo;
 }
 
