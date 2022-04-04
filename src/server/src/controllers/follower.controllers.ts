@@ -4,6 +4,7 @@ import Follower from '../models/Follower';
 import { AuthenticatedRequest } from '../types/auth';
 import { unauthorized } from '../handlers/auth.handlers';
 import { serializeAuthor } from '../serializers/author.serializers';
+import FollowRequest from '../models/FollowRequest';
 
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
@@ -32,7 +33,13 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
     return;
   }
 
-  if (!(await author.hasRequest(foreignAuthor))) {
+  const followRequest = await FollowRequest.findOne({
+    where: {
+      requesterId: req.params.foreign_author_id,
+      requesteeId: req.params.authorId,
+    },
+  });
+  if (followRequest === null) {
     res.status(400).send({
       error: `${foreignAuthor.displayName} did not request to follow`,
     });
@@ -40,7 +47,7 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
   }
 
   try {
-    await author.removeRequest(foreignAuthor);
+    await followRequest.destroy();
     await author.addFollower(foreignAuthor);
   } catch (error) {
     console.error(error);

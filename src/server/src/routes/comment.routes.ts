@@ -9,14 +9,12 @@ import { requiredLoggedIn } from '../middlewares/auth.middlewares';
 
 import {
   createComment,
-  getPostComments,
+  getComment,
+  getComments,
+  getCommentLikes,
 } from '../controllers/comment.controllers';
 
-router.get(
-  '/',
-  [paginate, validate([param('postId').isUUID()])],
-  getPostComments
-);
+router.get('/', [paginate, validate([param('postId').isUUID()])], getComments);
 
 router.post(
   '/',
@@ -29,5 +27,15 @@ router.post(
   ],
   createComment
 );
+
+router.get('/:commentId', [
+  validate([param('postId').isUUID(), param('commentId').isUUID()]),
+  getComment,
+]);
+
+router.get('/:commentId/likes', [
+  validate([param('postId').isUUID(), param('commentId').isUUID()]),
+  getCommentLikes,
+]);
 
 export default router;

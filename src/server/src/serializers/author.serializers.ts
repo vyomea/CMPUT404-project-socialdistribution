@@ -4,6 +4,7 @@ import Author from '../models/Author';
 import { getHost } from '../utilities/host';
 import { pick } from '../utilities/pick';
 import { remoteRequestConfig } from '../utilities/remote-request-config';
+import Node from '../models/Node';
 
 export const authorPublicAttributes = [
   'id',
@@ -18,7 +19,7 @@ export const serializeAuthor = async (
   author: Author,
   req: Request
 ): Promise<Record<string, unknown>> => {
-  if (!author.node) {
+  if (!author.nodeServiceUrl) {
     // Local author
     return {
       type: 'author',
@@ -28,9 +29,9 @@ export const serializeAuthor = async (
       host: `${getHost(req)}/`,
     };
   } else {
+    const node = await Node.findByPk(author.nodeServiceUrl);
     // Remote author
-    return (
-      await axios.get(`/authors/${author.id}`, remoteRequestConfig(author.node))
-    ).data;
+    return (await axios.get(`/authors/${author.id}`, remoteRequestConfig(node)))
+      .data;
   }
 };

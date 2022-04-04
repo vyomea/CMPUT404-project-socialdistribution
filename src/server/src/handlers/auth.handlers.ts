@@ -30,7 +30,7 @@ const unauthorized = (res: Response, authorizationType = 'Bearer'): void => {
 const findNode = async (username: string, password: string) => {
   const node = await Node.findOne({
     where: {
-      username: username,
+      incomingUsername: username,
     },
   });
   if (node === null) {

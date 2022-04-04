@@ -1,15 +1,20 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { FindOptions } from 'sequelize';
 import Author from '../models/Author';
 import Post from '../models/Post';
 import Comment from '../models/Comment';
-import { AuthenticatedRequest } from '../types/auth';
+import {
+  AuthenticatedRequest,
+  AuthenticatedRequestHandler,
+} from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 import {
   serializePost,
   postPublicAttributes,
 } from '../serializers/post.serializers';
 import { isFriends } from '../handlers/follower.handlers';
+import { serializeLike } from '../serializers/like.serializers';
+import PostLike from '../models/PostLike';
 
 const createPost = async (req: AuthenticatedRequest, res: Response) => {
   if (req.params.postId) {
@@ -95,7 +100,7 @@ const postFindOptions = (
     ...(isFriend
       ? { visibility: ['PUBLIC', 'FRIENDS'] }
       : { visibility: ['PUBLIC'] }),
-    serviceUrl: null,
+    nodeServiceUrl: null,
   },
   include: [
     // Author of the post
@@ -135,6 +140,7 @@ const postFindOptions = (
 });
 
 const getAllPublicPosts = async (req: PaginationRequest, res: Response) => {
+  const findOptions = postFindOptions();
   const posts = await Post.findAll({
     ...postFindOptions(undefined, undefined, false),
     offset: req.offset,
@@ -156,6 +162,7 @@ const getAuthorPost = async (
   if (req.authorId) {
     isFriend = await isFriends(req.authorId, req.params.authorId);
   }
+  const findOptions = postFindOptions(req.params.authorId, req.params.postId);
   const post = await Post.findOne({
     ...postFindOptions(req.params.authorId, req.params.postId, isFriend),
   });
@@ -181,6 +188,7 @@ const getAuthorPosts = async (
     res.status(404).send();
     return;
   }
+  const findOptions = postFindOptions(req.params.authorId);
   const posts = await Post.findAll({
     ...postFindOptions(req.params.authorId, undefined, isFriend),
     offset: req.offset,
@@ -268,6 +276,51 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
+const getPostLikes: AuthenticatedRequestHandler = async (req, res) => {
+  let isFriend = false;
+  if (req.authorId) {
+    isFriend = await isFriends(req.authorId, req.params.authorId);
+  }
+
+  const post = await Post.findOne({
+    ...postFindOptions(req.params.authorId, req.params.postId, isFriend),
+  });
+
+  if (post === null) {
+    res.status(404).send();
+    return;
+  }
+
+  const likes = await PostLike.findAll({
+    where: {
+      postId: req.params.postId,
+    },
+    include: [
+      {
+        model: Author,
+        as: 'author',
+      },
+      {
+        model: Post,
+        as: 'post',
+        attributes: ['id'],
+        include: [
+          {
+            model: Author,
+            as: 'author',
+            attributes: ['id'],
+          },
+        ],
+      },
+    ],
+  });
+
+  res.status(200).json({
+    type: 'likes',
+    items: await Promise.all(likes.map((like) => serializeLike(like, req))),
+  });
+};
+
 export {
   createPost,
   deleteAuthorPost,
@@ -276,4 +329,5 @@ export {
   getAuthorPosts,
   getPostImage,
   updateAuthorPost,
+  getPostLikes,
 };

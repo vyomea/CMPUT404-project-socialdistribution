@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 
 class Node extends Model {
@@ -7,6 +7,8 @@ class Node extends Model {
   declare incomingPasswordHash: string;
   declare outgoingUsername: string;
   declare outgoingPassword: string;
+  static Authors: HasMany;
+  static Posts: HasMany;
 }
 
 Node.init(

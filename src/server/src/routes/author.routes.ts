@@ -9,11 +9,13 @@ import { validate } from '../middlewares/validator.middlewares';
 import posts from './post.routes';
 import comments from './comment.routes';
 import followers from './follower.routes';
+import inbox from './inbox.routes';
 
 import {
   deleteAuthor,
   getAllAuthors,
   getAuthor,
+  getAuthorLiked,
   getCurrentAuthor,
   updateProfile,
 } from '../controllers/author.controllers';
@@ -35,6 +37,10 @@ router.use(
   validate([param('authorId').isUUID()]),
   getAuthorFollowings
 );
+
+router.use('/:authorId/inbox', inbox);
+
+router.get('/:authorId/liked', getAuthorLiked);
 
 router.get('/', paginate, getAllAuthors);
 router.get('/me', requiredLoggedIn, getCurrentAuthor);

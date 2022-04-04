@@ -14,7 +14,24 @@ import {
   getAuthorPosts,
   getPostImage,
   updateAuthorPost,
+  getPostLikes,
 } from '../controllers/post.controllers';
+
+export const postValidations = [
+  body('title').isString(),
+  body('description').isString(),
+  body('source').isURL(),
+  body('origin').isURL(),
+  body('contentType').isIn([
+    'text/markdown',
+    'text/plain',
+    'application/base64',
+    'image',
+  ]),
+  body('content').optional(),
+  body('categories.*').isString(),
+  body('visibility').isIn(['PUBLIC', 'FRIENDS']),
+];
 
 router.get('/:postId', validate([param('postId').isUUID()]), getAuthorPost);
 router.get(
@@ -29,16 +46,7 @@ router.post(
     multer().single('image'),
     validate([
       param('postId').isUUID(),
-      body('title').isString().optional(),
-      body('description').isString().optional(),
-      body('source').isURL().optional(),
-      body('origin').isURL().optional(),
-      body('contentType')
-        .isIn(['text/markdown', 'text/plain', 'application/base64', 'image'])
-        .optional(),
-      body('content').optional(),
-      body('categories.*').isString().optional(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']).optional(),
+      ...postValidations.map((validation) => validation.optional()),
     ]),
   ],
   updateAuthorPost
@@ -53,48 +61,21 @@ router.put(
   [
     requiredLoggedIn,
     multer().single('image'),
-    validate([
-      param('postId').isUUID(),
-      body('title').isString(),
-      body('description').isString(),
-      body('source').isURL(),
-      body('origin').isURL(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-        'application/base64',
-        'image',
-      ]),
-      body('content').optional(),
-      body('categories.*').isString(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']),
-    ]),
+    validate([param('postId').isUUID(), ...postValidations]),
   ],
   createPost
 );
 router.get('/', paginate, getAuthorPosts);
 router.post(
   '/',
-  [
-    requiredLoggedIn,
-    multer().single('image'),
-    validate([
-      body('title').isString(),
-      body('description').isString(),
-      body('source').isURL(),
-      body('origin').isURL(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-        'application/base64',
-        'image',
-      ]),
-      body('content').optional(),
-      body('categories.*').isString(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']),
-    ]),
-  ],
+  [requiredLoggedIn, multer().single('image'), validate([...postValidations])],
   createPost
+);
+
+router.get(
+  '/:postId/likes',
+  validate([param('postId').isUUID()]),
+  getPostLikes
 );
 
 export default router;

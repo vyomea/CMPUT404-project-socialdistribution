@@ -1,10 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import Author from '../models/Author';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 import { serializeComment } from '../serializers/comment.serializers';
+import { serializeLike } from '../serializers/like.serializers';
+import CommentLike from '../models/CommentLike';
 
 const createComment = async (
   req: AuthenticatedRequest & PaginationRequest,
@@ -44,11 +46,12 @@ const createComment = async (
 };
 
 // this should not be used as not in the specs, but is there for testing
-const getPostComment = async (req: Request, res: Response) => {
+const getComment = async (req: Request, res: Response) => {
   const comment = await Comment.findOne({
     attributes: ['comment', 'contentType', 'published', 'id'],
     where: {
       post_id: req.params.postId,
+      id: req.params.commentId,
     },
     include: [
       {
@@ -78,7 +81,7 @@ const getPostComment = async (req: Request, res: Response) => {
   res.send(await serializeComment(comment, req));
 };
 
-const getPostComments = async (req: PaginationRequest, res: Response) => {
+const getComments = async (req: PaginationRequest, res: Response) => {
   const post = await Post.findByPk(req.params.postId);
   if (post === null) {
     res.status(404).send({ error: 'Post does not exist' });
@@ -121,4 +124,41 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
   });
 };
 
-export { createComment, getPostComment, getPostComments };
+const getCommentLikes: RequestHandler = async (req, res) => {
+  const comment = await Comment.findByPk(req.params.commentId);
+  if (comment === null) {
+    res.status(404).send();
+    return;
+  }
+
+  const likes = await CommentLike.findAll({
+    where: {
+      commentId: req.params.commentId,
+    },
+    include: [
+      {
+        model: Comment,
+        as: 'comment',
+        attributes: ['id'],
+        include: [
+          {
+            model: Author,
+            as: 'author',
+            attributes: ['id'],
+          },
+        ],
+      },
+      {
+        model: Author,
+        as: 'author',
+      },
+    ],
+  });
+
+  res.status(200).send({
+    type: 'likes',
+    items: await Promise.all(likes.map((like) => serializeLike(like, req))),
+  });
+};
+
+export { createComment, getComment, getComments, getCommentLikes };

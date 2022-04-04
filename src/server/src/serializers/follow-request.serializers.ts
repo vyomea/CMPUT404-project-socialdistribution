@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import FollowRequest from '../models/Request';
+import FollowRequest from '../models/FollowRequest';
 import { serializeAuthor } from '../serializers/author.serializers';
 
 export const serializeFollowRequest = async (
@@ -8,7 +8,7 @@ export const serializeFollowRequest = async (
 ): Promise<Record<string, unknown>> => {
   return {
     type: 'Follow',
-    actor: await serializeAuthor(followRequest.requestor, req),
-    object: await serializeAuthor(followRequest.author, req),
+    actor: await serializeAuthor(followRequest.requester, req),
+    object: await serializeAuthor(followRequest.requestee, req),
   };
 };

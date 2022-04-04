@@ -28,7 +28,7 @@ export const serializePost = async (
   req: Request,
   comments?: Comment[]
 ): Promise<Record<string, unknown>> => {
-  if (!post.node) {
+  if (!post.nodeServiceUrl) {
     return {
       type: 'post',
       ...pick(post.toJSON(), postPublicAttributes),
@@ -59,7 +59,7 @@ export const serializePost = async (
     return (
       await axios.get(
         `/authors/${post.authorId}/posts/${post.id}`,
-        remoteRequestConfig(post.node)
+        remoteRequestConfig(await post.getNode())
       )
     ).data;
   }
