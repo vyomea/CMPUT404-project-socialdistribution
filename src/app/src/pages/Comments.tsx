@@ -19,6 +19,10 @@ import ReactMarkdown from "react-markdown";
 import { ButtonGroup, ButtonProps, InputLabel, TextField } from "@mui/material";
 import { styled as Styled } from "@mui/material/styles";
 import { useParams } from "react-router-dom";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
 
 interface Props {
   currentUser?: Author;
@@ -92,6 +96,11 @@ export default function Comments({ currentUser }: Props): JSX.Element {
   const [author, setAuthor] = useState<Author>();
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+    setType("");
+    setContent("");
   };
 
   const handleType = (event: SelectChangeEvent) => {
@@ -223,7 +232,31 @@ export default function Comments({ currentUser }: Props): JSX.Element {
                         onChange={handleTextChange}
                       />
                     ) : type === "text/markdown" ? (
-                      <ReactMarkdown>{content}</ReactMarkdown>
+                      <ReactMarkdown
+                        children={content}
+                        //@ts-ignore
+                        remarkPlugins={[remarkMath]}
+                        //@ts-ignore
+                        rehypePlugins={[rehypeKatex]}
+                        components={{
+                          code({ node, inline, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || "");
+                            return !inline && match ? (
+                              //@ts-ignore
+                              <SyntaxHighlighter
+                                children={String(children).replace(/\n$/, "")}
+                                language={match[1]}
+                                PreTag="div"
+                                {...props}
+                              />
+                            ) : (
+                              <code className={className} {...props}>
+                                {children}
+                              </code>
+                            );
+                          },
+                        }}
+                      />
                     ) : (
                       content
                     )}
@@ -236,8 +269,8 @@ export default function Comments({ currentUser }: Props): JSX.Element {
               aria-label="check"
               sx={{
                 color: "black",
-                background: "#46ECA6",
-                "&:hover": { background: "#18E78F" },
+                background: "#f4e6d7",
+                "&:hover": { background: "#E8CEB0" },
               }}
             >
               <CheckIcon onClick={createComment} />
@@ -268,9 +301,9 @@ export default function Comments({ currentUser }: Props): JSX.Element {
             left: "auto",
             position: "fixed",
           }}
-          sx={{ color: "black", background: "#46ECA6", "&:hover": { background: "#18E78F" } }}
+          sx={{ color: "black", background: "#f4e6d7", "&:hover": { background: "#E8CEB0" } }}
         >
-          <AddIcon onClick={() => setOpen(true)} />
+          <AddIcon onClick={handleOpen} />
         </Fab>
         {comments?.map((i) => {
           return <CommentComponent comm={i} likes={0} />;

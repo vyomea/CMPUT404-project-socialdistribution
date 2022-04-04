@@ -1,6 +1,6 @@
-import argon2 from 'argon2';
-import Author from './models/Author';
-import db from './db';
+import argon2 from "argon2";
+import Author from "./models/Author";
+import db from "./db";
 
 async function main() {
   if (process.argv.length < 4 || process.argv.length > 5) {
