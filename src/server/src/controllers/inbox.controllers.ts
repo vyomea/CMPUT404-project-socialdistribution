@@ -43,6 +43,7 @@ const getInbox = async (
       recipientId: req.params.authorId,
     },
     include: [
+      { model: Author, as: 'recipient' },
       {
         model: Post,
         as: 'post',
@@ -106,6 +107,16 @@ const getInbox = async (
       {
         model: FollowRequest,
         as: 'request',
+        include: [
+          {
+            model: Author,
+            as: 'requestee',
+          },
+          {
+            model: Author,
+            as: 'requester',
+          },
+        ],
       },
     ],
     order: [['createdAt', 'DESC']],
