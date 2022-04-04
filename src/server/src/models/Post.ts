@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
 import Comment from './Comment';
 import Node from './Node';
+import PostLike from './PostLike';
 
 class Post extends Model {
   declare id: typeof uuidv4;
@@ -32,6 +33,8 @@ class Post extends Model {
   declare serviceUrl: string;
   static Node: BelongsTo;
   declare node: Node;
+  static Likes: HasMany;
+  declare likes: PostLike[];
 }
 
 Post.init(
@@ -137,5 +140,8 @@ Post.Comments = Post.hasMany(Comment, { as: 'comments' });
 Comment.Post = Comment.belongsTo(Post, { as: 'post' });
 
 Post.Node = Post.belongsTo(Node, { as: 'node' });
+
+Post.Likes = Post.hasMany(PostLike, { as: 'likes' });
+PostLike.Post = PostLike.belongsTo(Post, { as: 'post' });
 
 export default Post;
