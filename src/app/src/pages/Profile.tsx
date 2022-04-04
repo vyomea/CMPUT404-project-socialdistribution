@@ -165,8 +165,8 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     async function fetchData() {
       try {
         const res = api.authors
-          .withId("" + currentUser?.id)
-          .followers.withId("" + author?.id)
+          .withId("" + author?.id)
+          .followers.withId("" + currentUser?.id)
           .isAFollower();
         res.then((isFollowing) => {
           setFollowing(isFollowing["result"]);
