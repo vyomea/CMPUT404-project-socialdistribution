@@ -7,10 +7,13 @@ import db from './db';
 db.sync({ alter: true });
 
 import { authenticate } from './middlewares/auth.middlewares';
+import { paginate } from './middlewares/pagination.middlewares';
 
 import auth from './routes/auth.routes';
 import authors from './routes/author.routes';
 import nodes from './routes/node.routes';
+
+import { getAllPublicPosts } from './controllers/post.controllers';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not set');
@@ -25,6 +28,7 @@ app.use(authenticate);
 app.use(auth);
 app.use('/authors', authors);
 app.use('/nodes', nodes);
+app.use('/posts', paginate, getAllPublicPosts);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../build')));

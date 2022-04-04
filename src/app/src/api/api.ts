@@ -1,5 +1,9 @@
 import Axios from "axios";
-import Author, { authorFromResponse, AuthorResponse, authorToRequest } from "./models/Author";
+import Author, {
+  authorFromResponse,
+  AuthorResponse,
+  authorToRequest,
+} from "./models/Author";
 import Comment, {
   commentFromResponse,
   CommentResponse,
@@ -16,7 +20,8 @@ import InboxItem, {
 import Like, { likeFromResponse, LikeResponse } from "./models/Like";
 import Node from "./models/Node";
 
-const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3001" : "/";
+const baseUrl =
+  process.env.NODE_ENV === "development" ? "http://localhost:3001" : "/";
 
 const axios = Axios.create({
   baseURL: baseUrl,
@@ -62,7 +67,11 @@ const api = {
    * Create a new author's account via admin.
    * @returns the new author
    */
-  create: async (email: string, password: string, displayName: string): Promise<Author> => {
+  create: async (
+    email: string,
+    password: string,
+    displayName: string
+  ): Promise<Author> => {
     const result = await axios.post("/register", {
       email,
       password,
@@ -83,9 +92,13 @@ const api = {
    * @param url the URL to the object
    * @returns the object
    */
-  getObjectFromUrl: async (url: string): Promise<Author | Post | Comment | Comment[]> => {
+  getObjectFromUrl: async (
+    url: string
+  ): Promise<Author | Post | Comment | Comment[]> => {
     const responseData = (
-      await axios.get<AuthorResponse | PostResponse | CommentResponse | CommentsResponse>(url)
+      await axios.get<
+        AuthorResponse | PostResponse | CommentResponse | CommentsResponse
+      >(url)
     ).data;
     if (responseData.type === "author") {
       return authorFromResponse(responseData);
@@ -108,26 +121,29 @@ const api = {
      * Fetches a list of all nodes on the server.
      * @returns a list of nodes
      */
-    list: async (): Promise<Node[]> => (await axios.get(`/nodes`)).data,
+    list: async (): Promise<Node[]> => (await axios.get("/nodes")).data,
 
     /**
-     * Creates a node.
-     * @param username the username of the node.
-     * @param password the password of the node.
+     * Creates or updates a node.
+     * @param node the node to create or update
      * @returns TODO
      */
-    create: async (username: string, password: string): Promise<unknown> =>
-      (await axios.post(`/nodes`, { username, password })).data,
+    createOrUpdate: async (
+      node: Node & { incomingPassword: string }
+    ): Promise<unknown> =>
+      (await axios.post(`/nodes/${encodeURIComponent(node.serviceUrl)}`, node))
+        .data,
 
     /**
-     * Actions on the node with ID `nodeId`.
+     * Actions on the node with service URL `serviceUrl`.
      */
-    withId: (nodeId: string) => ({
+    withServiceUrl: (serviceUrl: string) => ({
       /**
        * Deletes the node.
        * @returns TODO
        */
-      delete: async (): Promise<unknown> => (await axios.delete(`/nodes/${nodeId}`)).data,
+      delete: async (): Promise<unknown> =>
+        (await axios.delete(`/nodes/${encodeURIComponent(serviceUrl)}`)).data,
     }),
   },
 
@@ -163,7 +179,9 @@ const api = {
        * @returns profile of the author
        */
       get: async (): Promise<Author> =>
-        authorFromResponse((await axios.get<AuthorResponse>(`/authors/${authorId}`)).data),
+        authorFromResponse(
+          (await axios.get<AuthorResponse>(`/authors/${authorId}`)).data
+        ),
 
       /**
        * Updates the profile of the author.
@@ -171,13 +189,19 @@ const api = {
        * @returns TODO
        */
       update: async (author: Author): Promise<unknown> =>
-        (await axios.post(`/authors/${authorId}`, authorToRequest(author, baseUrl))).data,
+        (
+          await axios.post(
+            `/authors/${authorId}`,
+            authorToRequest(author, baseUrl)
+          )
+        ).data,
 
       /**
        * Deletes the author.
        * @returns TODO
        */
-      delete: async (): Promise<unknown> => (await axios.delete(`/authors/${authorId}`)).data,
+      delete: async (): Promise<unknown> =>
+        (await axios.delete(`/authors/${authorId}`)).data,
 
       /**
        * Actions relating to the author's inbox.
@@ -191,9 +215,12 @@ const api = {
          */
         list: async (page?: number, size?: number): Promise<InboxItem[]> =>
           (
-            await axios.get<{ items: InboxItemResponse[] }>(`/authors/${authorId}/inbox`, {
-              params: { page, size },
-            })
+            await axios.get<{ items: InboxItemResponse[] }>(
+              `/authors/${authorId}/inbox`,
+              {
+                params: { page, size },
+              }
+            )
           ).data.items.map(inboxItemFromResponse),
 
         /**
@@ -201,7 +228,12 @@ const api = {
          * @returns TODO
          */
         send: async (item: InboxItem): Promise<unknown> =>
-          (await axios.post(`/authors/${authorId}/inbox`, inboxItemToRequest(item, baseUrl))).data,
+          (
+            await axios.post(
+              `/authors/${authorId}/inbox`,
+              inboxItemToRequest(item, baseUrl)
+            )
+          ).data,
 
         /**
          * Clear the author's inbox.
@@ -245,7 +277,9 @@ const api = {
          */
         list: async (): Promise<Author[]> =>
           (
-            await axios.get<{ items: AuthorResponse[] }>(`/authors/${authorId}/followers`)
+            await axios.get<{ items: AuthorResponse[] }>(
+              `/authors/${authorId}/followers`
+            )
           ).data.items.map(authorFromResponse),
 
         /**
@@ -257,21 +291,27 @@ const api = {
            * @returns true if this author is a follower, false otherwise
            */
           isAFollower: async (): Promise<boolean> =>
-            (await axios.get<boolean>(`/authors/${authorId}/followers/${followerId}`)).data,
+            (
+              await axios.get<boolean>(
+                `/authors/${authorId}/followers/${followerId}`
+              )
+            ).data,
 
           /**
            * Makes this author a follower.
            * @returns TODO
            */
           follow: async (): Promise<unknown> =>
-            (await axios.put(`/authors/${authorId}/followers/${followerId}`)).data,
+            (await axios.put(`/authors/${authorId}/followers/${followerId}`))
+              .data,
 
           /**
            * Makes this author not a follower.
            * @returns TODO
            */
           unfollow: async (): Promise<unknown> =>
-            (await axios.delete(`/authors/${authorId}/followers/${followerId}`)).data,
+            (await axios.delete(`/authors/${authorId}/followers/${followerId}`))
+              .data,
         }),
       },
 
@@ -285,7 +325,9 @@ const api = {
          */
         list: async (): Promise<Author[]> =>
           (
-            await axios.get<{ items: AuthorResponse[] }>(`/authors/${authorId}/following`)
+            await axios.get<{ items: AuthorResponse[] }>(
+              `/authors/${authorId}/following`
+            )
           ).data.items.map(authorFromResponse),
       },
 
@@ -301,9 +343,12 @@ const api = {
          */
         list: async (page?: number, size?: number): Promise<Post[]> =>
           (
-            await axios.get<{ items: PostResponse[] }>(`/authors/${authorId}/posts`, {
-              params: { page, size },
-            })
+            await axios.get<{ items: PostResponse[] }>(
+              `/authors/${authorId}/posts`,
+              {
+                params: { page, size },
+              }
+            )
           ).data.items.map(postFromResponse),
 
         /**
@@ -324,7 +369,11 @@ const api = {
            */
           get: async (): Promise<Post> =>
             postFromResponse(
-              (await axios.get<PostResponse>(`/authors/${authorId}/posts/${postId}`)).data,
+              (
+                await axios.get<PostResponse>(
+                  `/authors/${authorId}/posts/${postId}`
+                )
+              ).data
             ),
 
           /**
@@ -333,7 +382,8 @@ const api = {
            * @returns TODO
            */
           update: async (data: FormData): Promise<unknown> =>
-            (await axios.post(`/authors/${authorId}/posts/${postId}`, data)).data,
+            (await axios.post(`/authors/${authorId}/posts/${postId}`, data))
+              .data,
 
           /**
            * Creates the post.
@@ -341,7 +391,8 @@ const api = {
            * @returns TODO
            */
           create: async (data: FormData): Promise<unknown> =>
-            (await axios.put(`/authors/${authorId}/posts/${postId}`, data)).data,
+            (await axios.put(`/authors/${authorId}/posts/${postId}`, data))
+              .data,
 
           /**
            * Deletes the post.
@@ -356,7 +407,11 @@ const api = {
            */
           image: async (): Promise<Post> =>
             postFromResponse(
-              (await axios.get<PostResponse>(`/authors/${authorId}/posts/${postId}/image`)).data,
+              (
+                await axios.get<PostResponse>(
+                  `/authors/${authorId}/posts/${postId}/image`
+                )
+              ).data
             ),
 
           /**
@@ -370,7 +425,7 @@ const api = {
             list: async (): Promise<Like[]> =>
               (
                 await axios.get<{ items: LikeResponse[] }>(
-                  `/authors/${authorId}/posts/${postId}/likes`,
+                  `/authors/${authorId}/posts/${postId}/likes`
                 )
               ).data.items.map(likeFromResponse),
 
@@ -383,7 +438,7 @@ const api = {
                 `/authors/${authorId}/inbox`,
                 (() => {
                   throw new Error("not implemented");
-                })(),
+                })()
               ),
           },
 
@@ -437,7 +492,7 @@ const api = {
                 list: async (): Promise<Like[]> =>
                   (
                     await axios.get<{ items: LikeResponse[] }>(
-                      `/authors/${authorId}/posts/${postId}/comments/${commentId}/likes`,
+                      `/authors/${authorId}/posts/${postId}/comments/${commentId}/likes`
                     )
                   ).data.items,
 
@@ -450,7 +505,7 @@ const api = {
                     `/authors/${authorId}/inbox`,
                     (() => {
                       throw new Error("not implemented");
-                    })(),
+                    })()
                   ),
               },
             }),
