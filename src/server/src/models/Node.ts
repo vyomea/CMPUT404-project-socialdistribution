@@ -1,26 +1,35 @@
 import { DataTypes, Model } from 'sequelize';
 import db from '../db';
-import { v4 as uuidv4 } from 'uuid';
 
 class Node extends Model {
-  declare id: typeof uuidv4;
-  declare username: string;
-  declare passwordHash: string;
+  declare serviceUrl: string;
+  declare incomingUsername: string;
+  declare incomingPasswordHash: string;
+  declare outgoingUsername: string;
+  declare outgoingPassword: string;
 }
 
 Node.init(
   {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+    serviceUrl: {
+      type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
     },
-    username: {
+    incomingUsername: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    incomingPasswordHash: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    passwordHash: {
+    outgoingUsername: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    outgoingPassword: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -28,7 +37,6 @@ Node.init(
   {
     sequelize: db,
     modelName: 'Node',
-    underscored: true,
   }
 );
 

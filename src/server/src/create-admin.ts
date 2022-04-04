@@ -19,9 +19,10 @@ async function main() {
     passwordHash,
     displayName,
     isAdmin: true,
+    verified: true,
   });
 
-  console.log(`Successfuly created admin ${displayName} (${email})`);
+  console.log(`Successfully created admin ${displayName} (${email})`);
 }
 
 main();
