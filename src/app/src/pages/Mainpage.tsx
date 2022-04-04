@@ -10,8 +10,9 @@ import Backdrop from '@mui/material/Backdrop';
 import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import { List } from '@mui/material';
+import { Box, List, ButtonGroup, Button } from '@mui/material';
 import InboxComponents from '../components/InboxComponents';
+import UserPost from '../components/UserPost';
 import InboxItem from '../api/models/InboxItem';
 
 // This is for all the stuff in the Main Page
@@ -36,6 +37,7 @@ const MainPageContentContainer = styled.div`
 
 const GitContainer = styled.div`
   margin-right: 1%;
+  width: 25%;
 `;
 
 interface Props {
@@ -83,6 +85,53 @@ export default function Mainpage({ currentUser }: Props) {
       .list()
       .then((data) => setInbox(data));
   }, [currentUser?.id, inboxChanged]);
+
+  const [posts, setPosts] = useState<Post[] | undefined>(undefined);
+  const [postsChanged, setPostsChanged] = useState(false);
+  useEffect(() => {
+    api.authors
+      .withId('' + currentUser?.id)
+      .posts
+      .list()
+      .then((data) => setPosts(data));
+  }, [currentUser?.id, setPostsChanged]);
+
+  const handlePostsChanged = () => {
+    setPostsChanged(!postsChanged);
+  };
+
+  // Sidebar Button group
+  const buttons = [
+    {id:0,title:'Inbox'},
+    {id:1,title:'Browse'}
+  ];
+
+  //Set which list to display
+  const [listDisplay, setListDisplay] = useState({id:0,title:'Inbox'});
+
+  const lists = [
+    inbox?.map((item,index)=>
+    (
+    <InboxComponents 
+      item={item} 
+      currentUser={currentUser} 
+      handlePostsChanged={handleInboxChanged} 
+      key={index}
+    />
+    )),
+
+    posts?.map((post)=>
+    (
+    <UserPost 
+      post={post} 
+      currentUser={currentUser} 
+      postAuthor={post.author} 
+      likes={0} 
+      handlePostsChanged={handlePostsChanged} 
+      key={post.id}
+    />
+    )),
+  ]
 
   return (
     <MainPageContainer>
@@ -132,11 +181,48 @@ export default function Mainpage({ currentUser }: Props) {
         </Backdrop>
       ) : (
         <MainPageContentContainer>
-          <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
-            {inbox?.map((item,index)=>
-              <InboxComponents item={item} currentUser={currentUser} handlePostsChanged={handleInboxChanged} key={index}/>
-            )}
-          </List>
+          <Box width='75%'>
+            <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '100%', ml: 5 }}>
+              <Box style={{
+                width: '90%',
+                display: 'flex',}}
+              >
+                <Box
+                    sx={{
+                    mb:5,
+                    width:'90%',
+                    ml: 13,
+                    }}
+                >
+                    <ButtonGroup
+                      orientation="horizontal"
+                      aria-label="horizontal contained button group"
+                      variant="contained"
+                      size="large"
+                      sx={{ 
+                        width:'100%',
+                      }}
+                    >
+                      {buttons.map((button) => (
+                        <Button 
+                          onClick={()=>setListDisplay(button)}
+                          key={button.id} 
+                          style={{
+                            justifyContent: 'center'
+                          }}
+                          sx={{
+                            justifyContent:"space-between", 
+                            width: '90%',
+                            
+                          }}
+                        > {button.title}</Button>
+                      ))}
+                    </ButtonGroup>
+                </Box>
+              </Box>
+              {lists[listDisplay.id]}
+            </List>
+            </Box>
           <GitContainer>
             <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
           </GitContainer>
