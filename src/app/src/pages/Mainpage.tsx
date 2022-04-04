@@ -14,6 +14,9 @@ import { Box, List, ButtonGroup, Button } from '@mui/material';
 import InboxComponents from '../components/InboxComponents';
 import UserPost from '../components/UserPost';
 import InboxItem from '../api/models/InboxItem';
+import Comment from '../api/models/Comment';
+import Like from '../api/models/Like';
+import FollowRequest from '../api/models/FollowRequest';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -106,11 +109,119 @@ export default function Mainpage({ currentUser }: Props) {
     {id:1,title:'Browse'}
   ];
 
+  //FAKE DATA
+
+  const a1: Author={
+    type: "author",
+    id: "http://localhost:3000/authors/b5b6c97c-3086-43a8-8bb3-2c3d351f000d",
+    displayName: "Lara Croft",
+    github: "",
+    profileImage: "",
+    isAdmin: false,
+    verified: true,
+  };
+  const a2: Author={
+    type: "author",
+    id: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e",
+    displayName: "Nathan Drake",
+    github: "",
+    profileImage: "",
+    isAdmin: false,
+    verified: true,
+  };
+
+  const p1: Post={
+    type: "post",
+    id: "http://localhost:3000/authors/b5b6c97c-3086-43a8-8bb3-2c3d351f000d/posts/4cc45732-e915-46e3-8418-cacb0ae0b114",
+    title: "Title",
+    source: "https://www.uuidgenerator.net/version4",
+    origin: "https://www.uuidgenerator.net/version4",
+    description: "Hi",
+    contentType:"text/plain",
+    content: "Hi",
+    image: "",
+    categories: [],
+    count: 10,
+    published: new Date('December 17, 1995 03:24:00'),
+    visibility: "PUBLIC",
+    unlisted: false,
+    author: a1,
+  };
+  const p2: Post={
+    type: "post",
+    id: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114",
+    title: "Title",
+    source: "https://www.uuidgenerator.net/version4",
+    origin: "https://www.uuidgenerator.net/version4",
+    description: "Bye",
+    contentType:"text/plain",
+    content: "Byew",
+    image: "",
+    categories: [],
+    count: 10,
+    published: new Date('December 17, 1995 03:24:00'),
+    visibility: "PUBLIC",
+    unlisted: false,
+    author: a2,
+  };
+
+
+  const c1: Comment={
+    type: "comment",
+    id: "8138f8da-d948-489e-90c5-a8fb873b57cb",
+    author: a1,
+    comment: "Hey",
+    contentType: "text/plain",
+    published: `${new Date('December 17, 1995 03:24:00')}`,
+    postUrl: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114", // URL of the API endpoint to get the post
+    postServiceUrl: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114", // service URL of the post
+    postId: "4cc45732-e915-46e3-8418-cacb0ae0b114", // id of the post the comment is on
+  };
+  const c2: Comment={
+    type: "comment",
+    id: "631febab-2044-43c3-9f0b-dbf5a1c868b2",
+    author: a2,
+    comment: "Bye",
+    contentType: "text/plain",
+    published: `${new Date('December 17, 1995 03:24:00')}`,
+    postUrl: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114", // URL of the API endpoint to get the post
+    postServiceUrl: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114", // service URL of the post
+    postId: "4cc45732-e915-46e3-8418-cacb0ae0b114", // id of the post the comment is on
+  };
+
+  const l1: Like={
+    type: "Like",
+    summary: "Lara Croft likes your comment.",
+    author: a1,
+    object: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114/comments/631febab-2044-43c3-9f0b-dbf5a1c868b2",
+  };
+  const l2: Like={
+    type: "Like",
+    summary: "Nathan Drakes likes your post.",
+    author: a1,
+    object: "http://localhost:3000/authors/e28da252-9934-4e46-8fd5-3c3e46e5765e/posts/4cc45732-e915-46e3-8418-cacb0ae0b114",
+  };
+
+  const r1: FollowRequest={
+    type: "Follow",
+    summary: "Lara Croft wants to follow you.",
+    actor: a1, //sends request
+    object: a2 ,//recieves request
+  };
+  const r2: FollowRequest={
+    type: "Follow",
+    summary: "Nathan Drakes wants to follow you.",
+    actor: a2, //sends request
+    object: a1 ,//recieves request
+  };
+
+  const indexArray: InboxItem[] = [p1,l1,p2,p1,l2,c1,r1,p2,c2,l2,r2];
+
   //Set which list to display
   const [listDisplay, setListDisplay] = useState({id:0,title:'Inbox'});
 
   const lists = [
-    inbox?.map((item,index)=>
+    indexArray?.map((item,index)=>
     (
     <InboxComponents 
       item={item} 

@@ -2,14 +2,21 @@ import * as React from "react";
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import Like from "../api/models/Like"
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useNavigate } from "react-router-dom";
 
 export default function MainLike({
     like,
 }: {
     like: Like,
 }): JSX.Element {
+    const navigate = useNavigate();
+
+    const idArray = like.object.split('/');
+    const authorId = idArray[4];
+    const postId = idArray[6];
+
     const handleClick = () =>{
-        window.open(`${like.object}`,"_blank");
+        navigate(`/profile/${authorId}/post/${postId}`);
     }
     return (
     <Box style={{
@@ -38,8 +45,8 @@ export default function MainLike({
                     }}>
                     <FavoriteIcon/>
                     <Typography noWrap ml={0.5}>
-                            {like.summary}: <Box style={{textDecoration: 'underline', cursor:'pointer'}} component="span" onClick={handleClick}>{like.object}</Box>
-                        </Typography>
+                        <Box style={{textDecoration: 'underline', cursor:'pointer'}} component="span" onClick={handleClick}> {like.summary}</Box>
+                    </Typography>
                     </Box>
 
             </CardContent>

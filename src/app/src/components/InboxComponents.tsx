@@ -34,9 +34,9 @@ export default function AdminAuthorCard({
         {item.type==="Follow" ? (
             <MainRequest followRequest={item} key={item.object.id}/>
         ):null}
-        {/* {item.type==="comment" ? (
+        {item.type==="comment" ? (
             <MainComment comment={item} key={item.id}/>
-        ):null} */}
+        ):null}
 
     </>
   );
