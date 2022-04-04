@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import Author from '../models/Author';
 import { JwtPayload } from '../types/auth';
 import Node from '../models/Node';
-import { serializeAuthor } from '../controllers/author.controllers';
+import { serializeAuthor } from '../serializers/author.serializers';
 
 const loginUser = async (
   author: Author,
@@ -19,28 +19,31 @@ const loginUser = async (
   }
   const payload: JwtPayload = { authorId: author.id.toString() };
   const token = jwt.sign(payload, process.env.JWT_SECRET);
-  res.json({ token, author: serializeAuthor(author, req) });
+  res.json({ token, author: await serializeAuthor(author, req) });
 };
 
-const unauthorized = (res: Response): void => {
-  res.setHeader('WWW-Authenticate', 'Bearer');
+const unauthorized = (res: Response, authorizationType = 'Bearer'): void => {
+  res.setHeader('WWW-Authenticate', authorizationType);
   res.status(401).send();
 };
 
-const validNode = async (username: string, password: string) => {
+const findNode = async (username: string, password: string) => {
   const node = await Node.findOne({
     where: {
-      username: username,
+      incomingUsername: username,
     },
   });
   if (node === null) {
-    return false;
+    return null;
   }
-  const passwordIsCorrect = await argon2.verify(node.passwordHash, password);
+  const passwordIsCorrect = await argon2.verify(
+    node.incomingPasswordHash,
+    password
+  );
   if (!passwordIsCorrect) {
-    return false;
+    return null;
   }
-  return true;
+  return node;
 };
 
-export { loginUser, unauthorized, validNode };
+export { loginUser, unauthorized, findNode };

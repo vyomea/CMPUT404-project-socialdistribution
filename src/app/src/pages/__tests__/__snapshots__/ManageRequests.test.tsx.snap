@@ -11,37 +11,7 @@ exports[`ManageRequests suite Renders correctly 1`] = `
         "height": "5%",
       }
     }
-  >
-    <div
-      className="sc-bdvvtL mzSdo"
-    >
-      <div
-        className="sc-gsDKAQ dokASy"
-      >
-        <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          tabIndex={0}
-          type="button"
-        >
-          
-        </button>
-      </div>
-    </div>
-  </div>
+  />
   <div
     className="MuiBox-root css-1k9ek97"
     style={

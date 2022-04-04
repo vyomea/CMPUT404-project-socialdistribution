@@ -1,11 +1,10 @@
 import styled from 'styled-components';
-import { TextField, Checkbox, FormControlLabel } from '@mui/material';
+import { TextField, Checkbox } from '@mui/material';
 import React from 'react';
 import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
 import api from '../api/api';
 import Author from '../api/models/Author';
-
 interface Props {
   data: Author;
   handleAuthorsChanged: any;
@@ -36,6 +35,13 @@ const Header = styled.div`
   margin-top: 1%;
   font-size: 200%;
   text-align: center;
+`;
+
+const ContentType = styled.div`
+  width: 80%;
+  text-align: center;
+  margin-top: 2%;
+  font-size: 150%;
 `;
 
 const fieldStyle = { width: '40%', mt: 5 };
@@ -79,8 +85,6 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
       verified: verified,
     };
 
-    console.log(author);
-
     api.authors
       .withId(author.id)
       .update(author)
@@ -120,16 +124,13 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
           onChange={handleImage}
           fullWidth
         />
-        <FormControlLabel
-          control={
-            <Checkbox
+
+        <ContentType> Verify </ContentType>
+        
+        <Checkbox
               id='standard-basic'
               checked={verified}
               onChange={handleVerified}
-            />
-          }
-          label='Verified'
-          labelPlacement='start'
         />
       </Block>
       <Fab
@@ -137,8 +138,8 @@ const EditAuthor = ({ data, handleAuthorsChanged, handleClose }: Props) => {
         aria-label='check'
         sx={{
           color: 'black',
-          background: '#46ECA6',
-          '&:hover': { background: '#18E78F' },
+          background: '#f4e6d7',
+          '&:hover': { background: '#E8CEB0' },
           mb: 5,
         }}>
         <CheckIcon onClick={handleEdit} />

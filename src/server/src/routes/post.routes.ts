@@ -6,6 +6,7 @@ const router = express.Router({ mergeParams: true });
 import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
 import { requiredLoggedIn } from '../middlewares/auth.middlewares';
+import { forwardRequestToRemoteNode } from '../middlewares/to-node.middlewares';
 
 import {
   createPost,
@@ -14,87 +15,75 @@ import {
   getAuthorPosts,
   getPostImage,
   updateAuthorPost,
+  getPostLikes,
 } from '../controllers/post.controllers';
 
-router.get('/:post_id', validate([param('post_id').isUUID()]), getAuthorPost);
+export const postValidations = [
+  body('title').isString(),
+  body('description').isString(),
+  body('source').isURL(),
+  body('origin').isURL(),
+  body('contentType').isIn([
+    'text/markdown',
+    'text/plain',
+    'application/base64',
+    'image',
+  ]),
+  body('content').optional(),
+  body('categories.*').isString(),
+  body('visibility').isIn(['PUBLIC', 'FRIENDS']),
+];
+
 router.get(
-  '/:post_id/image',
-  validate([param('post_id').isUUID()]),
+  '/:postId',
+  validate([param('postId').isUUID()]),
+  forwardRequestToRemoteNode,
+  getAuthorPost
+);
+router.get(
+  '/:postId/image',
+  validate([param('postId').isUUID()]),
+  forwardRequestToRemoteNode,
   getPostImage
 );
 router.post(
-  '/:post_id',
+  '/:postId',
   [
     requiredLoggedIn,
     multer().single('image'),
     validate([
-      param('post_id').isUUID(),
-      body('title').isString().optional(),
-      body('description').isString().optional(),
-      body('source').isURL().optional(),
-      body('origin').isURL().optional(),
-      body('contentType')
-        .isIn(['text/markdown', 'text/plain', 'application/base64', 'image'])
-        .optional(),
-      body('content').optional(),
-      body('categories.*').isString().optional(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']).optional(),
+      param('postId').isUUID(),
+      ...postValidations.map((validation) => validation.optional()),
     ]),
   ],
   updateAuthorPost
 );
 router.delete(
-  '/:post_id',
-  [requiredLoggedIn, validate([param('post_id').isUUID()])],
+  '/:postId',
+  [requiredLoggedIn, validate([param('postId').isUUID()])],
   deleteAuthorPost
 );
 router.put(
-  '/:post_id',
+  '/:postId',
   [
     requiredLoggedIn,
     multer().single('image'),
-    validate([
-      param('post_id').isUUID(),
-      body('title').isString(),
-      body('description').isString(),
-      body('source').isURL(),
-      body('origin').isURL(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-        'application/base64',
-        'image',
-      ]),
-      body('content').optional(),
-      body('categories.*').isString(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']),
-    ]),
+    validate([param('postId').isUUID(), ...postValidations]),
   ],
   createPost
 );
-router.get('/', paginate, getAuthorPosts);
+router.get('/', paginate, forwardRequestToRemoteNode, getAuthorPosts);
 router.post(
   '/',
-  [
-    requiredLoggedIn,
-    multer().single('image'),
-    validate([
-      body('title').isString(),
-      body('description').isString(),
-      body('source').isURL(),
-      body('origin').isURL(),
-      body('contentType').isIn([
-        'text/markdown',
-        'text/plain',
-        'application/base64',
-        'image',
-      ]),
-      body('content').optional(),
-      body('categories.*').isString(),
-      body('visibility').isIn(['PUBLIC', 'FRIENDS']),
-    ]),
-  ],
+  [requiredLoggedIn, multer().single('image'), validate([...postValidations])],
   createPost
+);
+
+router.get(
+  '/:postId/likes',
+  validate([param('postId').isUUID()]),
+  forwardRequestToRemoteNode,
+  getPostLikes
 );
 
 export default router;

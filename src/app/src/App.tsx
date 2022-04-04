@@ -8,11 +8,62 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import ErrorPage from "./pages/Error";
 import api from "./api/api";
+import NavBar from "./components/NavBar";
+import Comments from "./pages/Comments";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Author | undefined>(undefined);
   const [fetchingCurrentUser, setFetchingCurrentUser] = useState(true);
+  const url = new URL(window.location.href);
 
+  const adminUser = [
+    {
+      Text: "Admin",
+      handleClick: () => {
+        window.location.assign(`${url.origin}/admin`);
+      },
+    },
+    {
+      Text: "Home",
+      handleClick: () => {
+        window.location.assign(`${url.origin}/`);
+      },
+    },
+    {
+      Text: "Profile",
+      handleClick: () => {
+        window.location.assign(`${url.origin}/profile/${currentUser?.id}`);
+      },
+    },
+    {
+      Text: "Logout",
+      handleClick: () => {
+        api.logout();
+        window?.location?.reload();
+      },
+    },
+  ];
+  const normalUser = [
+    {
+      Text: "Home",
+      handleClick: () => {
+        window.location.assign(`${url.origin}/`);
+      },
+    },
+    {
+      Text: "Profile",
+      handleClick: () => {
+        window.location.assign(`${url.origin}/profile/${currentUser?.id}`);
+      },
+    },
+    {
+      Text: "Logout",
+      handleClick: () => {
+        api.logout();
+        window?.location?.reload();
+      },
+    },
+  ];
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -34,22 +85,33 @@ function App() {
     </Box>
   ) : (
     <BrowserRouter>
+      {currentUser ? (
+        <NavBar items={currentUser && currentUser.isAdmin ? adminUser : normalUser} />
+      ) : null}
       <Routes>
         <Route
           index
           element={
             currentUser ? (
-              <Mainpage currentUser={currentUser} />
+              <>
+                <Mainpage currentUser={currentUser} />
+              </>
             ) : (
               <Homepage setCurrentUser={setCurrentUser} />
             )
           }
         />
+        <Route path="/profile/:id" element={<Profile currentUser={currentUser} />} />
         <Route
-          path="/profile/:id"
-          element={<Profile currentUser={currentUser} />}
+          path="/profile/:authorID/post/:postID"
+          element={<Comments currentUser={currentUser} />}
         />
-        <Route path="/admin" element={currentUser && currentUser.isAdmin ? <Admin /> : <ErrorPage errorType="NotFound" />} />
+        <Route
+          path="/admin"
+          element={
+            currentUser && currentUser.isAdmin ? <Admin /> : <ErrorPage errorType="NotFound" />
+          }
+        />
         <Route path="*" element={<ErrorPage errorType="NotFound" />} />
       </Routes>
     </BrowserRouter>

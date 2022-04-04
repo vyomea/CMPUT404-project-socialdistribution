@@ -1,12 +1,12 @@
-import { Octokit } from '@octokit/rest';
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import CircularProgress from '@mui/material/CircularProgress';
-import Activity from './Activity';
+import { Octokit } from "@octokit/rest";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+import CircularProgress from "@mui/material/CircularProgress";
+import Activity from "./Activity";
 
 const octokit = new Octokit({
   auth: process.env.REACT_APP_GH,
-  userAgent: 'Yoda',
+  userAgent: "Yoda",
 });
 
 interface props {
@@ -17,7 +17,7 @@ const GithubContainer = styled.div`
   width: 20%;
   height: 500px;
   position: fixed;
-  border: 2px solid black;
+  border: 1px solid grey;
   background-color: white;
   overflow-y: scroll;
 `;
@@ -37,7 +37,7 @@ const Github = ({ username }: props) => {
     async function onLoad() {
       if (username) {
         await octokit
-          .request('GET /users/{username}/events/public', {
+          .request("GET /users/{username}/events/public", {
             username: username,
           })
           .then((res) => {

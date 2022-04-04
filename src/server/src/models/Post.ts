@@ -1,8 +1,10 @@
-import { BelongsTo, DataTypes, Model } from 'sequelize';
+import { BelongsTo, DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
 import Comment from './Comment';
+import Node from './Node';
+import PostLike from './PostLike';
 
 class Post extends Model {
   declare id: typeof uuidv4;
@@ -23,11 +25,18 @@ class Post extends Model {
   declare published: Date;
   declare visibility: 'PUBLIC' | 'FRIENDS';
   declare unlisted: boolean;
+  declare authorId: string;
   static Author: BelongsTo;
   declare author: Author;
-  static Comments: BelongsTo;
+  static Comments: HasMany;
   declare comments: Comment[];
   declare addComment: (comment: Comment) => void;
+  static Node: BelongsTo;
+  declare node: Node;
+  declare nodeServiceUrl: string;
+  static Likes: HasMany;
+  declare likes: PostLike[];
+  declare getNode: () => Promise<Node>;
 }
 
 Post.init(
@@ -40,23 +49,23 @@ Post.init(
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     source: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     origin: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     contentType: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'text/plain',
       validate: {
         customValidator: (value) => {
@@ -83,21 +92,21 @@ Post.init(
     },
     categories: {
       type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false,
+      allowNull: true,
     },
     count: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0,
     },
     published: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: DataTypes.NOW,
     },
     visibility: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'PUBLIC',
       validate: {
         customValidator: (value) => {
@@ -110,7 +119,7 @@ Post.init(
     },
     unlisted: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       defaultValue: false,
     },
   },
@@ -121,7 +130,13 @@ Post.init(
   }
 );
 
-Post.Comments = Post.hasMany(Comment);
+Post.Comments = Post.hasMany(Comment, { as: 'comments' });
 Comment.Post = Comment.belongsTo(Post, { as: 'post' });
+
+Post.Node = Post.belongsTo(Node, { as: 'node' });
+Node.Posts = Node.hasMany(Post, { as: 'posts' });
+
+Post.Likes = Post.hasMany(PostLike, { as: 'likes' });
+PostLike.Post = PostLike.belongsTo(Post, { as: 'post' });
 
 export default Post;

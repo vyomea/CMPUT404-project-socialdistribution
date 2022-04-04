@@ -3,21 +3,22 @@ import Author from '../models/Author';
 import Follower from '../models/Follower';
 import { AuthenticatedRequest } from '../types/auth';
 import { unauthorized } from '../handlers/auth.handlers';
-import { serializeAuthor } from './author.controllers';
+import { serializeAuthor } from '../serializers/author.serializers';
+import FollowRequest from '../models/FollowRequest';
 
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
 const addFollower = async (req: AuthenticatedRequest, res: Response) => {
-  if (req.params.foreign_author_id !== req.authorId) {
+  if (req.params.authorId !== req.authorId) {
     unauthorized(res);
     return;
   }
-  if (req.params.id === req.params.foreign_author_id) {
+  if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot follow yourself' });
     return;
   }
 
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;
@@ -32,7 +33,21 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
     return;
   }
 
+  const followRequest = await FollowRequest.findOne({
+    where: {
+      requesterId: req.params.foreign_author_id,
+      requesteeId: req.params.authorId,
+    },
+  });
+  if (followRequest === null) {
+    res.status(400).send({
+      error: `${foreignAuthor.displayName} did not request to follow`,
+    });
+    return;
+  }
+
   try {
+    await followRequest.destroy();
     await author.addFollower(foreignAuthor);
   } catch (error) {
     console.error(error);
@@ -43,12 +58,12 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 const checkFollower = async (req: Request, res: Response) => {
-  if (req.params.id === req.params.foreign_author_id) {
+  if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot check if following yourself' });
     return;
   }
 
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;
@@ -64,7 +79,7 @@ const checkFollower = async (req: Request, res: Response) => {
 const getAuthorFollowers = async (req: Request, res: Response) => {
   const followers = await Follower.findAll({
     where: {
-      authorId: req.params.id,
+      authorId: req.params.authorId,
     },
     attributes: [],
     include: {
@@ -75,14 +90,16 @@ const getAuthorFollowers = async (req: Request, res: Response) => {
   });
   res.send({
     type: 'followers',
-    items: followers.map((follower) => serializeAuthor(follower.follower, req)),
+    items: await Promise.all(
+      followers.map((follower) => serializeAuthor(follower.follower, req))
+    ),
   });
 };
 
 const getAuthorFollowings = async (req: Request, res: Response) => {
   const followings = await Follower.findAll({
     where: {
-      followerId: req.params.id,
+      followerId: req.params.authorId,
     },
     attributes: [],
     include: [
@@ -95,19 +112,19 @@ const getAuthorFollowings = async (req: Request, res: Response) => {
   });
   res.send({
     type: 'following',
-    items: followings.map((following) =>
-      serializeAuthor(following.author, req)
+    items: await Promise.all(
+      followings.map((following) => serializeAuthor(following.author, req))
     ),
   });
 };
 
 const removeFollower = async (req: Request, res: Response) => {
-  if (req.params.id === req.params.foreign_author_id) {
+  if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot unfollow yourself' });
     return;
   }
 
-  const author = await Author.findByPk(req.params.id);
+  const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
     return;

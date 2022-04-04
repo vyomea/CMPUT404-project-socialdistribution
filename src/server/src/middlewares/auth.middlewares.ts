@@ -1,8 +1,12 @@
 import { NextFunction, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { unauthorized, validNode } from '../handlers/auth.handlers';
+import { unauthorized, findNode } from '../handlers/auth.handlers';
 import Author from '../models/Author';
-import { AuthenticatedRequest, JwtPayload } from '../types/auth';
+import {
+  AuthenticatedRequest,
+  FromNodeRequest,
+  JwtPayload,
+} from '../types/auth';
 
 const adminOnly: RequestHandler = async (
   req: AuthenticatedRequest,
@@ -26,10 +30,10 @@ const adminOnly: RequestHandler = async (
 };
 
 /**
- * Adds `authorId` to the request based on the request Authorization header.
+ * Adds `authorId` or `node` to the request based on the request Authorization header.
  */
 const authenticate: RequestHandler = async (
-  req: AuthenticatedRequest,
+  req: AuthenticatedRequest | FromNodeRequest,
   res,
   next
 ) => {
@@ -40,18 +44,21 @@ const authenticate: RequestHandler = async (
     const [username, password] = Buffer.from(encodedData, 'base64')
       .toString()
       .split(':');
-    if (!(await validNode(username, password))) {
-      unauthorized(res);
+    const node = await findNode(username, password);
+    if (node === null) {
+      unauthorized(res, 'Basic');
       return;
     }
-  }
-  if (authType === 'Bearer' && encodedData) {
+    (req as FromNodeRequest).requestType = 'fromNode';
+    (req as FromNodeRequest).fromNode = node;
+  } else if (authType === 'Bearer' && encodedData) {
     jwt.verify(
       encodedData,
       process.env.JWT_SECRET,
       (err, payload: JwtPayload) => {
         if (!err && payload) {
-          req.authorId = payload.authorId;
+          (req as AuthenticatedRequest).requestType = 'author';
+          (req as AuthenticatedRequest).authorId = payload.authorId;
         } else {
           unauthorized(res);
           return;
@@ -67,8 +74,6 @@ const authenticate: RequestHandler = async (
  *
  * If the author is logged in, the request is passed on.
  * Otherwise, an HTTP 400 response is sent.
- *
- * @param handler the handler to use if the request is authenticated
  */
 
 const requiredLoggedIn: RequestHandler = (
