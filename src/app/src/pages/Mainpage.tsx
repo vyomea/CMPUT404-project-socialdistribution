@@ -1,16 +1,16 @@
-import UserPost from '../components/UserPost';
-import Github from '../components/Github';
-import styled from 'styled-components';
-import Author from '../api/models/Author';
-import Post from '../api/models/Post';
-import api from '../api/api';
-import Add from '../components/Add';
-import { useState, useEffect } from 'react';
-import Backdrop from '@mui/material/Backdrop';
-import { CloseRounded } from '@mui/icons-material';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-import { List } from '@mui/material';
+import UserPost from "../components/UserPost";
+import Github from "../components/Github";
+import styled from "styled-components";
+import Author from "../api/models/Author";
+import Post from "../api/models/Post";
+import api from "../api/api";
+import Add from "../components/Add";
+import { useState, useEffect } from "react";
+import Backdrop from "@mui/material/Backdrop";
+import { CloseRounded } from "@mui/icons-material";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
+import { List } from "@mui/material";
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -25,16 +25,21 @@ const MainPageContentContainer = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  background-color: white;
+`;
+
+const Heading = styled.header`
+  font-size: 50px;
 `;
 
 const GitContainer = styled.div`
   margin-right: 1%;
+  margin-top: 1%;
 `;
 
 interface Props {
   currentUser?: Author;
 }
-
 
 export default function Mainpage({ currentUser }: Props) {
   // For now, mainpage just shows your own posts
@@ -56,50 +61,51 @@ export default function Mainpage({ currentUser }: Props) {
 
   useEffect(() => {
     api.authors
-      .withId('' + currentUser?.id)
+      .withId("" + currentUser?.id)
       .posts.list(1, 10)
       .then((data) => setPosts(data));
   }, [currentUser?.id, postsChanged]);
 
   return (
     <MainPageContainer>
+      <Heading>Hello, {currentUser?.displayName}! This is your homepage.</Heading>
       <Fab
         color="primary"
         aria-label="check"
         style={{
           margin: 0,
-          top: 'auto',
+          top: "auto",
           right: 20,
           bottom: 20,
-          left: 'auto',
-          position: 'fixed',
+          left: "auto",
+          position: "fixed",
         }}
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' } }}
+        sx={{ color: "black", background: "#46ECA6", "&:hover": { background: "#18E78F" } }}
       >
         <AddIcon onClick={handleToggle} />
       </Fab>
       {open ? (
         <Backdrop
           sx={{
-            color: '#fff',
+            color: "#fff",
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
           open={open}
         >
           <CloseRounded
             onClick={handleClose}
             sx={{
-              '&:hover': {
-                cursor: 'pointer',
+              "&:hover": {
+                cursor: "pointer",
               },
-              marginBottom: '10px',
-              borderRadius: '100%',
-              border: '1px solid white',
+              marginBottom: "10px",
+              borderRadius: "100%",
+              border: "1px solid white",
             }}
           />
           <Add
@@ -110,7 +116,7 @@ export default function Mainpage({ currentUser }: Props) {
         </Backdrop>
       ) : (
         <MainPageContentContainer>
-          <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
+          <List style={{ maxHeight: "100%", overflow: "auto" }} sx={{ width: "70%", ml: 5 }}>
             {posts?.map((post) => (
               <UserPost
                 post={post}
@@ -124,7 +130,7 @@ export default function Mainpage({ currentUser }: Props) {
           </List>
           <GitContainer>
             <Github
-              username={currentUser?.github ? `${currentUser.github.split('/').pop()}` : ''}
+              username={currentUser?.github ? `${currentUser.github.split("/").pop()}` : ""}
             />
           </GitContainer>
         </MainPageContentContainer>
