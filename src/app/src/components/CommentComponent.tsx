@@ -113,7 +113,7 @@ const CommentComponent = (props?: any): JSX.Element => {
   const navigate = useNavigate();
 
   const HandleNavigation = (id: string) => {
-    navigate(`/profile/${id.split("/").pop()}`);
+    navigate(`/profile/${id.split("/").pop()}?node=${comm.postServiceUrl}`);
   };
 
   const handleLikes = () => {

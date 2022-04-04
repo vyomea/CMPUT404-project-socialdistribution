@@ -220,14 +220,18 @@ const UserPost: React.FC<postItem> = (props?) => {
 
   //Navigate to user's profile from userpost
   const HandleNavigation = () => {
-    navigate(`/profile/${props?.postAuthor?.id.split("/").pop()}`);
+    navigate(
+      `/profile/${props?.postAuthor?.id.split("/").pop()}?node=${
+        (props?.post as Post)?.serviceUrl
+      }`
+    );
   };
 
   const navigateToComments = () => {
     navigate(
       `/profile/${props?.postAuthor?.id.split("/").pop()}/post/${
         props?.post?.id
-      }`
+      }?node=${(props?.post as Post)?.serviceUrl}`
     );
   };
 
