@@ -15,13 +15,14 @@ import Post, { postFromResponse, PostResponse } from "./models/Post";
 import InboxItem, {
   inboxItemFromResponse,
   InboxItemResponse,
-  inboxItemToRequest,
 } from "./models/InboxItem";
 import Like, { likeFromResponse, LikeResponse } from "./models/Like";
 import Node from "./models/Node";
 
 const baseUrl =
-  process.env.NODE_ENV === "development" ? `http://localhost:${process.env.REACT_APP_API_PORT || 3001}` : "/";
+  process.env.NODE_ENV === "development"
+    ? `http://localhost:${process.env.REACT_APP_API_PORT || 3001}`
+    : "/";
 
 const axios = Axios.create({
   baseURL: baseUrl,
@@ -114,8 +115,8 @@ const api = {
   },
 
   /**
- * Actions on the posts.
- */
+   * Actions on the posts.
+   */
   posts: {
     /**
      * Fetches a paginated list of posts.
@@ -125,14 +126,11 @@ const api = {
      */
     list: async (page?: number, size?: number): Promise<Post[]> =>
       (
-        await axios.get<{ items: PostResponse[] }>(
-          `/posts`,
-          {
-            params: { page, size },
-          }
-        )
-      ).data.items.map(postFromResponse)
-    },
+        await axios.get<{ items: PostResponse[] }>(`/posts`, {
+          params: { page, size },
+        })
+      ).data.items.map(postFromResponse),
+  },
 
   /**
    * Actions on nodes.
@@ -178,10 +176,14 @@ const api = {
      * @param size the number of authors per page
      * @returns a list of authors
      */
-    list: async (page?: number, size?: number): Promise<Author[]> =>
+    list: async (
+      page?: number,
+      size?: number,
+      nodeServiceUrl?: string
+    ): Promise<Author[]> =>
       (
         await axios.get<{ items: AuthorResponse[] }>("/authors", {
-          params: { page, size },
+          params: { page, size, node: nodeServiceUrl },
         })
       ).data.items.map(authorFromResponse),
 
@@ -194,14 +196,18 @@ const api = {
     /**
      * Actions on the author with ID `authorId`.
      */
-    withId: (authorId: string) => ({
+    withId: (authorId: string, nodeServiceUrl?: string) => ({
       /**
        * Fetches the profile of the author.
        * @returns profile of the author
        */
       get: async (): Promise<Author> =>
         authorFromResponse(
-          (await axios.get<AuthorResponse>(`/authors/${authorId}`)).data
+          (
+            await axios.get<AuthorResponse>(`/authors/${authorId}`, {
+              params: { node: nodeServiceUrl },
+            })
+          ).data
         ),
 
       /**
@@ -245,16 +251,11 @@ const api = {
           ).data.items.map(inboxItemFromResponse),
 
         /**
-         * Send an item to the author's inbox.
-         * @returns TODO
+         * Send a follow request to the author's inbox.
          */
-        send: async (item: InboxItem): Promise<unknown> =>
-          (
-            await axios.post(
-              `/authors/${authorId}/inbox`,
-              inboxItemToRequest(item, baseUrl)
-            )
-          ).data,
+        requestToFollow: async (): Promise<void> =>
+          (await axios.post(`authors/${authorId}/inbox`, { type: "Follow" }))
+            .data,
 
         /**
          * Clear the author's inbox.
@@ -275,7 +276,9 @@ const api = {
           const items = (
             await axios.get<{
               items: (PostResponse | CommentResponse)[];
-            }>(`/authors/${authorId}/likes`)
+            }>(`/authors/${authorId}/likes`, {
+              params: { node: nodeServiceUrl },
+            })
           ).data.items;
           return items.map((itemData) => {
             if (itemData.type === "post") {
@@ -299,7 +302,8 @@ const api = {
         list: async (): Promise<Author[]> =>
           (
             await axios.get<{ items: AuthorResponse[] }>(
-              `/authors/${authorId}/followers`
+              `/authors/${authorId}/followers`,
+              { params: { node: nodeServiceUrl } }
             )
           ).data.items.map(authorFromResponse),
 
@@ -314,7 +318,8 @@ const api = {
           isAFollower: async (): Promise<{ result: boolean }> =>
             (
               await axios.get<{ result: boolean }>(
-                `/authors/${authorId}/followers/${followerId}`
+                `/authors/${authorId}/followers/${followerId}`,
+                { params: { node: nodeServiceUrl } }
               )
             ).data,
 
@@ -347,7 +352,8 @@ const api = {
         list: async (): Promise<Author[]> =>
           (
             await axios.get<{ items: AuthorResponse[] }>(
-              `/authors/${authorId}/following`
+              `/authors/${authorId}/following`,
+              { params: { node: nodeServiceUrl } }
             )
           ).data.items.map(authorFromResponse),
       },
@@ -367,7 +373,7 @@ const api = {
             await axios.get<{ items: PostResponse[] }>(
               `/authors/${authorId}/posts`,
               {
-                params: { page, size },
+                params: { page, size, node: nodeServiceUrl },
               }
             )
           ).data.items.map(postFromResponse),
@@ -392,7 +398,8 @@ const api = {
             postFromResponse(
               (
                 await axios.get<PostResponse>(
-                  `/authors/${authorId}/posts/${postId}`
+                  `/authors/${authorId}/posts/${postId}`,
+                  { params: { node: nodeServiceUrl } }
                 )
               ).data
             ),
@@ -430,7 +437,8 @@ const api = {
             postFromResponse(
               (
                 await axios.get<PostResponse>(
-                  `/authors/${authorId}/posts/${postId}/image`
+                  `/authors/${authorId}/posts/${postId}/image`,
+                  { params: { node: nodeServiceUrl } }
                 )
               ).data
             ),
@@ -446,7 +454,8 @@ const api = {
             list: async (): Promise<Like[]> =>
               (
                 await axios.get<{ items: LikeResponse[] }>(
-                  `/authors/${authorId}/posts/${postId}/likes`
+                  `/authors/${authorId}/posts/${postId}/likes`,
+                  { params: { node: nodeServiceUrl } }
                 )
               ).data.items.map(likeFromResponse),
 
@@ -478,7 +487,7 @@ const api = {
                 (
                   await axios.get<CommentsResponse>(
                     `/authors/${authorId}/posts/${postId}/comments`,
-                    { params: { page, size } }
+                    { params: { page, size, node: nodeServiceUrl } }
                   )
                 ).data
               ),
@@ -513,7 +522,8 @@ const api = {
                 list: async (): Promise<Like[]> =>
                   (
                     await axios.get<{ items: LikeResponse[] }>(
-                      `/authors/${authorId}/posts/${postId}/comments/${commentId}/likes`
+                      `/authors/${authorId}/posts/${postId}/comments/${commentId}/likes`,
+                      { params: { node: nodeServiceUrl } }
                     )
                   ).data.items,
 
@@ -522,12 +532,10 @@ const api = {
                  * @returns TODO
                  */
                 like: async (): Promise<unknown> =>
-                  await axios.post(
-                    `/authors/${authorId}/inbox`,
-                    (() => {
-                      throw new Error("not implemented");
-                    })()
-                  ),
+                  await axios.post(`/authors/${authorId}/inbox`, {
+                    type: "Like",
+                    object: `${baseUrl}/authors/${authorId}/posts/${postId}`,
+                  }),
               },
             }),
           },
