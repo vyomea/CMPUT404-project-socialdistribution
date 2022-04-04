@@ -1,16 +1,18 @@
-import UserPost from "../components/UserPost";
-import Github from "../components/Github";
-import styled from "styled-components";
-import Author from "../api/models/Author";
-import Post from "../api/models/Post";
-import api from "../api/api";
-import Add from "../components/Add";
-import { useState, useEffect } from "react";
-import Backdrop from "@mui/material/Backdrop";
-import { CloseRounded } from "@mui/icons-material";
-import Fab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
-import { Box, List, ButtonGroup, Button } from "@mui/material";
+import Github from '../components/Github';
+import styled from 'styled-components';
+import Author from '../api/models/Author';
+import Post from '../api/models/Post';
+import api from '../api/api';
+import Add from '../components/Add';
+import { useState, useEffect } from 'react';
+import Backdrop from '@mui/material/Backdrop';
+import { CloseRounded } from '@mui/icons-material';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+import { Box, List, ButtonGroup, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import InboxComponents from '../components/InboxComponents';
+import UserPost from '../components/UserPost';
+import InboxItem from '../api/models/InboxItem';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -30,6 +32,7 @@ const MainPageContentContainer = styled.div`
 
 const GitContainer = styled.div`
   margin-right: 1%;
+  width: 25%;
 `;
 interface Props {
   currentUser?: Author;
@@ -47,7 +50,7 @@ export default function Mainpage({ currentUser }: Props) {
     setOpen(!open);
   };
 
-  const [inbox, setInbox] = useState<Post[] | undefined>(undefined);
+  const [inbox, setInbox] = useState<InboxItem[] | undefined>(undefined);
   const [inboxChanged, setInboxChanged] = useState(false);
   const handleInboxChanged = () => {
     setInboxChanged(!inboxChanged);
@@ -61,33 +64,35 @@ export default function Mainpage({ currentUser }: Props) {
 
   useEffect(() => {
     api.authors
-      .withId("" + currentUser?.id)
-      .posts.list(1, 10)
+      .withId('' + currentUser?.id)
+      .inbox
+      .list()
       .then((data) => setInbox(data));
   }, [currentUser?.id, inboxChanged]);
 
   useEffect(() => {
-    api.posts.list(1, 10).then((data) => setPosts(data));
+    api.posts.list(1,10).then((data) => setPosts(data));
   }, [postsChanged]);
-
+  
+  //Set which list to display
+  const [listDisplay, setListDisplay] = useState({
+    id: 0,
+    title: "Inbox",
+  });
+    
   // Sidebar Button group
   const buttons = [
     { id: 0, title: "Inbox" },
     { id: 1, title: "Browse" },
   ];
-
-  //Set which list to display
-  const [listDisplay, setListDisplay] = useState({ id: 0, title: "Inbox" });
-
+  
   const lists = [
-    inbox?.map((item) => (
-      <UserPost
-        post={item}
+    inbox?.map((item,index) => (
+      <InboxComponents
+        item={item}
         currentUser={currentUser}
-        postAuthor={item.author}
-        likes={0}
-        handlePostsChanged={handleInboxChanged}
-        key={item.id}
+        handlePostsChanged={handleInboxChanged}  
+        key={index}
       />
     )),
 
@@ -103,6 +108,27 @@ export default function Mainpage({ currentUser }: Props) {
     )),
   ];
 
+  // Open Clear Dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleClickClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleClear = () => {
+      api.authors
+      .withId('' + currentUser?.id)
+      .inbox
+      .clear()
+      .then(()=>handleInboxChanged())
+      .catch((e) => console.log(e.response))
+
+      handleClickClose();
+  };
   return (
     <MainPageContainer>
       <Fab
@@ -203,7 +229,49 @@ export default function Mainpage({ currentUser }: Props) {
               username={currentUser?.github ? `${currentUser.github.split("/").pop()}` : ""}
             />
           </GitContainer>
+          {listDisplay.title === "Inbox" ? (
+            <Box style={{
+              margin: 5,
+              top: 'auto',
+              right: 100,
+              bottom: 20,
+              left: 'auto',
+              position: 'fixed',
+            }}>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{ 
+                mt:5,
+                backgroundColor: 'red'
+              }}
+              onClick={handleClickOpen}
+              >Clear
+            </Button>
+            </Box>
+          ):null}
+        <Dialog
+          open={dialogOpen}
+          onClose={handleClickClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+      >
+          <DialogTitle id="alert-dialog-title">
+          {"Clear Inbox"}
+          </DialogTitle>
+          <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+              Clear your inbox?
+          </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+          <Button onClick={handleClickClose}>Cancel</Button>
+          <Button onClick={handleClear} autoFocus>Ok</Button>
+          </DialogActions>
+      </Dialog>
+
         </MainPageContentContainer>
+        
       )}
     </MainPageContainer>
   );

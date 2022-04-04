@@ -10,9 +10,11 @@ export default function MainComment({
   comment: Comment;
 }): JSX.Element {
   const navigate = useNavigate();
+  const idArray = comment.postUrl.split('/');
+  const authorID = idArray[4];
 
   const handleClick = () => {
-    navigate(`/post/${comment.postId}?node=${comment.postServiceUrl}`);
+    navigate(`/profile/${authorID}/post/${comment.postId}?node=${comment.postServiceUrl}`);
   };
 
   return (

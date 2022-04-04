@@ -1,23 +1,36 @@
 import * as React from "react";
-import { Box, Button, ButtonGroup, Card, CardContent } from "@mui/material";
+import { Box, Button, Card, CardContent } from "@mui/material";
 import FollowRequest from "../api/models/FollowRequest"
+import Author from "../api/models/Author"
+import api from "../api/api"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 export default function MainRequest({
     followRequest,
+    currentUser,
 }: {
     followRequest: FollowRequest,
+    currentUser: Author|undefined,
+
 }): JSX.Element {
+    const authorId = `${followRequest.actor.id.split('/').pop()}`;
+
+     //Opens profile in new tab
     const handleClick = () =>{
-        const authorId = `${followRequest.actor.id.split('/').pop()}`;
-        //Opens profile in new tab
         window.open(`profile/${authorId}`,"_blank");
     }
 
-    const buttons = [
-        <Button onClick={()=>alert("Accepted follow")}key="accept" > Accept </Button>,
-        <Button onClick={()=>alert("Rejected follow")} key="reject"> Reject </Button>,
-    ];
+    // let user follow me
+    const handleFollow = () =>{
+        api.authors
+        .withId(`${currentUser?.id}`)
+        .followers
+        .withId(authorId)
+        .follow()
+        .catch((e) => {
+            console.log(e.response);
+        });
+    }
 
     return (
     <Box style={{
@@ -62,9 +75,7 @@ export default function MainRequest({
                         width: '50%',
                         alignItems: 'center',
                     }}>
-                        <ButtonGroup variant="contained" size="small">
-                            {buttons}
-                        </ButtonGroup>
+                        <Button variant="contained" size="small" onClick={handleFollow} key="accept" > Accept </Button>
                     </Box>
                 </Box>
             </CardContent>
