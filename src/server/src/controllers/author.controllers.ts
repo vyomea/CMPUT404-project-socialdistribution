@@ -2,30 +2,12 @@ import { Request, Response } from 'express';
 import { unauthorized } from '../handlers/auth.handlers';
 import { isAdmin } from '../handlers/author.handlers';
 import Author from '../models/Author';
+import {
+  authorPublicAttributes,
+  serializeAuthor,
+} from '../serializers/author.serializers';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
-import { getHost } from '../utilities/host';
-import { pick } from '../utilities/pick';
-
-const publicAttributes = [
-  'id',
-  'displayName',
-  'github',
-  'profileImage',
-  'isAdmin',
-  'verified',
-];
-
-export const serializeAuthor = (
-  author: Author,
-  req: Request
-): Record<string, unknown> => ({
-  type: 'author',
-  ...pick(author.toJSON(), publicAttributes),
-  id: `${getHost(req)}/authors/${author.id}`,
-  url: `${getHost(req)}/authors/${author.id}`,
-  host: `${getHost(req)}/`,
-});
 
 const deleteAuthor = async (req: AuthenticatedRequest, res: Response) => {
   const author = await Author.findByPk(req.params.authorId);
@@ -47,39 +29,41 @@ const getAllAuthors = async (req: PaginationRequest, res: Response) => {
     where: {
       serviceUrl: null,
     },
-    attributes: publicAttributes,
+    attributes: authorPublicAttributes,
     offset: req.offset,
     limit: req.limit,
   });
 
   res.send({
     type: 'authors',
-    items: authors.map((author) => serializeAuthor(author, req)),
+    items: await Promise.all(
+      authors.map((author) => serializeAuthor(author, req))
+    ),
   });
 };
 
 const getAuthor = async (req: Request, res: Response) => {
   const author = await Author.findOne({
-    attributes: publicAttributes,
+    attributes: authorPublicAttributes,
     where: { id: req.params.authorId },
   });
   if (author === null) {
     res.status(404).send();
     return;
   }
-  res.send(serializeAuthor(author, req));
+  res.send(await serializeAuthor(author, req));
 };
 
 const getCurrentAuthor = async (req: AuthenticatedRequest, res: Response) => {
   const author = await Author.findOne({
-    attributes: publicAttributes,
+    attributes: authorPublicAttributes,
     where: { id: req.authorId },
   });
   if (author === null) {
     res.status(400).send();
     return;
   }
-  res.send(serializeAuthor(author, req));
+  res.send(await serializeAuthor(author, req));
 };
 
 const updateProfile = async (req: AuthenticatedRequest, res: Response) => {

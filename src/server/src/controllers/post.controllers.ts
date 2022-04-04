@@ -1,61 +1,22 @@
 import { Request, Response } from 'express';
+import { FindOptions } from 'sequelize';
 import Author from '../models/Author';
 import Post from '../models/Post';
 import Comment from '../models/Comment';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
-import { getHost } from '../utilities/host';
-import { pick } from '../utilities/pick';
-import { serializeAuthor } from './author.controllers';
-import { serializeComment } from './comment.controllers';
-import { FindOptions } from 'sequelize/types';
+import {
+  serializePost,
+  postPublicAttributes,
+} from '../serializers/post.serializers';
 import { isFriends } from '../handlers/follower.handlers';
-
-const publicAttributes = [
-  'id',
-  'title',
-  'source',
-  'origin',
-  'description',
-  'contentType',
-  'content',
-  'categories',
-  'count',
-  'published',
-  'visibility',
-  'unlisted',
-];
-
-export const serializePost = (
-  post: Post,
-  req: Request,
-  comments: Comment[]
-): Record<string, unknown> => ({
-  type: 'post',
-  ...pick(post.toJSON(), publicAttributes),
-  id: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}`,
-  url: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}`,
-  host: `${getHost(req)}/`,
-  comments: `${getHost(req)}/authors/${post.author.id}/posts/${
-    post.id
-  }/comments`,
-  author: serializeAuthor(post.author, req),
-  commentsSrc: {
-    type: 'comments',
-    post: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}`,
-    id: `${getHost(req)}/authors/${post.author.id}/posts/${post.id}/comments`,
-    page: 1,
-    size: comments.length,
-    comments: comments.map((comment) => serializeComment(comment, req)),
-  },
-});
 
 const createPost = async (req: AuthenticatedRequest, res: Response) => {
   if (req.params.postId) {
-    const post_exists = await Post.findOne({
+    const postExists = await Post.findOne({
       where: { id: req.params.postId },
     });
-    if (post_exists !== null) {
+    if (postExists !== null) {
       res.status(400).send({ error: 'Post already exists' });
       return;
     }
@@ -128,7 +89,6 @@ const postFindOptions = (
   postId?: string,
   isFriend?: boolean
 ): FindOptions => ({
-  attributes: publicAttributes,
   where: {
     ...(authorId ? { author_id: authorId } : {}),
     ...(postId ? { id: postId } : {}),
@@ -182,7 +142,9 @@ const getAllPublicPosts = async (req: PaginationRequest, res: Response) => {
   });
   res.send({
     type: 'posts',
-    items: posts.map((post) => serializePost(post, req, post.comments)),
+    items: await Promise.all(
+      posts.map((post) => serializePost(post, req, post.comments))
+    ),
   });
 };
 
@@ -202,7 +164,7 @@ const getAuthorPost = async (
     res.status(404).send();
     return;
   }
-  res.send(serializePost(post, req, post.comments));
+  res.send(await serializePost(post, req, post.comments));
 };
 
 const getAuthorPosts = async (
@@ -226,7 +188,9 @@ const getAuthorPosts = async (
   });
   res.send({
     type: 'posts',
-    items: posts.map((post) => serializePost(post, req, post.comments)),
+    items: await Promise.all(
+      posts.map((post) => serializePost(post, req, post.comments))
+    ),
   });
 };
 

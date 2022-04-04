@@ -3,7 +3,7 @@ import Author from '../models/Author';
 import Follower from '../models/Follower';
 import { AuthenticatedRequest } from '../types/auth';
 import { unauthorized } from '../handlers/auth.handlers';
-import { serializeAuthor } from './author.controllers';
+import { serializeAuthor } from '../serializers/author.serializers';
 
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
@@ -83,7 +83,9 @@ const getAuthorFollowers = async (req: Request, res: Response) => {
   });
   res.send({
     type: 'followers',
-    items: followers.map((follower) => serializeAuthor(follower.follower, req)),
+    items: await Promise.all(
+      followers.map((follower) => serializeAuthor(follower.follower, req))
+    ),
   });
 };
 
@@ -103,8 +105,8 @@ const getAuthorFollowings = async (req: Request, res: Response) => {
   });
   res.send({
     type: 'following',
-    items: followings.map((following) =>
-      serializeAuthor(following.author, req)
+    items: await Promise.all(
+      followings.map((following) => serializeAuthor(following.author, req))
     ),
   });
 };

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import Author from '../models/Author';
 import { JwtPayload } from '../types/auth';
 import Node from '../models/Node';
-import { serializeAuthor } from '../controllers/author.controllers';
+import { serializeAuthor } from '../serializers/author.serializers';
 
 const loginUser = async (
   author: Author,
@@ -19,7 +19,7 @@ const loginUser = async (
   }
   const payload: JwtPayload = { authorId: author.id.toString() };
   const token = jwt.sign(payload, process.env.JWT_SECRET);
-  res.json({ token, author: serializeAuthor(author, req) });
+  res.json({ token, author: await serializeAuthor(author, req) });
 };
 
 const unauthorized = (res: Response, authorizationType = 'Bearer'): void => {

@@ -25,6 +25,7 @@ class Post extends Model {
   declare published: Date;
   declare visibility: 'PUBLIC' | 'FRIENDS';
   declare unlisted: boolean;
+  declare authorId: string;
   static Author: BelongsTo;
   declare author: Author;
   static Comments: HasMany;

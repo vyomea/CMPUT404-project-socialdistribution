@@ -4,18 +4,7 @@ import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
-import { getHost } from '../utilities/host';
-import { pick } from '../utilities/pick';
-import { serializeAuthor } from './author.controllers';
-
-export const serializeComment = (comment: Comment, req: Request) => ({
-  type: 'comment',
-  ...pick(comment.toJSON(), ['comment', 'contentType', 'published']),
-  author: serializeAuthor(comment.author, req),
-  id: `${getHost(req)}/authors/${comment.post.author.id}/posts/${
-    comment.post.id
-  }/comments/${comment.id}`,
-});
+import { serializeComment } from '../serializers/comment.serializers';
 
 const createComment = async (
   req: AuthenticatedRequest & PaginationRequest,
@@ -86,7 +75,7 @@ const getPostComment = async (req: Request, res: Response) => {
     return;
   }
 
-  res.send(serializeComment(comment, req));
+  res.send(await serializeComment(comment, req));
 };
 
 const getPostComments = async (req: PaginationRequest, res: Response) => {
@@ -126,7 +115,9 @@ const getPostComments = async (req: PaginationRequest, res: Response) => {
 
   res.send({
     type: 'comments',
-    comments: comments.map((comment) => serializeComment(comment, req)),
+    comments: await Promise.all(
+      comments.map((comment) => serializeComment(comment, req))
+    ),
   });
 };
 
