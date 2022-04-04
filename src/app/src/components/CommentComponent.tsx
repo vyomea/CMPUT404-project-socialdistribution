@@ -6,6 +6,10 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
 
 const ContentContainer = styled.div`
   padding: 1%;
@@ -67,7 +71,32 @@ const cursorStyle = {
 const renderContent = (content: any, contentType: any) => {
   switch (contentType) {
     case "text/markdown":
-      return <ReactMarkdown>{content}</ReactMarkdown>;
+      return <ReactMarkdown
+            children={content}
+            //@ts-ignore
+            remarkPlugins={[remarkMath]}
+            //@ts-ignore
+            rehypePlugins={[rehypeKatex]}
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || "");
+                return !inline && match ? (
+                  //@ts-ignore
+                  <SyntaxHighlighter
+                    children={String(children).replace(/\n$/, "")}
+                    language={match[1]}
+                    PreTag="div"
+                    {...props}
+                  />
+                ) : (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
+          />
+;
     case "text/plain":
       return content;
   }

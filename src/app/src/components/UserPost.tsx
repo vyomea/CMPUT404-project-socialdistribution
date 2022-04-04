@@ -10,10 +10,14 @@ import Post from "../api/models/Post";
 import { Avatar, Box } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNavigate } from "react-router-dom";
-import ReactMarkdown from "react-markdown";
 import api from "../api/api";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
 
 interface postItem {
   post: any | Post | undefined;
@@ -169,7 +173,32 @@ const UserPost: React.FC<postItem> = (props?) => {
     // h = h.replace('3002', '3001');
     switch (contentType) {
       case "text/markdown":
-        return <ReactMarkdown>{content}</ReactMarkdown>;
+        return <ReactMarkdown
+            children={content}
+            //@ts-ignore
+            remarkPlugins={[remarkMath]}
+            //@ts-ignore
+            rehypePlugins={[rehypeKatex]}
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || "");
+                return !inline && match ? (
+                  //@ts-ignore
+                  <SyntaxHighlighter
+                    children={String(children).replace(/\n$/, "")}
+                    language={match[1]}
+                    PreTag="div"
+                    {...props}
+                  />
+                ) : (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
+          />
+
       case "text/plain":
         return content;
       case "image/png;base64":

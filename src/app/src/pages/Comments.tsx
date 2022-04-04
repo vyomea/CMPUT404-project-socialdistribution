@@ -19,6 +19,10 @@ import ReactMarkdown from "react-markdown";
 import { ButtonGroup, ButtonProps, InputLabel, TextField } from "@mui/material";
 import { styled as Styled } from "@mui/material/styles";
 import { useParams } from "react-router-dom";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
 
 interface Props {
   currentUser?: Author;
@@ -223,7 +227,31 @@ export default function Comments({ currentUser }: Props): JSX.Element {
                         onChange={handleTextChange}
                       />
                     ) : type === "text/markdown" ? (
-                      <ReactMarkdown>{content}</ReactMarkdown>
+                      <ReactMarkdown
+                        children={content}
+                        //@ts-ignore
+                        remarkPlugins={[remarkMath]}
+                        //@ts-ignore
+                        rehypePlugins={[rehypeKatex]}
+                        components={{
+                          code({ node, inline, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || "");
+                            return !inline && match ? (
+                              //@ts-ignore
+                              <SyntaxHighlighter
+                                children={String(children).replace(/\n$/, "")}
+                                language={match[1]}
+                                PreTag="div"
+                                {...props}
+                              />
+                            ) : (
+                              <code className={className} {...props}>
+                                {children}
+                              </code>
+                            );
+                          },
+                        }}
+                      />
                     ) : (
                       content
                     )}
