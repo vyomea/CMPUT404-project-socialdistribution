@@ -288,11 +288,11 @@ const api = {
         withId: (followerId: string) => ({
           /**
            * Checks if this author is in fact a follower.
-           * @returns true if this author is a follower, false otherwise
+           * @returns {'result': true} if this author is a follower, {'result': false} otherwise
            */
-          isAFollower: async (): Promise<boolean> =>
+          isAFollower: async (): Promise<{ result: boolean }> =>
             (
-              await axios.get<boolean>(
+              await axios.get<{ result: boolean }>(
                 `/authors/${authorId}/followers/${followerId}`
               )
             ).data,
