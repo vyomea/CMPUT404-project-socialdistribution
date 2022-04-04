@@ -1,5 +1,6 @@
 export default interface Node {
-    id: string;
-    username: string;
-  }
-  
+  serviceUrl: string;
+  incomingUsername: string;
+  outgoingUsername: string;
+  outgoingPassword: string;
+}
