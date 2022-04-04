@@ -1,10 +1,11 @@
-import { DataTypes, HasMany, Model } from 'sequelize';
+import { BelongsTo, DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Post from './Post';
 import Comment from './Comment';
 import Follower from './Follower';
 import Request from './Request';
+import Node from './Node';
 
 class Author extends Model {
   declare id: typeof uuidv4;
@@ -20,16 +21,18 @@ class Author extends Model {
   static Comments: HasMany;
   static Followers: HasMany;
   static Requests: HasMany;
+  static Node: BelongsTo;
   declare followers: Follower[];
   declare posts: Post[];
   declare requests: Request[];
+  declare node: Node;
   declare addComment: (comment: Comment) => Promise<void>;
   declare addPost: (post: Post) => Promise<void>;
   declare addFollower: (author: Author) => Promise<void>;
   declare hasFollower: (author: Author) => Promise<boolean>;
   declare removeFollower: (author: Author) => Promise<void>;
   declare addRequest: (author: Author) => Promise<void>;
-  declare hasRequest: (author: Author) => Promise<void>;
+  declare hasRequest: (author: Author) => Promise<boolean>;
   declare removeRequest: (author: Author) => Promise<void>;
 }
 
@@ -75,6 +78,10 @@ Author.init(
     serviceUrl: {
       type: DataTypes.STRING,
       allowNull: true,
+      references: {
+        model: Node,
+        key: 'serviceUrl',
+      },
     },
   },
   {
@@ -115,5 +122,7 @@ Request.Requestor = Request.belongsTo(Author, {
 
 Author.Comments = Author.hasMany(Comment);
 Comment.Author = Comment.belongsTo(Author, { as: 'author' });
+
+Author.Node = Author.belongsTo(Node, { as: 'node' });
 
 export default Author;

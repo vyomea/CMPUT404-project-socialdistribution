@@ -8,7 +8,7 @@ import { serializeAuthor } from './author.controllers';
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
 const addFollower = async (req: AuthenticatedRequest, res: Response) => {
-  if (req.params.foreign_author_id !== req.authorId) {
+  if (req.params.authorId !== req.authorId) {
     unauthorized(res);
     return;
   }
@@ -25,13 +25,22 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
   const foreignAuthor = await Author.findByPk(req.params.foreign_author_id);
   if (foreignAuthor === null) {
     res.status(404).send();
+    return;
   }
   if (await author.hasFollower(foreignAuthor)) {
     res.status(400).send({ error: 'Already following' });
     return;
   }
 
+  if (!(await author.hasRequest(foreignAuthor))) {
+    res.status(400).send({
+      error: `${foreignAuthor.displayName} did not request to follow`,
+    });
+    return;
+  }
+
   try {
+    await author.removeRequest(foreignAuthor);
     await author.addFollower(foreignAuthor);
   } catch (error) {
     console.error(error);
@@ -55,6 +64,7 @@ const checkFollower = async (req: Request, res: Response) => {
   const foreignAuthor = await Author.findByPk(req.params.foreign_author_id);
   if (foreignAuthor === null) {
     res.status(404).send();
+    return;
   }
   res.send({ result: await author.hasFollower(foreignAuthor) });
 };
@@ -102,6 +112,7 @@ const getAuthorFollowings = async (req: Request, res: Response) => {
 const removeFollower = async (req: Request, res: Response) => {
   if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot unfollow yourself' });
+    return;
   }
 
   const author = await Author.findByPk(req.params.authorId);
@@ -112,6 +123,7 @@ const removeFollower = async (req: Request, res: Response) => {
   const foreignAuthor = await Author.findByPk(req.params.foreign_author_id);
   if (foreignAuthor === null) {
     res.status(404).send();
+    return;
   }
 
   if (!(await author.hasFollower(foreignAuthor))) {

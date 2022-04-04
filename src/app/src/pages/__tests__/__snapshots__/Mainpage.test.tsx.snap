@@ -2,62 +2,8 @@
 
 exports[`Mainpage suite Renders correctly 1`] = `
 <div
-  className="sc-iwjdpV OHnYU"
+  className="sc-fKVqWL jCzvhL"
 >
-  <div
-    className="sc-cxpSdN TLJOs"
-  >
-    <div
-      className="sc-bdvvtL mzSdo"
-    >
-      <div
-        className="sc-gsDKAQ dokASy"
-      >
-        <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          tabIndex={0}
-          type="button"
-        >
-          Home
-        </button>
-        <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          tabIndex={0}
-          type="button"
-        >
-          Logout
-        </button>
-      </div>
-    </div>
-  </div>
   <button
     aria-label="check"
     className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-primary css-1ckp4x4-MuiButtonBase-root-MuiFab-root"
@@ -101,30 +47,109 @@ exports[`Mainpage suite Renders correctly 1`] = `
     </svg>
   </button>
   <div
-    className="sc-llYSUQ gRojfe"
+    className="sc-bBHxTw eilNef"
   >
-    <ul
-      className="MuiList-root MuiList-padding css-xgw77h-MuiList-root"
-      style={
-        Object {
-          "maxHeight": "100%",
-          "overflow": "auto",
-        }
-      }
-    />
     <div
-      className="sc-iJKOTD kGsKvO"
+      className="MuiBox-root css-1hbj5v0"
     >
-      <div
-        className="sc-fFeiMQ ejkoIZ"
+      <ul
+        className="MuiList-root MuiList-padding css-d05jsf-MuiList-root"
+        style={
+          Object {
+            "maxHeight": "100%",
+            "overflow": "auto",
+          }
+        }
       >
         <div
-          className="sc-bkkeKt Qfuew"
+          className="MuiBox-root css-0"
+          style={
+            Object {
+              "display": "flex",
+              "width": "90%",
+            }
+          }
+        >
+          <div
+            className="MuiBox-root css-jfhg9a"
+          >
+            <div
+              aria-label="horizontal contained button group"
+              className="MuiButtonGroup-root MuiButtonGroup-contained css-6ekcsh-MuiButtonGroup-root"
+              role="group"
+            >
+              <button
+                className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-j82eom-MuiButtonBase-root-MuiButton-root"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                style={
+                  Object {
+                    "justifyContent": "center",
+                  }
+                }
+                tabIndex={0}
+                type="button"
+              >
+                 
+                Inbox
+              </button>
+              <button
+                className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-j82eom-MuiButtonBase-root-MuiButton-root"
+                disabled={false}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                style={
+                  Object {
+                    "justifyContent": "center",
+                  }
+                }
+                tabIndex={0}
+                type="button"
+              >
+                 
+                Browse
+              </button>
+            </div>
+          </div>
+        </div>
+      </ul>
+    </div>
+    <div
+      className="sc-iwjdpV fZAKJX"
+    >
+      <div
+        className="sc-hBUSln jrhiCv"
+      >
+        <div
+          className="sc-fotOHu hFHCBv"
         >
           Github Activity
         </div>
         <div
-          className="sc-bkkeKt Qfuew"
+          className="sc-fotOHu hFHCBv"
         >
           <span
             className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSuccess css-15u8j6q-MuiCircularProgress-root"

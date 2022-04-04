@@ -4,23 +4,31 @@ const router = express.Router();
 
 import { validate } from '../middlewares/validator.middlewares';
 
-import { addNode, getAllNodes, removeNode } from '../controllers/node.controllers';
+import {
+  addOrUpdateNode,
+  getAllNodes,
+  removeNode,
+} from '../controllers/node.controllers';
 import { adminOnly } from '../middlewares/auth.middlewares';
 
 router.get('/', adminOnly, getAllNodes);
 
+const nodeValidations = [
+  body('incomingUsername').isString().notEmpty(),
+  body('incomingPassword').isString().notEmpty(),
+  body('outgoingUsername').isString().notEmpty(),
+  body('outgoingPassword').isString().notEmpty(),
+];
+
 router.post(
-  '/',
-  [
-    adminOnly,
-    validate([body('username').isString(), body('password').isString()]),
-  ],
-  addNode
+  '/:serviceUrl',
+  [adminOnly, validate([param('serviceUrl').isString(), ...nodeValidations])],
+  addOrUpdateNode
 );
 
 router.delete(
-  '/:node_id',
-  [adminOnly, validate([param('node_id').isString()])],
+  '/:serviceUrl',
+  [adminOnly, validate([param('serviceUrl').isString()])],
   removeNode
 );
 

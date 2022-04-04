@@ -55,14 +55,12 @@ const api = {
     email: string,
     password: string,
     displayName: string
-  ): Promise<Author> => {
-    const result = await axios.post("/register", {
+  ): Promise<void> => {
+    await axios.post("/register", {
       email,
       password,
       displayName,
     });
-    localStorage.setItem("token", result.data.token);
-    return result.data.author;
   },
 
   /**
@@ -116,6 +114,27 @@ const api = {
   },
 
   /**
+ * Actions on the posts.
+ */
+  posts: {
+    /**
+     * Fetches a paginated list of posts.
+     * @param page the page to return
+     * @param size the number of posts per page
+     * @returns a list of posts
+     */
+    list: async (page?: number, size?: number): Promise<Post[]> =>
+      (
+        await axios.get<{ items: PostResponse[] }>(
+          `/posts`,
+          {
+            params: { page, size },
+          }
+        )
+      ).data.items.map(postFromResponse)
+    },
+
+  /**
    * Actions on nodes.
    */
   nodes: {
@@ -123,27 +142,29 @@ const api = {
      * Fetches a list of all nodes on the server.
      * @returns a list of nodes
      */
-    list: async (): Promise<Node[]> => (await axios.get(`/nodes`)).data,
+    list: async (): Promise<Node[]> => (await axios.get("/nodes")).data,
 
     /**
-     * Creates a node.
-     * @param username the username of the node.
-     * @param password the password of the node.
+     * Creates or updates a node.
+     * @param node the node to create or update
      * @returns TODO
      */
-    create: async (username: string, password: string): Promise<unknown> =>
-      (await axios.post(`/nodes`, { username, password })).data,
+    createOrUpdate: async (
+      node: Node & { incomingPassword: string }
+    ): Promise<unknown> =>
+      (await axios.post(`/nodes/${encodeURIComponent(node.serviceUrl)}`, node))
+        .data,
 
     /**
-     * Actions on the node with ID `nodeId`.
+     * Actions on the node with service URL `serviceUrl`.
      */
-    withId: (nodeId: string) => ({
+    withServiceUrl: (serviceUrl: string) => ({
       /**
        * Deletes the node.
        * @returns TODO
        */
       delete: async (): Promise<unknown> =>
-        (await axios.delete(`/nodes/${nodeId}`)).data,
+        (await axios.delete(`/nodes/${encodeURIComponent(serviceUrl)}`)).data,
     }),
   },
 
@@ -288,11 +309,11 @@ const api = {
         withId: (followerId: string) => ({
           /**
            * Checks if this author is in fact a follower.
-           * @returns true if this author is a follower, false otherwise
+           * @returns {'result': true} if this author is a follower, {'result': false} otherwise
            */
-          isAFollower: async (): Promise<boolean> =>
+          isAFollower: async (): Promise<{ result: boolean }> =>
             (
-              await axios.get<boolean>(
+              await axios.get<{ result: boolean }>(
                 `/authors/${authorId}/followers/${followerId}`
               )
             ).data,

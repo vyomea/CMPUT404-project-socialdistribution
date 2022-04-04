@@ -1,8 +1,10 @@
-import { BelongsTo, DataTypes, Model } from 'sequelize';
+import { BelongsTo, DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
 import Comment from './Comment';
+import Node from './Node';
+import PostLike from './PostLike';
 
 class Post extends Model {
   declare id: typeof uuidv4;
@@ -23,12 +25,16 @@ class Post extends Model {
   declare published: Date;
   declare visibility: 'PUBLIC' | 'FRIENDS';
   declare unlisted: boolean;
-  declare serviceUrl: string;
   static Author: BelongsTo;
   declare author: Author;
-  static Comments: BelongsTo;
+  static Comments: HasMany;
   declare comments: Comment[];
   declare addComment: (comment: Comment) => void;
+  declare serviceUrl: string;
+  static Node: BelongsTo;
+  declare node: Node;
+  static Likes: HasMany;
+  declare likes: PostLike[];
 }
 
 Post.init(
@@ -117,6 +123,10 @@ Post.init(
     serviceUrl: {
       type: DataTypes.STRING,
       allowNull: true,
+      references: {
+        model: Node,
+        key: 'serviceUrl',
+      },
     },
   },
   {
@@ -128,5 +138,10 @@ Post.init(
 
 Post.Comments = Post.hasMany(Comment, { as: 'comments' });
 Comment.Post = Comment.belongsTo(Post, { as: 'post' });
+
+Post.Node = Post.belongsTo(Node, { as: 'node' });
+
+Post.Likes = Post.hasMany(PostLike, { as: 'likes' });
+PostLike.Post = PostLike.belongsTo(Post, { as: 'post' });
 
 export default Post;

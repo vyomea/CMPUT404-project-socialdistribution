@@ -43,7 +43,7 @@ export type CommentCreateRequest = CommentCreate;
 
 export const commentCreateToRequest = (
   comment: CommentCreate,
-  baseUrl: string
+  baseUrl: string,
 ): CommentCreateRequest => ({
   ...comment,
 });

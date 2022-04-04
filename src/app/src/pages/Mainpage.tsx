@@ -1,4 +1,3 @@
-import NavBar from '../components/NavBar';
 import Github from '../components/Github';
 import styled from 'styled-components';
 import Author from '../api/models/Author';
@@ -26,11 +25,6 @@ const MainPageContainer = styled.div`
   width: ${window.innerWidth}px;
 `;
 
-// This is for the NavBar
-const NavBarContainer = styled.div`
-  margin-bottom: 5%;
-`;
-
 // This is for the posts and New Post Button and Github Activity
 const MainPageContentContainer = styled.div`
   display: flex;
@@ -49,23 +43,8 @@ interface Props {
 
 
 export default function Mainpage({ currentUser }: Props) {
+  // For now, mainpage just shows your own posts
   const [open, setOpen] = useState(false);
-
-  const items2 = [
-    {
-      Text: 'Home',
-      handleClick: () => {
-        // navigate('/');
-      },
-    },
-    {
-      Text: 'Logout',
-      handleClick: () => {
-        api.logout();
-        window?.location?.reload();
-      },
-    },
-  ];
 
   const handleClose = () => {
     setOpen(false);
@@ -81,6 +60,12 @@ export default function Mainpage({ currentUser }: Props) {
     setInboxChanged(!inboxChanged);
   };
 
+  const [posts, setPosts] = useState<Post[] | undefined>(undefined);
+  const [postsChanged, setpostsChanged] = useState(false);
+  const handlePostsChanged = () => {
+    setpostsChanged(!postsChanged);
+  };
+
   useEffect(() => {
     api.authors
       .withId('' + currentUser?.id)
@@ -89,20 +74,13 @@ export default function Mainpage({ currentUser }: Props) {
       .then((data) => setInbox(data));
   }, [currentUser?.id, inboxChanged]);
 
-  const [posts, setPosts] = useState<Post[] | undefined>(undefined);
-  const [postsChanged, setPostsChanged] = useState(false);
   useEffect(() => {
-    api.authors
-      .withId('' + currentUser?.id)
+    api
       .posts
-      .list()
+      .list(1,10)
       .then((data) => setPosts(data));
-  }, [currentUser?.id, setPostsChanged]);
-
-  const handlePostsChanged = () => {
-    setPostsChanged(!postsChanged);
-  };
-
+  }, [postsChanged]);
+  
   // Sidebar Button group
   const buttons = [
     {id:0,title:'Inbox'},
@@ -267,9 +245,6 @@ export default function Mainpage({ currentUser }: Props) {
   };
   return (
     <MainPageContainer>
-      <NavBarContainer>
-        <NavBar items={items2} />
-      </NavBarContainer>
       <Fab
         color="primary"
         aria-label="check"
@@ -309,7 +284,11 @@ export default function Mainpage({ currentUser }: Props) {
               border: '1px solid white',
             }}
           />
-          <Add currentUser={currentUser} handlePostsChanged={handleInboxChanged} handleClose={handleClose}/>
+          <Add
+            currentUser={currentUser}
+            handlePostsChanged={handlePostsChanged}
+            handleClose={handleClose}
+          />
         </Backdrop>
       ) : (
         <MainPageContentContainer>
@@ -335,7 +314,6 @@ export default function Mainpage({ currentUser }: Props) {
                         width:'100%',
                       }}
                     >
-
                       {buttons.map((button) => (
                         <Button 
                           onClick={()=>setListDisplay(button)}
@@ -358,7 +336,9 @@ export default function Mainpage({ currentUser }: Props) {
             </List>
             </Box>
           <GitContainer>
-            <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
+            <Github
+              username={currentUser?.github ? `${currentUser.github.split('/').pop()}` : ''}
+            />
           </GitContainer>
           {listDisplay.title === "Inbox" ? (
             <Box style={{

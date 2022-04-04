@@ -22,25 +22,28 @@ const loginUser = async (
   res.json({ token, author: serializeAuthor(author, req) });
 };
 
-const unauthorized = (res: Response): void => {
-  res.setHeader('WWW-Authenticate', 'Bearer');
+const unauthorized = (res: Response, authorizationType = 'Bearer'): void => {
+  res.setHeader('WWW-Authenticate', authorizationType);
   res.status(401).send();
 };
 
-const validNode = async (username: string, password: string) => {
+const findNode = async (username: string, password: string) => {
   const node = await Node.findOne({
     where: {
       username: username,
     },
   });
   if (node === null) {
-    return false;
+    return null;
   }
-  const passwordIsCorrect = await argon2.verify(node.passwordHash, password);
+  const passwordIsCorrect = await argon2.verify(
+    node.incomingPasswordHash,
+    password
+  );
   if (!passwordIsCorrect) {
-    return false;
+    return null;
   }
-  return true;
+  return node;
 };
 
-export { loginUser, unauthorized, validNode };
+export { loginUser, unauthorized, findNode };
