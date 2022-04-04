@@ -32,7 +32,7 @@ export const receiveRemoteComment = async (
   }
 
   const commentAuthorIdMatch = /.*?\/authors\/([^/]+)/.exec(req.body.author.id);
-  if (commentAuthorIdMatch) {
+  if (commentAuthorIdMatch === null) {
     res.status(400).json({ error: 'Invalid comment author' });
     return;
   }
