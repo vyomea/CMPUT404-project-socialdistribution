@@ -41,7 +41,7 @@ const forwardRequestToRemoteNode = async (
       .send(
         (
           await axios.get(
-            req.originalUrl.replace(/node=[^%]*/, ''),
+            `${req.baseUrl}/${req.path}`,
             remoteRequestConfig(req.toNode)
           )
         ).data
