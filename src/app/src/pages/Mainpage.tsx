@@ -13,9 +13,6 @@ import { Box, List, ButtonGroup, Button, Dialog, DialogActions, DialogContent, D
 import InboxComponents from '../components/InboxComponents';
 import UserPost from '../components/UserPost';
 import InboxItem from '../api/models/InboxItem';
-import Comment from '../api/models/Comment';
-import Like from '../api/models/Like';
-import FollowRequest from '../api/models/FollowRequest';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
