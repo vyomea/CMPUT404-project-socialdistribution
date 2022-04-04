@@ -264,8 +264,8 @@ export default function Comments({ currentUser }: Props): JSX.Element {
               aria-label="check"
               sx={{
                 color: "black",
-                background: "#46ECA6",
-                "&:hover": { background: "#18E78F" },
+                background: "#f4e6d7",
+                "&:hover": { background: "#E8CEB0" },
               }}
             >
               <CheckIcon onClick={createComment} />
@@ -296,7 +296,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
             left: "auto",
             position: "fixed",
           }}
-          sx={{ color: "black", background: "#46ECA6", "&:hover": { background: "#18E78F" } }}
+          sx={{ color: "black", background: "#f4e6d7", "&:hover": { background: "#E8CEB0" } }}
         >
           <AddIcon onClick={() => setOpen(true)} />
         </Fab>

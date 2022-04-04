@@ -106,7 +106,7 @@ const CommentsContainer = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   width: 130px;
-  &:hover: {
+  &:hover {
     cursor: pointer;
   }
 `;

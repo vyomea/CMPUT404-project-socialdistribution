@@ -246,7 +246,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
             />
           </Backdrop>
         ) : (
-          <Box sx={{ height: "100%", width: window.innerWidth }}>
+          <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
             <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
               <Box
                 boxShadow={5}

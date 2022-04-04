@@ -322,8 +322,8 @@ const Add = ({ currentUser, handlePostsChanged, handleClose }: Props) => {
         aria-label="check"
         sx={{
           color: "black",
-          background: "#46ECA6",
-          "&:hover": { background: "#18E78F" },
+          background: "#f4e6d7",
+          "&:hover": { background: "#E8CEB0" },
         }}
       >
         <CheckIcon onClick={createPost} />

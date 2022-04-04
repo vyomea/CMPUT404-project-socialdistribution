@@ -73,7 +73,7 @@ export default function Mainpage({ currentUser }: Props) {
           left: "auto",
           position: "fixed",
         }}
-        sx={{ color: "black", background: "#46ECA6", "&:hover": { background: "#18E78F" } }}
+        sx={{ color: "black", background: "#f4e6d7", "&:hover": { background: "#E8CEB0" } }}
       >
         <AddIcon onClick={handleToggle} />
       </Fab>

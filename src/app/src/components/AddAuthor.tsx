@@ -99,7 +99,7 @@ const AddAuthor = ({ handleAuthorsChanged, handleClose }: Props) => {
       <Fab
         color="primary"
         aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' }, mb: 5 }}
+        sx={{ color: 'black', background: '#f4e6d7', '&:hover': { background: '#E8CEB0' }, mb: 5 }}
       >
         <CheckIcon onClick={handleEdit} />
       </Fab>

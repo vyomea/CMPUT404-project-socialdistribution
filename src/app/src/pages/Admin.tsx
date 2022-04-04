@@ -13,7 +13,6 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import NavBar from "../components/NavBar";
 import AdminAuthorCard from "../components/AdminAuthorCard";
 import AdminPostCard from "../components/AdminPostCard";
 import AdminNodeCard from "../components/AdminNodeCard";
@@ -171,18 +170,6 @@ export default function Admin(): JSX.Element {
         </Backdrop>
       ) : (
         <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-          <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}>
-            <NavBar
-              items={[
-                {
-                  Text: "",
-                  handleClick: () => {
-                    console.log(1);
-                  },
-                },
-              ]}
-            />
-          </Box>
           <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
             <Box
               display="flex"
@@ -212,7 +199,14 @@ export default function Admin(): JSX.Element {
               </ButtonGroup>
 
               {listDisplay.title === "Authors" || listDisplay.title === "Nodes" ? (
-                <Button onClick={handleToggle} variant="contained" fullWidth={true} sx={{ mt: 5 }}>
+                <Button
+                  onClick={handleToggle}
+                  variant="contained"
+                  fullWidth={true}
+                  sx={{
+                    mt: 5,
+                  }}
+                >
                   Add
                 </Button>
               ) : null}
