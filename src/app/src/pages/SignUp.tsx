@@ -1,15 +1,15 @@
 import TextField, { TextFieldProps } from '@mui/material/TextField';
-import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
-import { styled as Styled } from "@mui/material/styles";
-import { useState } from "react";
-import api from "../api/api";
-import Author from "../api/models/Author";
+import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
+import { styled as Styled } from '@mui/material/styles';
+import { Typography } from '@mui/material';
+import { useState } from 'react';
+import api from '../api/api';
 
 const validate = (
-  props: "email" | "password" | "displayName",
+  props: 'email' | 'password' | 'displayName',
   item: string
 ) => {
-  if (props === "email") {
+  if (props === 'email') {
     return !!item
       .toLowerCase()
       .match(
@@ -17,11 +17,11 @@ const validate = (
       );
   }
 
-  if (props === "displayName") {
+  if (props === 'displayName') {
     return true;
   }
 
-  if (props === "password") {
+  if (props === 'password') {
     return !!item;
   }
 
@@ -29,52 +29,54 @@ const validate = (
 };
 
 const ColorButton = Styled(LoadingButton)<LoadingButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText("#e6c9a8"),
-  padding: "10px",
-  marginTop: "2%",
-  backgroundColor: "#e6c9a8",
-  "&:hover": {
-    backgroundColor: "#D4AF85",
+  color: theme.palette.getContrastText('#e6c9a8'),
+  padding: '10px',
+  marginTop: '5%',
+  backgroundColor: '#e6c9a8',
+  '&:hover': {
+    backgroundColor: '#D4AF85',
   },
 }));
 
 const TextFieldCustom = Styled(TextField)<TextFieldProps>(({ theme }) => ({
-  color: theme.palette.getContrastText("#fbf8f0"),
-  height: "50px",
-  marginTop: "3%",
-  "& .Mui-focused": {
-    color: "black",
+  color: theme.palette.getContrastText('#fbf8f0'),
+  height: '50px',
+  marginTop: '3%',
+  '& .Mui-focused': {
+    color: 'black',
   },
-  backgroundColor: "white",
-  "&:hover": {
-    backgroundColor: "#fbf8f0",
+  backgroundColor: 'white',
+  '&:hover': {
+    backgroundColor: '#fbf8f0',
   },
 }));
 
-interface Props {
-  setCurrentUser: React.Dispatch<React.SetStateAction<Author | undefined>>;
-}
-
-export default function SignUp({ setCurrentUser }: Props) {
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function SignUp() {
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [validEmail, setValidEmail] = useState(true);
   const [validPassword, setValidPassword] = useState(true);
   const [validDisplayName, setValidDisplayName] = useState(true);
   const [isSigningUp, setIsSigningUp] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
 
   const handleClick = () => {
-    setValidEmail(validate("email", email));
-    setValidDisplayName(validate("displayName", displayName));
-    setValidPassword(validate("password", password));
+    setValidEmail(validate('email', email));
+    setValidDisplayName(validate('displayName', displayName));
+    setValidPassword(validate('password', password));
 
     if (validEmail && validDisplayName && validPassword) {
       setIsSigningUp(true);
       api
         .register(email, password, displayName)
-        .then((author) => setCurrentUser(author))
-        .catch((error) => console.error(error))
+        .then(() => {
+          setShowMessage(true);
+          setDisplayName('');
+          setEmail('');
+          setPassword('');
+        })
+        .catch(error => console.error(error))
         .finally(() => setIsSigningUp(false));
     }
   };
@@ -89,71 +91,79 @@ export default function SignUp({ setCurrentUser }: Props) {
   };
   return (
     <>
+      <Typography padding={'lg'} display={showMessage ? 'inline' : 'none'}>
+        Sign up successful. Waiting for admin to verify.
+      </Typography>
       {validDisplayName ? (
         <TextFieldCustom
-          id="standard-basic"
-          color="primary"
-          label="Display Name"
-          variant="standard"
+          id='standard-basic'
+          color='primary'
+          label='Display Name'
+          variant='standard'
+          value={displayName}
           onChange={onChangeDisplayName}
-          helperText="Upto 16 characters."
+          helperText='Upto 16 characters.'
         />
       ) : (
         <TextFieldCustom
-          id="standard-error"
-          color="primary"
-          label="Display Name"
-          variant="standard"
+          id='standard-error'
+          color='primary'
+          label='Display Name'
+          variant='standard'
+          value={displayName}
           onChange={onChangeDisplayName}
-          helperText="Invalid display name"
+          helperText='Invalid display name'
         />
       )}
       {validEmail ? (
         <TextFieldCustom
-          id="standard-basic"
-          defaultValue={email}
-          color="primary"
-          label="Email"
-          variant="standard"
+          id='standard-basic'
+          // defaultValue={email}
+          color='primary'
+          label='Email'
+          variant='standard'
+          value={email}
           onChange={onChangeEmail}
         />
       ) : (
         <TextFieldCustom
           error
-          id="outlined-error"
-          defaultValue={email}
-          label="Email"
+          id='outlined-error'
+          // defaultValue={email}
+          label='Email'
+          value={email}
           onChange={onChangeEmail}
-          helperText="Incorrect email"
+          helperText='Incorrect email'
         />
       )}
       {validPassword ? (
         <TextFieldCustom
-          id="standard-basic"
-          label="Password"
-          variant="standard"
-          type="password"
-          autoComplete="current-password"
+          id='standard-basic'
+          label='Password'
+          variant='standard'
+          type='password'
+          autoComplete='current-password'
+          value={password}
           onChange={onChangePassword}
-          helperText="Alphanumeric 16 characters."
+          helperText='Alphanumeric 16 characters.'
         />
       ) : (
         <TextFieldCustom
-          id="standard-error"
-          label="Password"
-          variant="standard"
-          type="password"
-          autoComplete="current-password"
+          id='standard-error'
+          label='Password'
+          variant='standard'
+          type='password'
+          autoComplete='current-password'
+          value={password}
           onChange={onChangePassword}
-          helperText="Alphanumeric 16 characters!"
+          helperText='Alphanumeric 16 characters!'
         />
       )}
       <ColorButton
-        variant="contained"
+        variant='contained'
         onClick={handleClick}
         loading={isSigningUp}
-        disabled={isSigningUp}
-      >
+        disabled={isSigningUp}>
         Sign up
       </ColorButton>
     </>

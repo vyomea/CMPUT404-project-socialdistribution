@@ -34,9 +34,8 @@ const register = async (req: Request, res: Response) => {
   const { email, password, displayName } = req.body;
   const passwordHash = await argon2.hash(password);
 
-  let author: Author;
   try {
-    author = await Author.create({
+    await Author.create({
       email,
       passwordHash,
       displayName,
@@ -50,7 +49,7 @@ const register = async (req: Request, res: Response) => {
     return;
   }
 
-  await loginUser(author, password, req, res);
+  res.status(200).send();
 };
 
 export { login, register };

@@ -46,14 +46,16 @@ const api = {
    * Register and log into a new author's account.
    * @returns the new author
    */
-  register: async (email: string, password: string, displayName: string): Promise<Author> => {
-    const result = await axios.post("/register", {
+  register: async (
+    email: string,
+    password: string,
+    displayName: string
+  ): Promise<void> => {
+    await axios.post("/register", {
       email,
       password,
       displayName,
     });
-    localStorage.setItem("token", result.data.token);
-    return result.data.author;
   },
 
   /**

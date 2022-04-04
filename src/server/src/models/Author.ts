@@ -29,7 +29,7 @@ class Author extends Model {
   declare hasFollower: (author: Author) => Promise<boolean>;
   declare removeFollower: (author: Author) => Promise<void>;
   declare addRequest: (author: Author) => Promise<void>;
-  declare hasRequest: (author: Author) => Promise<void>;
+  declare hasRequest: (author: Author) => Promise<boolean>;
   declare removeRequest: (author: Author) => Promise<void>;
 }
 
