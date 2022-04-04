@@ -2,14 +2,15 @@ import React from "react";
 import Button, { ButtonProps } from "@mui/material/Button";
 import { styled as Styled } from "@mui/material/styles";
 import styled from "styled-components";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
-interface navItem {
-  Text: string;
-  handleClick: () => void;
+export interface NavItem {
+  text: string;
+  handleClick: (navigate: NavigateFunction) => void;
 }
 
 interface NavBarProps {
-  items: navItem[];
+  items: NavItem[];
 }
 const LogoContainer = styled.div`
   text-align: center;
@@ -65,17 +66,20 @@ const NavBar: React.FC<NavBarProps> = (props) => {
   pathname = pathname === "" ? "Homepage" : pathname;
   const routes = ["Admin", "Profile", "Homepage"];
   pathname = routes.includes(pathname) ? pathname : "";
+  const navigate = useNavigate();
   return (
     <NavContainer>
-      <LogoContainer onClick={() => window.location.assign(`${url.origin}/`)}>
-        Website.
-      </LogoContainer>
+      <LogoContainer onClick={() => navigate("/")}>Website.</LogoContainer>
       <Heading>{pathname}</Heading>
 
       <NavItemsContainer>
-        {props?.items?.map((item: navItem) => (
-          <ColorButton key={item?.Text} variant="text" onClick={() => item?.handleClick()}>
-            {item?.Text}
+        {props?.items?.map((item: NavItem) => (
+          <ColorButton
+            key={item?.text}
+            variant="text"
+            onClick={() => item?.handleClick(navigate)}
+          >
+            {item?.text}
           </ColorButton>
         ))}
       </NavItemsContainer>

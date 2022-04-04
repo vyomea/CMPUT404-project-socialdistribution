@@ -1,69 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  NavigateFunction,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import Author from "./api/models/Author";
 import Homepage from "./pages/Homepage";
 import Mainpage from "./pages/Mainpage";
 import Profile from "./pages/Profile";
+import Profiles from "./pages/Profiles";
 import Admin from "./pages/Admin";
 import ErrorPage from "./pages/Error";
 import api from "./api/api";
-import NavBar from "./components/NavBar";
+import NavBar, { NavItem } from "./components/NavBar";
 import Comments from "./pages/Comments";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Author | undefined>(undefined);
   const [fetchingCurrentUser, setFetchingCurrentUser] = useState(true);
-  const url = new URL(window.location.href);
 
-  const adminUser = [
+  const normalUser: NavItem[] = [
     {
-      Text: "Admin",
-      handleClick: () => {
-        window.location.assign(`${url.origin}/admin`);
+      text: "Home",
+      handleClick: (navigate: NavigateFunction) => {
+        navigate("/");
       },
     },
     {
-      Text: "Home",
-      handleClick: () => {
-        window.location.assign(`${url.origin}/`);
+      text: "Authors",
+      handleClick: (navigate: NavigateFunction) => {
+        navigate(`/profile`);
       },
     },
     {
-      Text: "Profile",
-      handleClick: () => {
-        window.location.assign(`${url.origin}/profile/${currentUser?.id}`);
+      text: "My Profile",
+      handleClick: (navigate: NavigateFunction) => {
+        navigate(`/profile/${currentUser?.id}`);
       },
     },
     {
-      Text: "Logout",
-      handleClick: () => {
+      text: "Logout",
+      handleClick: (navigate: NavigateFunction) => {
         api.logout();
-        window?.location?.reload();
+        window.location.reload();
       },
     },
   ];
-  const normalUser = [
+  const adminUser: NavItem[] = [
     {
-      Text: "Home",
-      handleClick: () => {
-        window.location.assign(`${url.origin}/`);
+      text: "Admin",
+      handleClick: (navigate: NavigateFunction) => {
+        navigate("/admin");
       },
     },
-    {
-      Text: "Profile",
-      handleClick: () => {
-        window.location.assign(`${url.origin}/profile/${currentUser?.id}`);
-      },
-    },
-    {
-      Text: "Logout",
-      handleClick: () => {
-        api.logout();
-        window?.location?.reload();
-      },
-    },
+    ...normalUser,
   ];
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -86,7 +80,9 @@ function App() {
   ) : (
     <BrowserRouter>
       {currentUser ? (
-        <NavBar items={currentUser && currentUser.isAdmin ? adminUser : normalUser} />
+        <NavBar
+          items={currentUser && currentUser.isAdmin ? adminUser : normalUser}
+        />
       ) : null}
       <Routes>
         <Route
@@ -101,7 +97,14 @@ function App() {
             )
           }
         />
-        <Route path="/profile/:id" element={<Profile currentUser={currentUser} />} />
+        <Route
+          path="/profile"
+          element={<Profiles currentUser={currentUser} />}
+        />
+        <Route
+          path="/profile/:id"
+          element={<Profile currentUser={currentUser} />}
+        />
         <Route
           path="/profile/:authorID/post/:postID"
           element={<Comments currentUser={currentUser} />}
@@ -109,7 +112,11 @@ function App() {
         <Route
           path="/admin"
           element={
-            currentUser && currentUser.isAdmin ? <Admin /> : <ErrorPage errorType="NotFound" />
+            currentUser && currentUser.isAdmin ? (
+              <Admin />
+            ) : (
+              <ErrorPage errorType="NotFound" />
+            )
           }
         />
         <Route path="*" element={<ErrorPage errorType="NotFound" />} />
