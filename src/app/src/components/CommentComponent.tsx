@@ -10,6 +10,8 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
+import Comment from "../api/models/Comment";
+import api from "../api/api";
 
 const ContentContainer = styled.div`
   padding: 1%;
@@ -104,14 +106,14 @@ const renderContent = (content: any, contentType: any) => {
 };
 
 const CommentComponent = (props?: any): JSX.Element => {
-  const comm = props?.comm;
+  const comm: Comment = props?.comm;
   const numLikes = props?.likes;
   const [likes, setLikes] = useState(numLikes);
   const [liked, setLiked] = useState(likes === 0 ? true : false);
   const navigate = useNavigate();
 
   const HandleNavigation = (id: string) => {
-    navigate(`/profile/${id.split("/").pop()}`);
+    navigate(`/profile/${id.split("/").pop()}?node=${comm.postServiceUrl}`);
   };
 
   const handleLikes = () => {
@@ -119,6 +121,11 @@ const CommentComponent = (props?: any): JSX.Element => {
       setLiked(!liked);
       likes < 0 ? setLikes(0) : setLikes(likes);
       liked ? setLikes(likes + 1) : setLikes(likes - 1 > 0 ? likes - 1 : 0);
+      api.authors
+        .withId(comm.postAuthorId)
+        .posts.withId(comm.postId)
+        .comments.withId(comm.id)
+        .likes.like();
     }
   };
   return (
@@ -149,11 +156,16 @@ const CommentComponent = (props?: any): JSX.Element => {
         </PostProfilePictureContainer>
         <PostDetailsContainer>
           <TopRowContainer>
-            <NameContainer onClick={() => HandleNavigation(comm.author.id)} style={cursorStyle}>
+            <NameContainer
+              onClick={() => HandleNavigation(comm.author.id)}
+              style={cursorStyle}
+            >
               {comm?.author?.displayName}
             </NameContainer>
           </TopRowContainer>
-          <ContentContainer>{renderContent(comm?.comment, comm?.contentType)}</ContentContainer>
+          <ContentContainer>
+            {renderContent(comm?.comment, comm?.contentType)}
+          </ContentContainer>
           <LikesCommentsContainer>
             <LikesContainer onClick={handleLikes}>
               {likes}{" "}

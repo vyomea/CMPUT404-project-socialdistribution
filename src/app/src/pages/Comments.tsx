@@ -18,7 +18,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ReactMarkdown from "react-markdown";
 import { ButtonGroup, ButtonProps, InputLabel, TextField } from "@mui/material";
 import { styled as Styled } from "@mui/material/styles";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -85,6 +85,9 @@ const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
 const formStyle = { m: 1, minWidth: 120, width: "40%", mt: 2 };
 
 export default function Comments({ currentUser }: Props): JSX.Element {
+  const [searchParams] = useSearchParams();
+  const nodeServiceUrl = searchParams.get("node") || undefined;
+
   let { postID, authorID } = useParams();
   const [comments, setComments] = useState<Comment[]>([]);
   const [post, setPost] = useState<Post>();
@@ -113,12 +116,18 @@ export default function Comments({ currentUser }: Props): JSX.Element {
     async function fetchData() {
       try {
         if (authorID && postID) {
-          const postAuthor = api.authors.withId(authorID).get();
+          const postAuthor = api.authors.withId(authorID, nodeServiceUrl).get();
           postAuthor.then((author) => {
             setAuthor(author);
           });
-          const commentList = api.authors.withId(authorID).posts.withId(postID).comments.list();
-          const post = api.authors.withId(authorID).posts.withId(postID).get();
+          const commentList = api.authors
+            .withId(authorID, nodeServiceUrl)
+            .posts.withId(postID)
+            .comments.list();
+          const post = api.authors
+            .withId(authorID, nodeServiceUrl)
+            .posts.withId(postID)
+            .get();
           post.then((data) => setPost(data)).catch((err) => console.log(err));
           commentList.then((comment) => {
             setComments(comment);
@@ -130,7 +139,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
       }
     }
     fetchData();
-  }, [authorID, postID, commentsChanged]);
+  }, [authorID, postID, nodeServiceUrl, commentsChanged]);
 
   const comment = {
     comment: content,
@@ -139,7 +148,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
   const createComment = () => {
     if (authorID && postID) {
       api.authors
-        .withId(authorID)
+        .withId(authorID, nodeServiceUrl)
         .posts.withId(postID)
         .comments.create(comment)
         .then((res) => {
@@ -239,8 +248,16 @@ export default function Comments({ currentUser }: Props): JSX.Element {
                         //@ts-ignore
                         rehypePlugins={[rehypeKatex]}
                         components={{
-                          code({ node, inline, className, children, ...props }) {
-                            const match = /language-(\w+)/.exec(className || "");
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }) {
+                            const match = /language-(\w+)/.exec(
+                              className || ""
+                            );
                             return !inline && match ? (
                               //@ts-ignore
                               <SyntaxHighlighter
@@ -279,7 +296,12 @@ export default function Comments({ currentUser }: Props): JSX.Element {
         </Backdrop>
       ) : null}
       {post ? (
-        <UserPost post={post} likes={5} currentUser={currentUser} postAuthor={author} />
+        <UserPost
+          post={post}
+          likes={5}
+          currentUser={currentUser}
+          postAuthor={author}
+        />
       ) : (
         <CircularProgress color="success" />
       )}
@@ -301,7 +323,11 @@ export default function Comments({ currentUser }: Props): JSX.Element {
             left: "auto",
             position: "fixed",
           }}
-          sx={{ color: "black", background: "#f4e6d7", "&:hover": { background: "#E8CEB0" } }}
+          sx={{
+            color: "black",
+            background: "#f4e6d7",
+            "&:hover": { background: "#E8CEB0" },
+          }}
         >
           <AddIcon onClick={handleOpen} />
         </Fab>

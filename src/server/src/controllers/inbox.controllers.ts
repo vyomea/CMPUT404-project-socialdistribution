@@ -43,6 +43,7 @@ const getInbox = async (
       recipientId: req.params.authorId,
     },
     include: [
+      { model: Author, as: 'recipient' },
       {
         model: Post,
         as: 'post',
@@ -106,6 +107,16 @@ const getInbox = async (
       {
         model: FollowRequest,
         as: 'request',
+        include: [
+          {
+            model: Author,
+            as: 'requestee',
+          },
+          {
+            model: Author,
+            as: 'requester',
+          },
+        ],
       },
     ],
     order: [['createdAt', 'DESC']],
@@ -146,8 +157,12 @@ const sendToInbox = async (
     return;
   }
 
+  console.log(req.body);
+
   // Type of the item being sent
   const type = (req.body.type as string)?.toLowerCase();
+
+  console.log(type);
 
   if (type === 'post') {
     await receivePostInLocalInbox(req, res);
@@ -192,7 +207,8 @@ const sendToInbox = async (
       return;
     }
   } else {
-    throw new Error(`Invalid type ${req.body.type}`);
+    res.status(400).json({ error: `Invalid type ${req.body.type}` });
+    return;
   }
 };
 

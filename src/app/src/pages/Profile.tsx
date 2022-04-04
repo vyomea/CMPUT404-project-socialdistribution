@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import {
   Box,
   IconButton,
@@ -27,6 +27,9 @@ interface Props {
 }
 
 export default function Profile({ currentUser }: Props): JSX.Element {
+  const [searchParams] = useSearchParams();
+  const nodeServiceUrl = searchParams.get("node") || undefined;
+
   //Edit open
   const [open, setOpen] = React.useState(false);
 
@@ -72,13 +75,10 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   useEffect(() => {
     api.authors
-      .withId(id)
+      .withId(id, nodeServiceUrl)
       .get()
-      .then((data) => setAuthor(data))
-      .catch((error) => {
-        console.log("No author");
-      });
-  }, [id, authorsChanged]);
+      .then((data) => setAuthor(data));
+  }, [id, nodeServiceUrl, authorsChanged]);
 
   //Get author's posts
   const [posts, setPosts] = useState<Post[] | undefined>(undefined);
@@ -90,13 +90,13 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   useEffect(() => {
     api.authors
-      .withId(id)
+      .withId(id, nodeServiceUrl)
       .posts.list(1, 5)
       .then((data) => setPosts(data))
       .catch((error) => {
         console.log(error);
       });
-  }, [id, postsChanged]);
+  }, [id, nodeServiceUrl, postsChanged]);
 
   // If it's your profle - Edit
   let myProfile = false;
@@ -112,18 +112,21 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   const handleFollow = () => {
     setRequestSent(true);
+    api.authors.withId(id, nodeServiceUrl).inbox.requestToFollow();
   };
 
   const handleUnfollow = () => {
     setFollowing(false);
     // unfollow author
-    api.authors
-      .withId("" + author?.id)
-      .followers.withId("" + currentUser?.id)
-      .unfollow()
-      .catch((error) => {
-        console.log(error);
-      });
+    if (author && currentUser) {
+      api.authors
+        .withId(author.id, nodeServiceUrl)
+        .followers.withId(currentUser.id)
+        .unfollow()
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   const [followersList, setFollowers] = useState<Author[]>([]);
@@ -132,7 +135,9 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = api.authors.withId("" + author?.id).followers.list();
+        const res = api.authors
+          .withId("" + author?.id, nodeServiceUrl)
+          .followers.list();
         res.then((followers) => {
           setFollowers(followers);
         });
@@ -141,7 +146,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       }
     }
     fetchData();
-  }, [author?.id]);
+  }, [author?.id, nodeServiceUrl]);
 
   const [followingList, setFollowingList] = useState<Author[]>([]);
 
@@ -149,7 +154,9 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = api.authors.withId("" + author?.id).followings.list();
+        const res = api.authors
+          .withId("" + author?.id, nodeServiceUrl)
+          .followings.list();
         res.then((followings) => {
           setFollowingList(followings);
         });
@@ -158,14 +165,14 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       }
     }
     fetchData();
-  }, [author?.id]);
+  }, [author?.id, nodeServiceUrl]);
 
   // Update isFollowing if the author is being followed by the current user
   useEffect(() => {
     async function fetchData() {
       try {
         const res = api.authors
-          .withId("" + author?.id)
+          .withId("" + author?.id, nodeServiceUrl)
           .followers.withId("" + currentUser?.id)
           .isAFollower();
         res.then((isFollowing) => {
@@ -176,7 +183,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
       }
     }
     fetchData();
-  }, [author?.id, currentUser?.id]);
+  }, [author?.id, currentUser?.id, nodeServiceUrl]);
 
   if (author !== undefined && currentUser !== undefined) {
     return (
@@ -273,7 +280,10 @@ export default function Profile({ currentUser }: Props): JSX.Element {
           </Backdrop>
         ) : (
           <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-            <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
+            <Box
+              style={{ display: "flex", height: "95%" }}
+              sx={{ bgcolor: "#fff" }}
+            >
               <Box
                 boxShadow={5}
                 display="flex"
@@ -307,7 +317,9 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   {author.displayName}
                 </Typography>
                 {author.github ? (
-                  <IconButton onClick={() => window.open(`${author.github}`, "_blank")}>
+                  <IconButton
+                    onClick={() => window.open(`${author.github}`, "_blank")}
+                  >
                     <GitHubIcon />
                   </IconButton>
                 ) : null}
@@ -354,7 +366,10 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   mt: 0.5,
                 }}
               >
-                <List style={{ maxHeight: "100%", overflow: "auto" }} sx={{ width: "100%" }}>
+                <List
+                  style={{ maxHeight: "100%", overflow: "auto" }}
+                  sx={{ width: "100%" }}
+                >
                   {posts?.map((post) => (
                     <UserPost
                       post={post}

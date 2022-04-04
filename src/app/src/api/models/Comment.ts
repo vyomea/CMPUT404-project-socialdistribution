@@ -10,6 +10,7 @@ export default interface Comment {
   readonly postUrl: string; // URL of the API endpoint to get the post
   readonly postServiceUrl: string; // service URL of the post
   readonly postId: string; // id of the post the comment is on
+  readonly postAuthorId: string;
 }
 
 export type CommentCreate = Pick<Comment, "comment" | "contentType">;
@@ -23,17 +24,22 @@ export type CommentResponse = Pick<
 };
 
 export const commentFromResponse = (data: CommentResponse): Comment => {
-  const match = /^((.*?)\/posts\/([^/]+))\/comments\/([^/]+)\/?$/.exec(data.id);
+  const match =
+    /((.*?)\/authors\/([^/]+)\/posts\/([^/]+))\/comments\/([^/]+)\/?$/.exec(
+      data.id
+    );
   if (match === null) {
     throw new Error(`Invalid comment URL ${data.id}`);
   }
-  const [postUrl, postServiceUrl, postId, commentId] = match.slice(1);
+  const [postUrl, postServiceUrl, postAuthorId, postId, commentId] =
+    match.slice(1);
 
   return {
     ...data,
     author: authorFromResponse(data.author),
     id: commentId,
     postServiceUrl,
+    postAuthorId,
     postId,
     postUrl,
   };
@@ -43,7 +49,7 @@ export type CommentCreateRequest = CommentCreate;
 
 export const commentCreateToRequest = (
   comment: CommentCreate,
-  baseUrl: string,
+  baseUrl: string
 ): CommentCreateRequest => ({
   ...comment,
 });

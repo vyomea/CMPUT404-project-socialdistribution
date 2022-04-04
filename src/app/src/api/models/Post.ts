@@ -27,6 +27,8 @@ export default interface Post {
   visibility: "PUBLIC" | "FRIENDS";
   unlisted: boolean;
   author: Author;
+  readonly serviceUrl: string;
+  readonly authorId: string;
 }
 
 export type PostResponse = Omit<Post, "id" | "author"> & {
@@ -37,13 +39,15 @@ export type PostResponse = Omit<Post, "id" | "author"> & {
 };
 
 export const postFromResponse = (data: PostResponse): Post => {
-  const match = /\/posts\/([^/]+)\/?$/.exec(data.id);
+  const match = /(.*?)\/authors\/([^/]+)\/posts\/([^/]+)$/.exec(data.id);
   if (match === null) {
     throw new Error("Invalid post URL");
   }
   return {
     ...data,
-    id: match[1],
+    id: match[3],
+    authorId: match[2],
+    serviceUrl: match[1],
     author: authorFromResponse(data.author),
   };
 };
