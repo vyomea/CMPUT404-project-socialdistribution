@@ -4,7 +4,7 @@ import Comment from './Comment';
 import CommentLike from './CommentLike';
 import Post from './Post';
 import PostLike from './PostLike';
-import Request from './Request';
+import FollowRequest from './FollowRequest';
 import db from '../db';
 
 export default class InboxItem extends Model {
@@ -14,7 +14,7 @@ export default class InboxItem extends Model {
   declare comment?: Comment;
   declare commentLike?: CommentLike;
   declare postLike?: PostLike;
-  declare followRequest?: Request;
+  declare request?: FollowRequest;
   declare createdAt: Date;
   static Recipient: BelongsTo;
 }
@@ -24,19 +24,17 @@ InboxItem.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      allowNull: false,
       primaryKey: true,
     },
   },
   {
-    modelName: 'InboxItem',
     sequelize: db,
   }
 );
 
 InboxItem.belongsTo(Author, { as: 'recipient' });
-InboxItem.hasOne(Post, { as: 'post' });
-InboxItem.hasOne(Comment, { as: 'comment' });
-InboxItem.hasOne(PostLike, { as: 'postLike' });
-InboxItem.hasOne(CommentLike, { as: 'commentLike' });
-InboxItem.hasOne(Request, { as: 'followRequest' });
+InboxItem.belongsTo(Post, { as: 'post' });
+InboxItem.belongsTo(Comment, { as: 'comment' });
+InboxItem.belongsTo(PostLike, { as: 'postLike' });
+InboxItem.belongsTo(CommentLike, { as: 'commentLike' });
+InboxItem.belongsTo(FollowRequest, { as: 'request' });

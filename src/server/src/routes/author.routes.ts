@@ -5,15 +5,18 @@ const router = express.Router();
 import { adminOnly, requiredLoggedIn } from '../middlewares/auth.middlewares';
 import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
+import { forwardRequestToRemoteNode } from '../middlewares/to-node.middlewares';
 
 import posts from './post.routes';
 import comments from './comment.routes';
 import followers from './follower.routes';
+import inbox from './inbox.routes';
 
 import {
   deleteAuthor,
   getAllAuthors,
   getAuthor,
+  getAuthorLiked,
   getCurrentAuthor,
   updateProfile,
 } from '../controllers/author.controllers';
@@ -33,17 +36,27 @@ router.use(
 router.use(
   '/:authorId/following',
   validate([param('authorId').isUUID()]),
+  forwardRequestToRemoteNode,
   getAuthorFollowings
 );
 
-router.get('/', paginate, getAllAuthors);
+router.use('/:authorId/inbox', inbox);
+
+router.get('/:authorId/liked', forwardRequestToRemoteNode, getAuthorLiked);
+
+router.get('/', paginate, forwardRequestToRemoteNode, getAllAuthors);
 router.get('/me', requiredLoggedIn, getCurrentAuthor);
 router.delete(
   '/:authorId',
   [adminOnly, validate([param('authorId').isUUID()])],
   deleteAuthor
 );
-router.get('/:authorId', validate([param('authorId').isUUID()]), getAuthor);
+router.get(
+  '/:authorId',
+  validate([param('authorId').isUUID()]),
+  forwardRequestToRemoteNode,
+  getAuthor
+);
 router.post(
   '/:authorId',
   validate([

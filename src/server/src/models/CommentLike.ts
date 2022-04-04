@@ -10,6 +10,7 @@ export default class CommentLike extends Model {
   declare commentId: string;
   declare comment: Comment;
   declare createdAt: Date;
+  static Author: BelongsTo;
   static Comment: BelongsTo;
 }
 

@@ -4,6 +4,7 @@ const router = express.Router({ mergeParams: true });
 
 import { requiredLoggedIn } from '../middlewares/auth.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
+import { forwardRequestToRemoteNode } from '../middlewares/to-node.middlewares';
 
 import {
   addFollower,
@@ -12,11 +13,12 @@ import {
   removeFollower,
 } from '../controllers/follower.controllers';
 
-router.get('/', getAuthorFollowers);
+router.get('/', forwardRequestToRemoteNode, getAuthorFollowers);
 
 router.get(
   '/:foreign_author_id',
   validate([param('foreign_author_id').isUUID()]),
+  forwardRequestToRemoteNode,
   checkFollower
 );
 router.delete(

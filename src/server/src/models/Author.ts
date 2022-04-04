@@ -4,8 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 import Post from './Post';
 import Comment from './Comment';
 import Follower from './Follower';
-import Request from './Request';
 import Node from './Node';
+import CommentLike from './CommentLike';
+import PostLike from './PostLike';
+import FollowRequest from './FollowRequest';
 
 class Author extends Model {
   declare id: typeof uuidv4;
@@ -16,24 +18,26 @@ class Author extends Model {
   declare profileImage: string;
   declare isAdmin: boolean;
   declare verified: boolean;
-  declare serviceUrl: string;
   static Posts: HasMany;
   static Comments: HasMany;
   static Followers: HasMany;
-  static Requests: HasMany;
   static Node: BelongsTo;
+  static CommentLikes: HasMany;
+  static PostLikes: HasMany;
   declare followers: Follower[];
   declare posts: Post[];
-  declare requests: Request[];
+  declare outgoingFollowRequests: FollowRequest[];
+  declare incomingFollowRequests: FollowRequest[];
   declare node: Node;
+  declare nodeServiceUrl: string;
+  declare commentLikes: CommentLike[];
+  declare postLikes: PostLike[];
   declare addComment: (comment: Comment) => Promise<void>;
   declare addPost: (post: Post) => Promise<void>;
   declare addFollower: (author: Author) => Promise<void>;
   declare hasFollower: (author: Author) => Promise<boolean>;
   declare removeFollower: (author: Author) => Promise<void>;
-  declare addRequest: (author: Author) => Promise<void>;
-  declare hasRequest: (author: Author) => Promise<boolean>;
-  declare removeRequest: (author: Author) => Promise<void>;
+  declare getNode: () => Promise<Node>;
 }
 
 Author.init(
@@ -75,14 +79,6 @@ Author.init(
       allowNull: false,
       defaultValue: false,
     },
-    serviceUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      references: {
-        model: Node,
-        key: 'serviceUrl',
-      },
-    },
   },
   {
     sequelize: db,
@@ -107,22 +103,20 @@ Follower.Author = Follower.belongsTo(Author, {
   foreignKey: 'authorId',
 });
 
-Author.Requests = Author.belongsToMany(Author, {
-  through: 'requests',
-  as: 'request',
-});
-Request.Author = Request.belongsTo(Author, {
-  as: 'author',
-  foreignKey: 'authorId',
-});
-Request.Requestor = Request.belongsTo(Author, {
-  as: 'requestor',
-  foreignKey: 'requestId',
-});
+Author.hasMany(FollowRequest, { as: 'outgoingFollowRequests' });
+Author.hasMany(FollowRequest, { as: 'incomingFollowRequests' });
+FollowRequest.belongsTo(Author, { as: 'requestee' });
+FollowRequest.belongsTo(Author, { as: 'requester' });
 
 Author.Comments = Author.hasMany(Comment);
 Comment.Author = Comment.belongsTo(Author, { as: 'author' });
 
 Author.Node = Author.belongsTo(Node, { as: 'node' });
+Node.Authors = Node.hasMany(Author, { as: 'authors' });
+
+Author.PostLikes = Author.hasMany(PostLike, { as: 'postLikes' });
+PostLike.Author = PostLike.belongsTo(Author, { as: 'author' });
+Author.CommentLikes = Author.hasMany(CommentLike, { as: 'commentLikes' });
+CommentLike.Author = CommentLike.belongsTo(Author, { as: 'author' });
 
 export default Author;

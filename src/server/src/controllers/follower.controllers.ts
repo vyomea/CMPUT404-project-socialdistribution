@@ -3,7 +3,8 @@ import Author from '../models/Author';
 import Follower from '../models/Follower';
 import { AuthenticatedRequest } from '../types/auth';
 import { unauthorized } from '../handlers/auth.handlers';
-import { serializeAuthor } from './author.controllers';
+import { serializeAuthor } from '../serializers/author.serializers';
+import FollowRequest from '../models/FollowRequest';
 
 const authorPublicAttributes = ['id', 'displayName', 'github', 'profileImage'];
 
@@ -32,7 +33,13 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
     return;
   }
 
-  if (!(await author.hasRequest(foreignAuthor))) {
+  const followRequest = await FollowRequest.findOne({
+    where: {
+      requesterId: req.params.foreign_author_id,
+      requesteeId: req.params.authorId,
+    },
+  });
+  if (followRequest === null) {
     res.status(400).send({
       error: `${foreignAuthor.displayName} did not request to follow`,
     });
@@ -40,7 +47,7 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
   }
 
   try {
-    await author.removeRequest(foreignAuthor);
+    await followRequest.destroy();
     await author.addFollower(foreignAuthor);
   } catch (error) {
     console.error(error);
@@ -83,7 +90,9 @@ const getAuthorFollowers = async (req: Request, res: Response) => {
   });
   res.send({
     type: 'followers',
-    items: followers.map((follower) => serializeAuthor(follower.follower, req)),
+    items: await Promise.all(
+      followers.map((follower) => serializeAuthor(follower.follower, req))
+    ),
   });
 };
 
@@ -103,8 +112,8 @@ const getAuthorFollowings = async (req: Request, res: Response) => {
   });
   res.send({
     type: 'following',
-    items: followings.map((following) =>
-      serializeAuthor(following.author, req)
+    items: await Promise.all(
+      followings.map((following) => serializeAuthor(following.author, req))
     ),
   });
 };
