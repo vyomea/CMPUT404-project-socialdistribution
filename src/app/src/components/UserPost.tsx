@@ -145,7 +145,7 @@ const UserPost: React.FC<postItem> = (props?) => {
   const renderContent = (content: any, contentType: any) => {
     // HACK
     let f = "/posts/" + props?.post?.id + "/image";
-    let x = props?.currentUser?.id + f;
+    let x = props?.postAuthor?.id + f;
     let h = window.location.href + "authors/" + x;
     // Will work if running frontend on 3001
     // h = h.replace("3002", "3001");
