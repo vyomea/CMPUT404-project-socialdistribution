@@ -25,7 +25,7 @@ class Author extends Model {
   declare followers: Follower[];
   declare posts: Post[];
   declare requests: Request[];
-  declare node: Node[];
+  declare node: Node;
   declare addComment: (comment: Comment) => Promise<void>;
   declare addPost: (post: Post) => Promise<void>;
   declare addFollower: (author: Author) => Promise<void>;

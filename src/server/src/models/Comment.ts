@@ -1,8 +1,9 @@
-import { BelongsTo, DataTypes, Model } from 'sequelize';
+import { BelongsTo, DataTypes, HasMany, Model } from 'sequelize';
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
 import Post from './Post';
+import CommentLike from './CommentLike';
 
 class Comment extends Model {
   declare id: typeof uuidv4;
@@ -13,6 +14,8 @@ class Comment extends Model {
   declare author: Author;
   static Post: BelongsTo;
   declare post: Post;
+  static Likes: HasMany;
+  declare likes: CommentLike[];
 }
 
 Comment.init(
@@ -52,5 +55,8 @@ Comment.init(
     underscored: true,
   }
 );
+
+Comment.Likes = Comment.hasMany(CommentLike, { as: 'likes' });
+CommentLike.Comment = CommentLike.belongsTo(Comment, { as: 'comment' });
 
 export default Comment;
