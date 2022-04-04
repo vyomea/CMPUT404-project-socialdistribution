@@ -1,11 +1,11 @@
 import { BelongsTo, DataTypes, Model } from 'sequelize';
 import db from '../db';
-import { v4 as uuidv4 } from 'uuid';
 import Author from './Author';
 
 class Request extends Model {
-  declare authorId: typeof uuidv4;
-  declare requestId: typeof uuidv4;
+  declare id: number;
+  declare authorId: string;
+  declare requestId: string;
   declare author: Author;
   declare requestor: Author;
   static Author: BelongsTo;
@@ -14,15 +14,20 @@ class Request extends Model {
 
 Request.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     authorId: {
       type: DataTypes.UUID,
       allowNull: false,
-      primaryKey: true,
+      unique: 'author_requester',
     },
     requestId: {
       type: DataTypes.UUID,
       allowNull: false,
-      primaryKey: true,
+      unique: 'author_requester',
     },
   },
   {

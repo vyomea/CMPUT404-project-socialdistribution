@@ -24,8 +24,13 @@ export default function AdminPostCard({
                         height:'100%',
                 }}>
                     
-                    <Typography sx={{ fontWeight: 'bold' }}>
-                            {post.id}
+                    <Typography 
+                        onClick={()=>window.open(`profile/${post.author.id}/post/${post.id}`,"_blank")} 
+                        noWrap={true} 
+                        style={{cursor:'pointer'}} 
+                        sx={{ fontWeight: 'bold', textDecoration:'underline' }}
+                        >
+                        {post.id}
                     </Typography>
 
                     <Typography>
@@ -35,7 +40,6 @@ export default function AdminPostCard({
                     <Typography>
                         {post.published}
                     </Typography>
-
                 </Box>
             </CardContent>
         </Card>

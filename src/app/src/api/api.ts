@@ -114,6 +114,27 @@ const api = {
   },
 
   /**
+ * Actions on the posts.
+ */
+  posts: {
+    /**
+     * Fetches a paginated list of posts.
+     * @param page the page to return
+     * @param size the number of posts per page
+     * @returns a list of posts
+     */
+    list: async (page?: number, size?: number): Promise<Post[]> =>
+      (
+        await axios.get<{ items: PostResponse[] }>(
+          `/posts`,
+          {
+            params: { page, size },
+          }
+        )
+      ).data.items.map(postFromResponse)
+    },
+
+  /**
    * Actions on nodes.
    */
   nodes: {
@@ -288,11 +309,11 @@ const api = {
         withId: (followerId: string) => ({
           /**
            * Checks if this author is in fact a follower.
-           * @returns true if this author is a follower, false otherwise
+           * @returns {'result': true} if this author is a follower, {'result': false} otherwise
            */
-          isAFollower: async (): Promise<boolean> =>
+          isAFollower: async (): Promise<{ result: boolean }> =>
             (
-              await axios.get<boolean>(
+              await axios.get<{ result: boolean }>(
                 `/authors/${authorId}/followers/${followerId}`
               )
             ).data,

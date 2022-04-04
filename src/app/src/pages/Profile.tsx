@@ -107,7 +107,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   // If you follow them - Unfollow
   // You sent them a request - Request Sent
   // Else - Follow
-  const [isFollowing, setFollowing] = useState(true);
+  const [isFollowing, setFollowing] = useState(false);
   const [sentRequest, setRequestSent] = useState(false);
 
   const handleFollow = () => {
@@ -116,6 +116,14 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   const handleUnfollow = () => {
     setFollowing(false);
+    // unfollow author
+    api.authors
+      .withId("" + author?.id)
+      .followers.withId("" + currentUser?.id)
+      .unfollow()
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const [followersList, setFollowers] = useState<Author[]>([]);
@@ -151,6 +159,24 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     }
     fetchData();
   }, [author?.id]);
+
+  // Update isFollowing if the author is being followed by the current user
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = api.authors
+          .withId("" + author?.id)
+          .followers.withId("" + currentUser?.id)
+          .isAFollower();
+        res.then((isFollowing) => {
+          setFollowing(isFollowing["result"]);
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, [author?.id, currentUser?.id]);
 
   if (author !== undefined && currentUser !== undefined) {
     return (
