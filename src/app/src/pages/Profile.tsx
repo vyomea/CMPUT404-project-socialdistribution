@@ -107,7 +107,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
   // If you follow them - Unfollow
   // You sent them a request - Request Sent
   // Else - Follow
-  const [isFollowing, setFollowing] = useState(true);
+  const [isFollowing, setFollowing] = useState(false);
   const [sentRequest, setRequestSent] = useState(false);
 
   const handleFollow = () => {
@@ -116,6 +116,14 @@ export default function Profile({ currentUser }: Props): JSX.Element {
 
   const handleUnfollow = () => {
     setFollowing(false);
+    // unfollow author
+    api.authors
+      .withId("" + author?.id)
+      .followers.withId("" + currentUser?.id)
+      .unfollow()
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const [followersList, setFollowers] = useState<Author[]>([]);
@@ -151,6 +159,35 @@ export default function Profile({ currentUser }: Props): JSX.Element {
     }
     fetchData();
   }, [author?.id]);
+
+  // Get Current User's followers and update isFollwing is the author is being followed by the current user
+  const [currentUserFollowers, setCurrentUserFollowers] = useState<Author[]>(
+    []
+  );
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = api.authors.withId("" + currentUser?.id).followings.list();
+        res.then((followers) => {
+          setCurrentUserFollowers(followers);
+        });
+        let isFollowing = false;
+        if (currentUserFollowers) {
+          for (let i = 0; i < currentUserFollowers.length; i++) {
+            if (currentUserFollowers[i].id === author?.id) {
+              isFollowing = true;
+              break;
+            }
+          }
+
+          setFollowing(isFollowing);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, [author?.id, currentUser?.id, currentUserFollowers]);
 
   if (author !== undefined && currentUser !== undefined) {
     return (
@@ -248,7 +285,10 @@ export default function Profile({ currentUser }: Props): JSX.Element {
         ) : (
           <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
             <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}></Box>
-            <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
+            <Box
+              style={{ display: "flex", height: "95%" }}
+              sx={{ bgcolor: "#fff" }}
+            >
               <Box
                 boxShadow={5}
                 display="flex"
@@ -282,7 +322,9 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   {author.displayName}
                 </Typography>
                 {author.github ? (
-                  <IconButton onClick={() => window.open(`${author.github}`, "_blank")}>
+                  <IconButton
+                    onClick={() => window.open(`${author.github}`, "_blank")}
+                  >
                     <GitHubIcon />
                   </IconButton>
                 ) : null}
@@ -329,7 +371,10 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   mt: 0.5,
                 }}
               >
-                <List style={{ maxHeight: "100%", overflow: "auto" }} sx={{ width: "100%" }}>
+                <List
+                  style={{ maxHeight: "100%", overflow: "auto" }}
+                  sx={{ width: "100%" }}
+                >
                   {posts?.map((post) => (
                     <UserPost
                       post={post}
