@@ -143,11 +143,7 @@ const api = {
        * @returns TODO
        */
       delete: async (): Promise<unknown> =>
-<<<<<<< HEAD
-        (await axios.delete(`/nodes/${nodeId}`)).data,
-=======
         (await axios.delete(`/nodes/${encodeURIComponent(serviceUrl)}`)).data,
->>>>>>> devel
     }),
   },
 
