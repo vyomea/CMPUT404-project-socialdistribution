@@ -123,11 +123,18 @@ const deleteAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 // FindOptions for querying posts on this node along with their author and comments information.
-const postFindOptions = (authorId?: string, postId?: string): FindOptions => ({
+const postFindOptions = (
+  authorId?: string,
+  postId?: string,
+  isFriend?: boolean
+): FindOptions => ({
   attributes: publicAttributes,
   where: {
     ...(authorId ? { author_id: authorId } : {}),
     ...(postId ? { id: postId } : {}),
+    ...(isFriend
+      ? { visibility: ['PUBLIC', 'FRIENDS'] }
+      : { visibility: ['PUBLIC'] }),
     serviceUrl: null,
   },
   include: [
@@ -169,10 +176,7 @@ const postFindOptions = (authorId?: string, postId?: string): FindOptions => ({
 
 const getAllPublicPosts = async (req: PaginationRequest, res: Response) => {
   const posts = await Post.findAll({
-    ...postFindOptions(),
-    where: {
-      visibility: 'PUBLIC',
-    },
+    ...postFindOptions(undefined, undefined, false),
     offset: req.offset,
     limit: req.limit,
   });
@@ -191,12 +195,9 @@ const getAuthorPost = async (
     isFriend = await isFriends(req.authorId, req.params.authorId);
   }
   const post = await Post.findOne({
-    ...postFindOptions(req.params.authorId, req.params.postId),
-    ...(isFriend
-      ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
-      : { where: { visibility: ['PUBLIC'] } }),
+    ...postFindOptions(req.params.authorId, req.params.postId, isFriend),
   });
-  
+
   if (post === null) {
     res.status(404).send();
     return;
@@ -219,12 +220,9 @@ const getAuthorPosts = async (
     return;
   }
   const posts = await Post.findAll({
-    ...postFindOptions(req.params.authorId),
+    ...postFindOptions(req.params.authorId, undefined, isFriend),
     offset: req.offset,
     limit: req.limit,
-    ...(isFriend
-      ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
-      : { where: { visibility: ['PUBLIC'] } }),
   });
   res.send({
     type: 'posts',
@@ -232,7 +230,10 @@ const getAuthorPosts = async (
   });
 };
 
-const getPostImage = async (req: AuthenticatedRequest & Request, res: Response) => {
+const getPostImage = async (
+  req: AuthenticatedRequest & Request,
+  res: Response
+) => {
   let isFriend = false;
   if (req.authorId) {
     isFriend = await isFriends(req.authorId, req.params.authorId);
@@ -243,10 +244,10 @@ const getPostImage = async (req: AuthenticatedRequest & Request, res: Response) 
     where: {
       id: req.params.postId,
       author_id: req.params.authorId,
+      ...(isFriend
+        ? { visibility: ['PUBLIC', 'FRIENDS'] }
+        : { visibility: ['PUBLIC'] }),
     },
-    ...(isFriend
-      ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
-      : { where: { visibility: ['PUBLIC'] } }),
   });
   if (post === null || !post.contentType.includes('image')) {
     res.sendStatus(404);
