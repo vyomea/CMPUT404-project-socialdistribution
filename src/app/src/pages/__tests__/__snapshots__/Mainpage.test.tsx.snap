@@ -2,62 +2,8 @@
 
 exports[`Mainpage suite Renders correctly 1`] = `
 <div
-  className="sc-iwjdpV OHnYU"
+  className="sc-fKVqWL jCzvhL"
 >
-  <div
-    className="sc-cxpSdN TLJOs"
-  >
-    <div
-      className="sc-bdvvtL mzSdo"
-    >
-      <div
-        className="sc-gsDKAQ dokASy"
-      >
-        <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          tabIndex={0}
-          type="button"
-        >
-          Home
-        </button>
-        <button
-          className="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root css-16emiyp-MuiButtonBase-root-MuiButton-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          tabIndex={0}
-          type="button"
-        >
-          Logout
-        </button>
-      </div>
-    </div>
-  </div>
   <button
     aria-label="check"
     className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-primary css-1ckp4x4-MuiButtonBase-root-MuiFab-root"
@@ -101,7 +47,7 @@ exports[`Mainpage suite Renders correctly 1`] = `
     </svg>
   </button>
   <div
-    className="sc-llYSUQ gRojfe"
+    className="sc-bBHxTw eilNef"
   >
     <ul
       className="MuiList-root MuiList-padding css-xgw77h-MuiList-root"
@@ -113,18 +59,18 @@ exports[`Mainpage suite Renders correctly 1`] = `
       }
     />
     <div
-      className="sc-iJKOTD kGsKvO"
+      className="sc-iwjdpV fZAKJX"
     >
       <div
-        className="sc-fFeiMQ ejkoIZ"
+        className="sc-hBUSln jrhiCv"
       >
         <div
-          className="sc-bkkeKt Qfuew"
+          className="sc-fotOHu hFHCBv"
         >
           Github Activity
         </div>
         <div
-          className="sc-bkkeKt Qfuew"
+          className="sc-fotOHu hFHCBv"
         >
           <span
             className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSuccess css-15u8j6q-MuiCircularProgress-root"
