@@ -24,7 +24,7 @@ import { serializeFollowRequest } from '../serializers/follow-request.serializer
 import axios from 'axios';
 import { remoteRequestConfig } from '../utilities/remote-request-config';
 import { serializeAuthor } from '../serializers/author.serializers';
-import { createComment, receiveRemoteComment } from './comment.controllers';
+import { receiveRemoteComment } from './comment.controllers';
 
 const getInbox = async (
   req: AuthenticatedRequest & PaginationRequest,
@@ -147,7 +147,7 @@ const sendToInbox = async (
   }
 
   // Type of the item being sent
-  const type = (req.body.type as string).toLowerCase();
+  const type = (req.body.type as string)?.toLowerCase();
 
   if (type === 'post') {
     await receivePostInLocalInbox(req, res);
@@ -405,7 +405,7 @@ const receiveLikeInLocalInbox = async (
 
 const forwardInboxItemToNode = async (req: ToNodeRequest, res: Response) => {
   // Type of the item being sent
-  const type = (req.body.type as string).toLowerCase();
+  const type = (req.body.type as string)?.toLowerCase();
   const requestingAuthor = await Author.findByPk(req.authorId);
   const foreignAuthorUrl = `${req.toNode.serviceUrl}/authors/${req.params.authorId}`;
 
