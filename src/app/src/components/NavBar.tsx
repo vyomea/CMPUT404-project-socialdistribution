@@ -36,7 +36,12 @@ const NavContainer = styled.div`
   border-bottom: 1px;
   background-color: #f4e6d7;
 `;
-
+const Heading = styled.header`
+  font-size: 50px;
+  text-align: center;
+  font-family: Avenir Next Light;
+  margin-left: 14%;
+`;
 const NavItemsContainer = styled.div`
   padding: 10%;
   display: flex;
@@ -55,11 +60,18 @@ const ColorButton = Styled(Button)<ButtonProps>(({ theme }) => ({
 
 const NavBar: React.FC<NavBarProps> = (props) => {
   const url = new URL(window.location.href);
+  let pathname = url?.pathname?.split("/")[1];
+  pathname = pathname?.charAt(0)?.toUpperCase() + pathname?.slice(1);
+  pathname = pathname === "" ? "Homepage" : pathname;
+  const routes = ["Admin", "Profile", "Homepage"];
+  pathname = routes.includes(pathname) ? pathname : "";
   return (
     <NavContainer>
       <LogoContainer onClick={() => window.location.assign(`${url.origin}/`)}>
         Website.
       </LogoContainer>
+      <Heading>{pathname}</Heading>
+
       <NavItemsContainer>
         {props?.items?.map((item: navItem) => (
           <ColorButton key={item?.Text} variant="text" onClick={() => item?.handleClick()}>

@@ -28,15 +28,9 @@ const MainPageContentContainer = styled.div`
   background-color: white;
 `;
 
-const Heading = styled.header`
-  font-size: 50px;
-`;
-
 const GitContainer = styled.div`
   margin-right: 1%;
-  margin-top: 1%;
 `;
-
 interface Props {
   currentUser?: Author;
 }
@@ -68,7 +62,6 @@ export default function Mainpage({ currentUser }: Props) {
 
   return (
     <MainPageContainer>
-      <Heading>Hello, {currentUser?.displayName}! This is your homepage.</Heading>
       <Fab
         color="primary"
         aria-label="check"

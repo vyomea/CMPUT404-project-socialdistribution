@@ -1,6 +1,5 @@
 import React from "react";
-import Button, { ButtonProps } from "@mui/material/Button";
-import { styled as Styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { CloseRounded } from "@mui/icons-material";
 import Backdrop from "@mui/material/Backdrop";
@@ -29,10 +28,11 @@ interface postItem {
 
 // This is for the whole Post, which includes the profile picure, content, etc
 const PostContainer = styled.div`
-  width: 90%;
-  height: 300px;
+  width: 70%;
+  height: auto;
   display: flex;
   margin-bottom: 10px;
+  padding: 10px;
 `;
 
 // This is for the details of post: everything except the profile picture
@@ -40,7 +40,7 @@ const PostDetailsContainer = styled.div`
   height: 100%;
   width: 90%;
   display: flex;
-  border: 1px solid black;
+  border-bottom: 1px solid grey;
   flex-direction: column;
   position: relative;
 `;
@@ -76,6 +76,7 @@ const EditDeleteButtonContainer = styled.div`
 const ContentContainer = styled.div`
   padding: 1%;
   margin-top: 20px;
+  overflow-y: scroll;
 `;
 
 // This is for the likes and comments
@@ -84,7 +85,7 @@ const LikesCommentsContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
 `;
@@ -109,29 +110,6 @@ const CommentsContainer = styled.div`
     cursor: pointer;
   }
 `;
-
-const EditButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText("#e6c9a8"),
-  backgroundColor: "white",
-  border: "2px solid black",
-  height: "3%",
-  padding: "1%",
-  marginRight: "10px",
-  "&:hover": {
-    backgroundColor: "#F9F7F5",
-  },
-}));
-
-const DeleteButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText("#e6c9a8"),
-  backgroundColor: "white",
-  border: "2px solid black",
-  height: "3%",
-  padding: "1%",
-  "&:hover": {
-    backgroundColor: "#F9F7F5",
-  },
-}));
 
 const cursorStyle = {
   cursor: "pointer",
@@ -170,10 +148,11 @@ const UserPost: React.FC<postItem> = (props?) => {
     let x = props?.currentUser?.id + f;
     let h = window.location.href + "authors/" + x;
     // Will work if running frontend on 3001
-    // h = h.replace('3002', '3001');
+    // h = h.replace("3002", "3001");
     switch (contentType) {
       case "text/markdown":
-        return <ReactMarkdown
+        return (
+          <ReactMarkdown
             children={content}
             //@ts-ignore
             remarkPlugins={[remarkMath]}
@@ -198,6 +177,7 @@ const UserPost: React.FC<postItem> = (props?) => {
               },
             }}
           />
+        );
 
       case "text/plain":
         return content;
@@ -301,8 +281,28 @@ const UserPost: React.FC<postItem> = (props?) => {
 
               {showButtons ? (
                 <EditDeleteButtonContainer>
-                  <EditButton onClick={handleToggle}>Edit</EditButton>
-                  <DeleteButton onClick={handleDelete}>Delete</DeleteButton>
+                  <Button
+                    variant="contained"
+                    onClick={handleToggle}
+                    sx={{
+                      backgroundColor: "white",
+                      color: "black",
+                      "&:hover": { backgroundColor: "#f4e6d7" },
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handleDelete}
+                    sx={{
+                      backgroundColor: "white",
+                      color: "black",
+                      "&:hover": { backgroundColor: "#f4e6d7" },
+                    }}
+                  >
+                    Delete
+                  </Button>
                 </EditDeleteButtonContainer>
               ) : null}
             </TopRowContainer>
