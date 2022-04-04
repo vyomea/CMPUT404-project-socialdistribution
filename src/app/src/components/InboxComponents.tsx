@@ -32,7 +32,7 @@ export default function AdminAuthorCard({
             <MainLike like={item} key={item.author.id}/>
         ):null}
         {item.type==="Follow" ? (
-            <MainRequest followRequest={item} key={item.object.id}/>
+            <MainRequest followRequest={item} currentUser={currentUser} key={item.object.id}/>
         ):null}
         {item.type==="comment" ? (
             <MainComment comment={item} key={item.id}/>
