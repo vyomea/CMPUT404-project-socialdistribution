@@ -9,6 +9,7 @@ import { pick } from '../utilities/pick';
 import { serializeAuthor } from './author.controllers';
 import { serializeComment } from './comment.controllers';
 import { FindOptions } from 'sequelize/types';
+import { isFriends } from '../handlers/follower.handlers';
 
 const publicAttributes = [
   'id',
@@ -181,11 +182,21 @@ const getAllPublicPosts = async (req: PaginationRequest, res: Response) => {
   });
 };
 
-const getAuthorPost = async (req: Request, res: Response) => {
-  const post = await Post.findOne(
-    postFindOptions(req.params.authorId, req.params.postId)
-  );
-
+const getAuthorPost = async (
+  req: AuthenticatedRequest & Request,
+  res: Response
+) => {
+  let isFriend = false;
+  if (req.authorId) {
+    isFriend = await isFriends(req.authorId, req.params.authorId);
+  }
+  const post = await Post.findOne({
+    ...postFindOptions(req.params.authorId, req.params.postId),
+    ...(isFriend
+      ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
+      : { where: { visibility: ['PUBLIC'] } }),
+  });
+  
   if (post === null) {
     res.status(404).send();
     return;
@@ -193,7 +204,15 @@ const getAuthorPost = async (req: Request, res: Response) => {
   res.send(serializePost(post, req, post.comments));
 };
 
-const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
+const getAuthorPosts = async (
+  req: AuthenticatedRequest & PaginationRequest,
+  res: Response
+) => {
+  let isFriend = false;
+  if (req.authorId) {
+    isFriend = await isFriends(req.authorId, req.params.authorId);
+  }
+
   const author = await Author.findByPk(req.params.authorId);
   if (author === null) {
     res.status(404).send();
@@ -203,6 +222,9 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
     ...postFindOptions(req.params.authorId),
     offset: req.offset,
     limit: req.limit,
+    ...(isFriend
+      ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
+      : { where: { visibility: ['PUBLIC'] } }),
   });
   res.send({
     type: 'posts',
@@ -210,13 +232,21 @@ const getAuthorPosts = async (req: PaginationRequest, res: Response) => {
   });
 };
 
-const getPostImage = async (req: Request, res: Response) => {
+const getPostImage = async (req: AuthenticatedRequest & Request, res: Response) => {
+  let isFriend = false;
+  if (req.authorId) {
+    isFriend = await isFriends(req.authorId, req.params.authorId);
+  }
+
   const post = await Post.findOne({
     attributes: ['contentType', 'image'],
     where: {
       id: req.params.postId,
       author_id: req.params.authorId,
     },
+    ...(isFriend
+      ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
+      : { where: { visibility: ['PUBLIC'] } }),
   });
   if (post === null || !post.contentType.includes('image')) {
     res.sendStatus(404);
