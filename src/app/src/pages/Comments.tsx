@@ -89,7 +89,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
   const [type, setType] = useState<any>("");
   const [openWrite, setOpenWrite] = useState(true);
   const [content, setContent] = useState("");
-
+  const [author, setAuthor] = useState<Author>();
   const handleClose = () => {
     setOpen(false);
   };
@@ -104,6 +104,10 @@ export default function Comments({ currentUser }: Props): JSX.Element {
     async function fetchData() {
       try {
         if (authorID && postID) {
+          const postAuthor = api.authors.withId(authorID).get();
+          postAuthor.then((author) => {
+            setAuthor(author);
+          });
           const commentList = api.authors.withId(authorID).posts.withId(postID).comments.list();
           const post = api.authors.withId(authorID).posts.withId(postID).get();
           post.then((data) => setPost(data)).catch((err) => console.log(err));
@@ -242,7 +246,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
         </Backdrop>
       ) : null}
       {post ? (
-        <UserPost post={post} likes={5} currentUser={currentUser} postAuthor={currentUser} />
+        <UserPost post={post} likes={5} currentUser={currentUser} postAuthor={author} />
       ) : (
         <CircularProgress color="success" />
       )}
