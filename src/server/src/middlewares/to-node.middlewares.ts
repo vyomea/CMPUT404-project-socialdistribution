@@ -34,15 +34,17 @@ const forwardRequestToRemoteNode = async (
   }
   req.requestType = 'toNode';
   req.toNode = node;
-  delete req.query.node;
 
-  // Remote node request
-  // Forward request to remote server
   try {
     res
       .status(200)
       .send(
-        (await axios.get('/authors', remoteRequestConfig(req.toNode))).data
+        (
+          await axios.get(
+            req.originalUrl.replace(/node=[^%]*/, ''),
+            remoteRequestConfig(req.toNode)
+          )
+        ).data
       );
   } catch (e) {
     console.error(e);
