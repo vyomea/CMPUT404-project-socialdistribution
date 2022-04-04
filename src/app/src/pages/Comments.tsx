@@ -97,6 +97,11 @@ export default function Comments({ currentUser }: Props): JSX.Element {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleOpen = () => {
+    setOpen(true);
+    setType("");
+    setContent("");
+  };
 
   const handleType = (event: SelectChangeEvent) => {
     setType(event.target.value);
@@ -298,7 +303,7 @@ export default function Comments({ currentUser }: Props): JSX.Element {
           }}
           sx={{ color: "black", background: "#f4e6d7", "&:hover": { background: "#E8CEB0" } }}
         >
-          <AddIcon onClick={() => setOpen(true)} />
+          <AddIcon onClick={handleOpen} />
         </Fab>
         {comments?.map((i) => {
           return <CommentComponent comm={i} likes={0} />;
