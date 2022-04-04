@@ -273,11 +273,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
           </Backdrop>
         ) : (
           <Box sx={{ height: window.innerHeight, width: window.innerWidth }}>
-            <Box style={{ height: "5%" }} sx={{ bgcolor: "#fff" }}></Box>
-            <Box
-              style={{ display: "flex", height: "95%" }}
-              sx={{ bgcolor: "#fff" }}
-            >
+            <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
               <Box
                 boxShadow={5}
                 display="flex"
@@ -311,9 +307,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   {author.displayName}
                 </Typography>
                 {author.github ? (
-                  <IconButton
-                    onClick={() => window.open(`${author.github}`, "_blank")}
-                  >
+                  <IconButton onClick={() => window.open(`${author.github}`, "_blank")}>
                     <GitHubIcon />
                   </IconButton>
                 ) : null}
@@ -360,10 +354,7 @@ export default function Profile({ currentUser }: Props): JSX.Element {
                   mt: 0.5,
                 }}
               >
-                <List
-                  style={{ maxHeight: "100%", overflow: "auto" }}
-                  sx={{ width: "100%" }}
-                >
+                <List style={{ maxHeight: "100%", overflow: "auto" }} sx={{ width: "100%" }}>
                   {posts?.map((post) => (
                     <UserPost
                       post={post}

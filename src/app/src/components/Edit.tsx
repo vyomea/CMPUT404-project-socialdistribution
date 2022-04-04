@@ -1,15 +1,19 @@
-import styled from 'styled-components';
-import { Button, ButtonGroup, ButtonProps, InputLabel, TextField } from '@mui/material';
-import { styled as Styled } from '@mui/material/styles';
-import React from 'react';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Fab from '@mui/material/Fab';
-import CheckIcon from '@mui/icons-material/Check';
-import Checkbox from '@mui/material/Checkbox';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import ReactMarkdown from 'react-markdown';
-import api from '../api/api';
+import styled from "styled-components";
+import { Button, ButtonGroup, ButtonProps, InputLabel, TextField } from "@mui/material";
+import { styled as Styled } from "@mui/material/styles";
+import React from "react";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Fab from "@mui/material/Fab";
+import CheckIcon from "@mui/icons-material/Check";
+import Checkbox from "@mui/material/Checkbox";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import ReactMarkdown from "react-markdown";
+import api from "../api/api";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
 
 const EditContainer = styled.div`
   background-color: white;
@@ -64,16 +68,16 @@ const ActualContent = styled.div`
   width: 50%;
 `;
 const CustomButton = Styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText('#fff'),
-  padding: '10px',
-  backgroundColor: 'white',
-  '&:hover': {
-    backgroundColor: '#b5b5b5',
+  color: theme.palette.getContrastText("#fff"),
+  padding: "10px",
+  backgroundColor: "white",
+  "&:hover": {
+    backgroundColor: "#b5b5b5",
   },
 }));
 
-const fieldStyle = { width: '40%', mt:3 };
-const formStyle = { m: 1, minWidth: 120, width: '40%', mt:2 };
+const fieldStyle = { width: "40%", mt: 3 };
+const formStyle = { m: 1, minWidth: 120, width: "40%", mt: 2 };
 
 const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) => {
   const [content, setContent] = React.useState(data.content);
@@ -99,7 +103,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) =
 
   const handleCategory = (event: React.ChangeEvent<HTMLInputElement>) => {
     let csv = event.target.value;
-    setCategory(csv.split(','));
+    setCategory(csv.split(","));
   };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,15 +126,15 @@ const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) =
     const post = {
       id: id,
       title: title,
-      source: 'www.google.com',
-      origin: 'www.lol.com',
+      source: "www.google.com",
+      origin: "www.lol.com",
       description: description,
       contentType: type,
       content: content,
       image: images ? images[0] : undefined,
       categories: Array.isArray(category)
         ? JSON.stringify(category)
-        : JSON.stringify(category.split(',')),
+        : JSON.stringify(category.split(",")),
       count: 5,
       published: new Date(),
       visibility: visibility,
@@ -143,10 +147,13 @@ const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) =
       formData.append(key, post[key]);
     }
     api.authors
-      .withId('' + currentUser?.id)
-      .posts.withId('' + id)
+      .withId("" + currentUser?.id)
+      .posts.withId("" + id)
       .update(formData)
-      .then(() => {handlePostsChanged(); handleClose()})
+      .then(() => {
+        handlePostsChanged();
+        handleClose();
+      })
       .catch((e) => console.log(e.response));
   };
 
@@ -221,26 +228,26 @@ const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) =
         <ContentType> Unlisted </ContentType>
         <Checkbox defaultChecked={!!unlisted} onChange={handleUnlist} />
         <Content>
-          {' '}
+          {" "}
           <WriteOrPreview>
             <ButtonGroup
               variant="text"
               color="inherit"
               size="large"
-              sx={{ p: 1, borderBottom: '1px solid black' }}
+              sx={{ p: 1, borderBottom: "1px solid black" }}
             >
               <CustomButton
                 onClick={() => setOpenWrite(true)}
-                sx={{ background: openWrite ? '#b5b5b5' : 'white' }}
+                sx={{ background: openWrite ? "#b5b5b5" : "white" }}
               >
-                {' '}
-                Write{' '}
+                {" "}
+                Write{" "}
               </CustomButton>
               <CustomButton
                 onClick={() => setOpenWrite(false)}
-                sx={{ background: !openWrite ? '#b5b5b5' : 'white' }}
+                sx={{ background: !openWrite ? "#b5b5b5" : "white" }}
               >
-                {' '}
+                {" "}
                 Preview
               </CustomButton>
             </ButtonGroup>
@@ -261,13 +268,39 @@ const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) =
                     <input type="file" accept="image/*" name="image" onChange={handleUpload} />
                   </CustomButton>
                 </>
-              ) : (
+              ) : type === "text/markdown" ? (
                 <>
-                  <ReactMarkdown>{content}</ReactMarkdown>
+                  <ReactMarkdown
+                    children={content}
+                    //@ts-ignore
+                    remarkPlugins={[remarkMath]}
+                    //@ts-ignore
+                    rehypePlugins={[rehypeKatex]}
+                    components={{
+                      code({ node, inline, className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || "");
+                        return !inline && match ? (
+                          //@ts-ignore
+                          <SyntaxHighlighter
+                            children={String(children).replace(/\n$/, "")}
+                            language={match[1]}
+                            PreTag="div"
+                            {...props}
+                          />
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  />
                   {renderImages.map((image: string | undefined) => (
-                    <img style={{ width: '400px', height: '400px' }} src={image} alt="Uploaded" />
+                    <img style={{ width: "400px", height: "400px" }} src={image} alt="Uploaded" />
                   ))}
                 </>
+              ) : (
+                content
               )}
             </ActualContent>
           </WriteOrPreview>
@@ -276,7 +309,7 @@ const Edit = ({ id, currentUser, data, handlePostsChanged, handleClose }: any) =
       <Fab
         color="primary"
         aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' } }}
+        sx={{ color: "black", background: "#f4e6d7", "&:hover": { background: "#E8CEB0" } }}
       >
         <CheckIcon onClick={handleEdit} />
       </Fab>

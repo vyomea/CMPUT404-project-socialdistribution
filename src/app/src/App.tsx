@@ -9,12 +9,7 @@ import Admin from "./pages/Admin";
 import ErrorPage from "./pages/Error";
 import api from "./api/api";
 import NavBar from "./components/NavBar";
-import styled from "styled-components";
 import Comments from "./pages/Comments";
-
-const NavBarContainer = styled.div`
-  margin-bottom: 5%;
-`;
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Author | undefined>(undefined);
@@ -91,9 +86,7 @@ function App() {
   ) : (
     <BrowserRouter>
       {currentUser ? (
-        <NavBarContainer>
-          <NavBar items={currentUser && currentUser.isAdmin ? adminUser : normalUser} />
-        </NavBarContainer>
+        <NavBar items={currentUser && currentUser.isAdmin ? adminUser : normalUser} />
       ) : null}
       <Routes>
         <Route
