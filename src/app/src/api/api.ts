@@ -114,6 +114,27 @@ const api = {
   },
 
   /**
+ * Actions on the posts.
+ */
+  posts: {
+    /**
+     * Fetches a paginated list of posts.
+     * @param page the page to return
+     * @param size the number of posts per page
+     * @returns a list of posts
+     */
+    list: async (page?: number, size?: number): Promise<Post[]> =>
+      (
+        await axios.get<{ items: PostResponse[] }>(
+          `/posts`,
+          {
+            params: { page, size },
+          }
+        )
+      ).data.items.map(postFromResponse)
+    },
+
+  /**
    * Actions on nodes.
    */
   nodes: {

@@ -10,7 +10,7 @@ import Backdrop from '@mui/material/Backdrop';
 import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import { List } from '@mui/material';
+import { Box, List, ButtonGroup, Button } from '@mui/material';
 
 // This is for all the stuff in the Main Page
 const MainPageContainer = styled.div`
@@ -38,9 +38,7 @@ interface Props {
 
 export default function Mainpage({ currentUser }: Props) {
   // For now, mainpage just shows your own posts
-  const [posts, setPosts] = useState<Post[] | undefined>(undefined);
   const [open, setOpen] = useState(false);
-  const [postsChanged, setpostsChanged] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -50,6 +48,14 @@ export default function Mainpage({ currentUser }: Props) {
     setOpen(!open);
   };
 
+  const [inbox, setInbox] = useState<Post[] | undefined>(undefined);
+  const [inboxChanged, setInboxChanged] = useState(false);
+  const handleInboxChanged = () => {
+    setInboxChanged(!inboxChanged);
+  };
+
+  const [posts, setPosts] = useState<Post[] | undefined>(undefined);
+  const [postsChanged, setpostsChanged] = useState(false);
   const handlePostsChanged = () => {
     setpostsChanged(!postsChanged);
   };
@@ -58,8 +64,50 @@ export default function Mainpage({ currentUser }: Props) {
     api.authors
       .withId('' + currentUser?.id)
       .posts.list(1, 10)
+      .then((data) => setInbox(data));
+  }, [currentUser?.id, inboxChanged]);
+
+  useEffect(() => {
+    api
+      .posts
+      .list(1,10)
       .then((data) => setPosts(data));
-  }, [currentUser?.id, postsChanged]);
+  }, [postsChanged]);
+
+  // Sidebar Button group
+  const buttons = [
+    {id:0,title:'Inbox'},
+    {id:1,title:'Browse'}
+  ];
+
+  //Set which list to display
+  const [listDisplay, setListDisplay] = useState({id:0,title:'Inbox'});
+
+  const lists = [
+    inbox?.map((item)=>
+    (
+    <UserPost 
+      post={item} 
+      currentUser={currentUser} 
+      postAuthor={item.author} 
+      likes={0} 
+      handlePostsChanged={handleInboxChanged} 
+      key={item.id}
+    />
+    )),
+
+    posts?.map((post)=>
+    (
+    <UserPost 
+      post={post} 
+      currentUser={currentUser} 
+      postAuthor={post.author} 
+      likes={0} 
+      handlePostsChanged={handlePostsChanged} 
+      key={post.id}
+    />
+    )),
+  ]
 
   return (
     <MainPageContainer>
@@ -110,18 +158,48 @@ export default function Mainpage({ currentUser }: Props) {
         </Backdrop>
       ) : (
         <MainPageContentContainer>
-          <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '70%', ml: 5 }}>
-            {posts?.map((post) => (
-              <UserPost
-                post={post}
-                currentUser={currentUser}
-                postAuthor={currentUser}
-                likes={0}
-                handlePostsChanged={handlePostsChanged}
-                key={post.id}
-              />
-            ))}
-          </List>
+          <Box width='75%'>
+            <List style={{ maxHeight: '100%', overflow: 'auto' }} sx={{ width: '100%', ml: 5 }}>
+              <Box style={{
+                width: '90%',
+                display: 'flex',}}
+              >
+                <Box
+                    sx={{
+                    mb:5,
+                    width:'90%',
+                    ml: 13,
+                    }}
+                >
+                    <ButtonGroup
+                      orientation="horizontal"
+                      aria-label="horizontal contained button group"
+                      variant="contained"
+                      size="large"
+                      sx={{ 
+                        width:'100%',
+                      }}
+                    >
+                      {buttons.map((button) => (
+                        <Button 
+                          onClick={()=>setListDisplay(button)}
+                          key={button.id} 
+                          style={{
+                            justifyContent: 'center'
+                          }}
+                          sx={{
+                            justifyContent:"space-between", 
+                            width: '90%',
+                            
+                          }}
+                        > {button.title}</Button>
+                      ))}
+                    </ButtonGroup>
+                </Box>
+              </Box>
+              {lists[listDisplay.id]}
+            </List>
+            </Box>
           <GitContainer>
             <Github
               username={currentUser?.github ? `${currentUser.github.split('/').pop()}` : ''}
