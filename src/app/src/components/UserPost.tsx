@@ -122,23 +122,33 @@ const UserPost: React.FC<postItem> = (props?) => {
   const navigate = useNavigate();
 
   const handleLikes = () => {
-    if (likes !== undefined && likes >= 0) {
+    if (likes !== undefined && likes >= 0 && props.postAuthor && props.post) {
       setLiked(!liked);
       likes < 0 ? setLikes(0) : setLikes(likes);
       liked ? setLikes(likes + 1) : setLikes(likes - 1 > 0 ? likes - 1 : 0);
+      api.authors
+        .withId(props.postAuthor.id)
+        .posts.withId(props.post.id)
+        .likes.like();
     }
   };
   let showButtons = false;
   const handleDelete = () => {
-    api.authors
-      .withId("" + props.currentUser?.id)
-      .posts.withId("" + props?.post?.id)
-      .delete()
-      .then(() => props?.handlePostsChanged())
-      .catch((e) => console.log(e.response));
+    if (props.currentUser) {
+      api.authors
+        .withId(props.currentUser?.id)
+        .posts.withId("" + props?.post?.id)
+        .delete()
+        .then(() => props?.handlePostsChanged())
+        .catch((e) => console.log(e.response));
+    }
   };
 
-  if (props?.postAuthor && props?.currentUser && props.currentUser.id === props.postAuthor.id) {
+  if (
+    props?.postAuthor &&
+    props?.currentUser &&
+    props.currentUser.id === props.postAuthor.id
+  ) {
     showButtons = true;
   }
 
@@ -191,7 +201,11 @@ const UserPost: React.FC<postItem> = (props?) => {
               alignContent: "center",
             }}
           >
-            <img style={{ width: "180px", height: "180px" }} src={h} alt="Unavailable" />
+            <img
+              style={{ width: "180px", height: "180px" }}
+              src={h}
+              alt="Unavailable"
+            />
           </div>
         );
     }
@@ -210,7 +224,11 @@ const UserPost: React.FC<postItem> = (props?) => {
   };
 
   const navigateToComments = () => {
-    navigate(`/profile/${props?.postAuthor?.id.split("/").pop()}/post/${props?.post?.id}`);
+    navigate(
+      `/profile/${props?.postAuthor?.id.split("/").pop()}/post/${
+        props?.post?.id
+      }`
+    );
   };
 
   return (
