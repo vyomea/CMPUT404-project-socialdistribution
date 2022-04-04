@@ -1,9 +1,9 @@
-import styled from 'styled-components';
-import { TextField } from '@mui/material';
-import React from 'react';
-import Fab from '@mui/material/Fab';
-import CheckIcon from '@mui/icons-material/Check';
-import api from '../api/api';
+import styled from "styled-components";
+import { TextField } from "@mui/material";
+import React from "react";
+import Fab from "@mui/material/Fab";
+import CheckIcon from "@mui/icons-material/Check";
+import api from "../api/api";
 
 interface Props {
   handleNodesChanged: any;
@@ -36,57 +36,101 @@ const Header = styled.div`
   text-align: center;
 `;
 
-const fieldStyle = { width: '40%', mt:5 };
+const fieldStyle = { width: "40%", mt: 5 };
 
 const AddNode = ({ handleNodesChanged, handleClose }: Props) => {
-  const [username, setName] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [serviceUrl, setServiceUrl] = React.useState("");
+  const [incomingUsername, setIncomingUsername] = React.useState("");
+  const [incomingPassword, setIncomingPassword] = React.useState("");
+  const [outgoingUsername, setOutgoingUsername] = React.useState("");
+  const [outgoingPassword, setOutgoingPassword] = React.useState("");
 
-  const handleName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-  
-  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-
+  const handlerFor =
+    (setter: React.Dispatch<React.SetStateAction<string>>) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setter(event.target.value);
+    };
 
   const handleEdit = () => {
-    api
-    .nodes
-    .create(username,password)
-    .then(()=>{handleNodesChanged(); handleClose()})
-    .catch((e) => console.log(e.response))
-    };
+    api.nodes
+      .createOrUpdate({
+        serviceUrl,
+        incomingUsername,
+        incomingPassword,
+        outgoingUsername,
+        outgoingPassword,
+      })
+      .then(() => {
+        handleNodesChanged();
+        handleClose();
+      })
+      .catch((e) => console.error(e.response));
+  };
 
   return (
     <EditContainer>
       <Block>
-      <Header>Add Node</Header>
+        <Header>Add Node</Header>
         <TextField
           sx={fieldStyle}
           id="standard-basic"
           required
-          label="username"
-          value={username}
-          onChange={handleName}
+          label="Service URL"
+          type="url"
+          value={serviceUrl}
+          onChange={handlerFor(setServiceUrl)}
+          fullWidth
+        />
+
+        <TextField
+          sx={fieldStyle}
+          id="standard-basic"
+          required
+          label="Incoming Username"
+          value={incomingUsername}
+          onChange={handlerFor(setIncomingUsername)}
           fullWidth
         />
         <TextField
           sx={fieldStyle}
           id="standard-basic"
           required
-          label="password"
+          label="Incoming Password"
           type="password"
-          value={password}
-          onChange={handlePassword}
+          value={incomingPassword}
+          onChange={handlerFor(setIncomingPassword)}
+          fullWidth
+        />
+        <TextField
+          sx={fieldStyle}
+          id="standard-basic"
+          required
+          label="Outgoing Username"
+          type="text"
+          value={outgoingUsername}
+          onChange={handlerFor(setOutgoingUsername)}
+          fullWidth
+        />
+        <TextField
+          sx={fieldStyle}
+          id="standard-basic"
+          required
+          label="Outgoing Password"
+          type="password"
+          value={outgoingPassword}
+          onChange={handlerFor(setOutgoingPassword)}
           fullWidth
         />
       </Block>
       <Fab
         color="primary"
         aria-label="check"
-        sx={{ color: 'black', background: '#46ECA6', '&:hover': { background: '#18E78F' }, mb: 5 }}
+        sx={{
+          color: "black",
+          background: "#46ECA6",
+          "&:hover": { background: "#18E78F" },
+          mb: 5,
+        }}
       >
         <CheckIcon onClick={handleEdit} />
       </Fab>

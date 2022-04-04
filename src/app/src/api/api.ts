@@ -121,27 +121,33 @@ const api = {
      * Fetches a list of all nodes on the server.
      * @returns a list of nodes
      */
-    list: async (): Promise<Node[]> => (await axios.get(`/nodes`)).data,
+    list: async (): Promise<Node[]> => (await axios.get("/nodes")).data,
 
     /**
-     * Creates a node.
-     * @param username the username of the node.
-     * @param password the password of the node.
+     * Creates or updates a node.
+     * @param node the node to create or update
      * @returns TODO
      */
-    create: async (username: string, password: string): Promise<unknown> =>
-      (await axios.post(`/nodes`, { username, password })).data,
+    createOrUpdate: async (
+      node: Node & { incomingPassword: string }
+    ): Promise<unknown> =>
+      (await axios.post(`/nodes/${encodeURIComponent(node.serviceUrl)}`, node))
+        .data,
 
     /**
-     * Actions on the node with ID `nodeId`.
+     * Actions on the node with service URL `serviceUrl`.
      */
-    withId: (nodeId: string) => ({
+    withServiceUrl: (serviceUrl: string) => ({
       /**
        * Deletes the node.
        * @returns TODO
        */
       delete: async (): Promise<unknown> =>
+<<<<<<< HEAD
         (await axios.delete(`/nodes/${nodeId}`)).data,
+=======
+        (await axios.delete(`/nodes/${encodeURIComponent(serviceUrl)}`)).data,
+>>>>>>> devel
     }),
   },
 

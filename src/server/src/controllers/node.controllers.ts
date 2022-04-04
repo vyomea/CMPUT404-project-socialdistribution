@@ -3,28 +3,21 @@ import argon2 from 'argon2';
 import Node from '../models/Node';
 import { AuthenticatedRequest } from '../types/auth';
 
-const addNode = async (req: AuthenticatedRequest, res: Response) => {
-  const { username, password } = req.body;
-  const nodeExists = await Node.findOne({
-    where: {
-      username: username,
-    },
+const addOrUpdateNode = async (req: AuthenticatedRequest, res: Response) => {
+  const serviceUrl = req.params.serviceUrl;
+  const {
+    incomingUsername,
+    incomingPassword,
+    outgoingUsername,
+    outgoingPassword,
+  } = req.body;
+  await Node.upsert({
+    serviceUrl,
+    incomingUsername,
+    incomingPasswordHash: await argon2.hash(incomingPassword),
+    outgoingUsername,
+    outgoingPassword,
   });
-  if (nodeExists !== null) {
-    res.status(400).send({ error: 'Node already exists' });
-    return;
-  }
-  const passwordHash = await argon2.hash(password);
-  try {
-    await Node.create({
-      username: username,
-      passwordHash: passwordHash,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: error });
-    return;
-  }
   res.status(200).send();
 };
 
@@ -35,7 +28,7 @@ const getAllNodes = async (req: AuthenticatedRequest, res: Response) => {
 
 const removeNode = async (req: AuthenticatedRequest, res: Response) => {
   const node = await Node.findOne({
-    where: { id: req.params.node_id },
+    where: { serviceUrl: req.params.serviceUrl },
   });
   if (node === null) {
     res.status(404).send();
@@ -51,4 +44,4 @@ const removeNode = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
-export { addNode, getAllNodes, removeNode };
+export { addOrUpdateNode, getAllNodes, removeNode };

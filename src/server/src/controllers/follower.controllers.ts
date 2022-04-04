@@ -25,6 +25,7 @@ const addFollower = async (req: AuthenticatedRequest, res: Response) => {
   const foreignAuthor = await Author.findByPk(req.params.foreign_author_id);
   if (foreignAuthor === null) {
     res.status(404).send();
+    return;
   }
   if (await author.hasFollower(foreignAuthor)) {
     res.status(400).send({ error: 'Already following' });
@@ -63,6 +64,7 @@ const checkFollower = async (req: Request, res: Response) => {
   const foreignAuthor = await Author.findByPk(req.params.foreign_author_id);
   if (foreignAuthor === null) {
     res.status(404).send();
+    return;
   }
   res.send({ result: await author.hasFollower(foreignAuthor) });
 };
@@ -110,6 +112,7 @@ const getAuthorFollowings = async (req: Request, res: Response) => {
 const removeFollower = async (req: Request, res: Response) => {
   if (req.params.authorId === req.params.foreign_author_id) {
     res.status(400).send({ error: 'Cannot unfollow yourself' });
+    return;
   }
 
   const author = await Author.findByPk(req.params.authorId);
@@ -120,6 +123,7 @@ const removeFollower = async (req: Request, res: Response) => {
   const foreignAuthor = await Author.findByPk(req.params.foreign_author_id);
   if (foreignAuthor === null) {
     res.status(404).send();
+    return;
   }
 
   if (!(await author.hasFollower(foreignAuthor))) {
