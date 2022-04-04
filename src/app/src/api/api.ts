@@ -466,9 +466,10 @@ const api = {
             like: async (): Promise<unknown> =>
               await axios.post(
                 `/authors/${authorId}/inbox`,
-                (() => {
-                  throw new Error("not implemented");
-                })()
+                await axios.post(`/authors/${authorId}/inbox`, {
+                  type: "Like",
+                  object: `${baseUrl}/authors/${authorId}/posts/${postId}`,
+                })
               ),
           },
 
@@ -534,7 +535,7 @@ const api = {
                 like: async (): Promise<unknown> =>
                   await axios.post(`/authors/${authorId}/inbox`, {
                     type: "Like",
-                    object: `${baseUrl}/authors/${authorId}/posts/${postId}`,
+                    object: `${baseUrl}/authors/${authorId}/posts/${postId}/comments/${commentId}`,
                   }),
               },
             }),
