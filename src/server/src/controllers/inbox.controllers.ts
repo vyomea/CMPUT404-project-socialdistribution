@@ -5,8 +5,8 @@ import { unauthorized } from '../handlers/auth.handlers';
 
 import {
   AuthenticatedRequest,
-  AuthenticatedRequestHandler,
-  NodeAuthenticatedRequest,
+  FromNodeRequest,
+  ToNodeRequest,
 } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
 import FollowRequest from '../models/FollowRequest';
@@ -21,6 +21,10 @@ import { serializePost } from '../serializers/post.serializers';
 import { serializeComment } from '../serializers/comment.serializers';
 import { serializeLike } from '../serializers/like.serializers';
 import { serializeFollowRequest } from '../serializers/follow-request.serializers';
+import axios from 'axios';
+import { remoteRequestConfig } from '../utilities/remote-request-config';
+import { serializeAuthor } from '../serializers/author.serializers';
+import { createComment, receiveRemoteComment } from './comment.controllers';
 
 const getInbox = async (
   req: AuthenticatedRequest & PaginationRequest,
@@ -123,24 +127,19 @@ const getInbox = async (
   });
 };
 
-const requireRemoteNode = (
-  req: AuthenticatedRequest | NodeAuthenticatedRequest,
-  res: Response
-): req is NodeAuthenticatedRequest => {
-  if (req.requesterType !== 'node') {
-    res
-      .status(401)
-      .header('WWW-Authenticate', 'Basic')
-      .json({ error: 'Must be authenticated as remote node' });
-    return false;
-  }
-  return true;
-};
-
 const sendToInbox = async (
-  req: AuthenticatedRequest | NodeAuthenticatedRequest,
+  req: AuthenticatedRequest | FromNodeRequest | ToNodeRequest,
   res: Response
 ) => {
+  // Check if this is a local request destined for another node
+  if (req.requestType === 'toNode') {
+    await forwardInboxItemToNode(req, res);
+    return;
+  }
+
+  // This item is destined for a local inbox, but
+  // it may from either a local user or a remote node.
+
   // Check if author exists
   if (Author.findByPk(req.params.authorId) === null) {
     res.status(404).json({ error: 'Author not found' });
@@ -151,22 +150,63 @@ const sendToInbox = async (
   const type = (req.body.type as string).toLowerCase();
 
   if (type === 'post') {
-    // The post must be from a remote node,
-    // otherwise the inbox should have just been updated in the post creation handler
-    if (requireRemoteNode(req, res)) await sendPostToInbox(req, res);
+    await receivePostInLocalInbox(req, res);
   } else if (type === 'follow') {
-    await sendFollowRequestToInbox(req, res);
+    await receiveFollowRequestInLocalInbox(req, res);
   } else if (type === 'like') {
-    await sendLikeToInbox(req, res);
+    await receiveLikeInLocalInbox(req, res);
+  } else if (type === 'comment') {
+    if (req.requestType === 'fromNode') {
+      let postUrl: string;
+      const regex = /.*?\/posts\/([^/]+)/;
+      if (typeof req.body.post === 'string') {
+        postUrl = req.body.post;
+      } else if (
+        typeof req.body.post === 'object' &&
+        typeof req.body.post.id === 'string'
+      ) {
+        postUrl = req.body.post.id;
+      } else if (typeof req.body.object === 'string') {
+        postUrl = req.body.object;
+      } else if (typeof req.body.id === 'string') {
+        postUrl = req.body.id;
+      } else {
+        res
+          .status(400)
+          .json({ error: "Can't find ID of the post in that comment" });
+        return;
+      }
+      const postMatch = regex.exec(postUrl);
+      if (postMatch === null) {
+        res
+          .status(400)
+          .json({ error: "Can't find ID of the post in that comment" });
+        return;
+      }
+      const postId = postMatch[1];
+      await receiveRemoteComment(postId, req, res);
+    } else {
+      res
+        .status(400)
+        .json({ error: 'Send comment to the /comments endpoint instead' });
+      return;
+    }
   } else {
     throw new Error(`Invalid type ${req.body.type}`);
   }
 };
 
-const sendPostToInbox = async (
-  req: NodeAuthenticatedRequest,
+const receivePostInLocalInbox = async (
+  req: AuthenticatedRequest | FromNodeRequest,
   res: Response
 ) => {
+  // The post must be from a remote node,
+  // otherwise the inbox should have just been updated in the post creation handler
+  if (req.requestType !== 'fromNode') {
+    res.status(401).json({ error: 'Must be authenticated as remote node' });
+    return;
+  }
+
   // Extract the service URL and ID of the post from the ID field
   const postIdMatch = /^(.*?)\/authors\/[^/]+\/posts\/([^/]+)/.exec(
     req.body.id
@@ -176,9 +216,9 @@ const sendPostToInbox = async (
     return;
   }
   const [postServiceUrl, postId] = postIdMatch.slice(1);
-  if (postServiceUrl !== req.node.serviceUrl) {
+  if (postServiceUrl !== req.fromNode.serviceUrl) {
     res.status(400).json({
-      error: `Invalid post service URL ${postServiceUrl}, should be ${req.node.serviceUrl}`,
+      error: `Invalid post service URL ${postServiceUrl}, should be ${req.fromNode.serviceUrl}`,
     });
     return;
   }
@@ -189,9 +229,9 @@ const sendPostToInbox = async (
     return;
   }
   const [postAuthorServiceUrl, postAuthorId] = postAuthorIdMatch.slice(1);
-  if (postAuthorServiceUrl !== req.node.serviceUrl) {
+  if (postAuthorServiceUrl !== req.fromNode.serviceUrl) {
     res.status(400).json({
-      error: `Invalid post author service URL ${postAuthorServiceUrl}, should be ${req.node.serviceUrl}`,
+      error: `Invalid post author service URL ${postAuthorServiceUrl}, should be ${req.fromNode.serviceUrl}`,
     });
     return;
   }
@@ -217,32 +257,43 @@ const sendPostToInbox = async (
   )[0];
   await author.addPost(post);
 
-  await InboxItem.create({
-    recipientId: req.params.authorId,
-    postId,
+  await InboxItem.findOrCreate({
+    where: {
+      recipientId: req.params.authorId,
+      postId,
+    },
   });
 
   res.status(200).send();
 };
 
-const sendFollowRequestToInbox = async (
-  req: AuthenticatedRequest | NodeAuthenticatedRequest,
+const receiveFollowRequestInLocalInbox = async (
+  req: AuthenticatedRequest | FromNodeRequest,
   res: Response
 ) => {
-  const requesterIdMatch = /(.*?)\/authors\/([^/]+)/.exec(req.body.actor.id);
-  if (requesterIdMatch === null) {
-    res.status(400).json({ error: 'Invalid actor id' });
-    return;
-  }
-  const [requesterServiceUrl, requesterId] = requesterIdMatch.slice(1);
+  let requesterId: string;
+  if (req.requestType === 'author') {
+    requesterId = req.authorId;
+  } else if (req.requestType === 'fromNode') {
+    const requesterIdMatch = /(.*?)\/authors\/([^/]+)/.exec(req.body.actor.id);
+    if (requesterIdMatch === null) {
+      res.status(400).json({ error: 'Invalid actor id' });
+      return;
+    }
+    const requesterServiceUrl = requesterIdMatch[1];
+    requesterId = requesterIdMatch[2];
 
-  // Create the author for the requester if neccessary
-  await Author.findOrCreate({
-    where: {
-      id: requesterId,
-      nodeServiceUrl: requesterServiceUrl,
-    },
-  });
+    // Create the author for the requester if neccessary
+    await Author.findOrCreate({
+      where: {
+        id: requesterId,
+        nodeServiceUrl: requesterServiceUrl,
+      },
+    });
+  }
+  if (!requesterId) {
+    throw new Error('missing requesterId');
+  }
 
   try {
     const followRequest = await FollowRequest.create({
@@ -250,9 +301,11 @@ const sendFollowRequestToInbox = async (
       requesterId: requesterId,
     });
 
-    await InboxItem.create({
-      recipientId: req.params.authorId,
-      requestId: followRequest.id,
+    await InboxItem.findOrCreate({
+      where: {
+        recipientId: req.params.authorId,
+        requestId: followRequest.id,
+      },
     });
   } catch (e) {
     if (e instanceof UniqueConstraintError) {
@@ -262,17 +315,19 @@ const sendFollowRequestToInbox = async (
       return;
     }
   }
+
+  res.status(200).send();
 };
 
-const sendLikeToInbox = async (
-  req: AuthenticatedRequest | NodeAuthenticatedRequest,
+const receiveLikeInLocalInbox = async (
+  req: AuthenticatedRequest | FromNodeRequest,
   res: Response
 ) => {
   // Determine the ID of the author that is making the like
   let likerId: string;
-  if (req.requesterType === 'author') {
+  if (req.requestType === 'author') {
     likerId = req.authorId;
-  } else if (req.requesterType === 'node') {
+  } else if (req.requestType === 'fromNode') {
     const likerIdMatch = /(.*?)\/authors\/([^/]+)/.exec(req.body.author.id);
     if (likerIdMatch === null) {
       res.status(400).json({ error: 'Invalid author id' });
@@ -290,8 +345,7 @@ const sendLikeToInbox = async (
     });
   }
   if (!likerId) {
-    unauthorized(res);
-    return;
+    throw new Error('missing likerId');
   }
 
   // Extract the ID of the liked post or comment from the object field
@@ -301,17 +355,33 @@ const sendLikeToInbox = async (
 
   try {
     if (likedObjectType.startsWith('post')) {
-      await PostLike.findOrCreate({
+      const postLike = (
+        await PostLike.findOrCreate({
+          where: {
+            authorId: likerId,
+            postId: likedObjectId,
+          },
+        })
+      )[0];
+      await InboxItem.findOrCreate({
         where: {
-          authorId: likerId,
-          postId: likedObjectId,
+          recipientId: (await Post.findByPk(likedObjectId)).authorId,
+          postLikeId: postLike.id,
         },
       });
     } else if (likedObjectType.startsWith('comment')) {
-      await CommentLike.findOrCreate({
+      const commentLike = (
+        await CommentLike.findOrCreate({
+          where: {
+            authorId: likerId,
+            commentId: likedObjectId,
+          },
+        })
+      )[0];
+      await InboxItem.findOrCreate({
         where: {
-          authorId: likerId,
-          postId: likedObjectId,
+          recipientId: (await Comment.findByPk(likedObjectId)).authorId,
+          commentLikeId: commentLike.id,
         },
       });
     } else {
@@ -333,7 +403,67 @@ const sendLikeToInbox = async (
   res.status(200).send();
 };
 
-const clearInbox: AuthenticatedRequestHandler = async (req, res) => {
+const forwardInboxItemToNode = async (req: ToNodeRequest, res: Response) => {
+  // Type of the item being sent
+  const type = (req.body.type as string).toLowerCase();
+  const requestingAuthor = await Author.findByPk(req.authorId);
+  const foreignAuthorUrl = `${req.toNode.serviceUrl}/authors/${req.params.authorId}`;
+
+  let body: Record<string, unknown>;
+  if (type === 'post') {
+    // Posts are only sent to remotes when they created on this server
+    res.status(400).json({
+      error: 'Posts should originate only from the server, not the client',
+    });
+    return;
+  } else if (type === 'follow') {
+    body = {
+      type: 'Follow',
+      summary: `${requestingAuthor.displayName} wants to follow you`,
+      actor: await serializeAuthor(requestingAuthor, req),
+      object: {
+        type: 'author',
+        id: foreignAuthorUrl,
+        url: foreignAuthorUrl,
+        host: req.toNode.serviceUrl,
+      },
+    };
+  } else if (type === 'like') {
+    const foreignObjectUrl: string = req.body.object;
+    const foreignObjectType = foreignObjectUrl.includes('comment')
+      ? 'comment'
+      : 'post';
+    body = {
+      type: 'Like',
+      summary: `${requestingAuthor.displayName} likes your ${foreignObjectType}`,
+      author: await serializeAuthor(requestingAuthor, req),
+      object: foreignObjectUrl,
+    };
+  } else if (type === 'comment') {
+    res
+      .status(400)
+      .json({ error: 'POST the comment to the comments endpoint instead' });
+    return;
+  } else {
+    res.status(400).json({ error: `Unknown object type ${req.body.type}` });
+    return;
+  }
+  try {
+    const remoteResponse = await axios.post(
+      `/authors/${req.params.authorId}/inbox`,
+      body,
+      remoteRequestConfig(req.toNode)
+    );
+    res.status(200).send(remoteResponse.data);
+    return;
+  } catch (e) {
+    res.status(502).send();
+    console.error(e);
+    return;
+  }
+};
+
+const clearInbox = async (req: AuthenticatedRequest, res: Response) => {
   // Only allow the inbox of the requesting author to be cleared, unless they are an admin
   const requester = await Author.findOne({
     where: { id: req.authorId, nodeServiceUrl: null },

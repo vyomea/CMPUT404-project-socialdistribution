@@ -6,6 +6,7 @@ const router = express.Router({ mergeParams: true });
 import { paginate } from '../middlewares/pagination.middlewares';
 import { validate } from '../middlewares/validator.middlewares';
 import { requiredLoggedIn } from '../middlewares/auth.middlewares';
+import { forwardRequestToRemoteNode } from '../middlewares/to-node.middlewares';
 
 import {
   createPost,
@@ -33,10 +34,16 @@ export const postValidations = [
   body('visibility').isIn(['PUBLIC', 'FRIENDS']),
 ];
 
-router.get('/:postId', validate([param('postId').isUUID()]), getAuthorPost);
+router.get(
+  '/:postId',
+  validate([param('postId').isUUID()]),
+  forwardRequestToRemoteNode,
+  getAuthorPost
+);
 router.get(
   '/:postId/image',
   validate([param('postId').isUUID()]),
+  forwardRequestToRemoteNode,
   getPostImage
 );
 router.post(
@@ -65,7 +72,7 @@ router.put(
   ],
   createPost
 );
-router.get('/', paginate, getAuthorPosts);
+router.get('/', paginate, forwardRequestToRemoteNode, getAuthorPosts);
 router.post(
   '/',
   [requiredLoggedIn, multer().single('image'), validate([...postValidations])],
@@ -75,6 +82,7 @@ router.post(
 router.get(
   '/:postId/likes',
   validate([param('postId').isUUID()]),
+  forwardRequestToRemoteNode,
   getPostLikes
 );
 

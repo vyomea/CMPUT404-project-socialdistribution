@@ -1,17 +1,11 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import { FindOptions } from 'sequelize';
 import Author from '../models/Author';
 import Post from '../models/Post';
 import Comment from '../models/Comment';
-import {
-  AuthenticatedRequest,
-  AuthenticatedRequestHandler,
-} from '../types/auth';
+import { AuthenticatedRequest } from '../types/auth';
 import { PaginationRequest } from '../types/pagination';
-import {
-  serializePost,
-  postPublicAttributes,
-} from '../serializers/post.serializers';
+import { serializePost } from '../serializers/post.serializers';
 import { isFriends } from '../handlers/follower.handlers';
 import { serializeLike } from '../serializers/like.serializers';
 import PostLike from '../models/PostLike';
@@ -140,7 +134,6 @@ const postFindOptions = (
 });
 
 const getAllPublicPosts = async (req: PaginationRequest, res: Response) => {
-  const findOptions = postFindOptions();
   const posts = await Post.findAll({
     ...postFindOptions(undefined, undefined, false),
     offset: req.offset,
@@ -162,7 +155,6 @@ const getAuthorPost = async (
   if (req.authorId) {
     isFriend = await isFriends(req.authorId, req.params.authorId);
   }
-  const findOptions = postFindOptions(req.params.authorId, req.params.postId);
   const post = await Post.findOne({
     ...postFindOptions(req.params.authorId, req.params.postId, isFriend),
   });
@@ -188,7 +180,6 @@ const getAuthorPosts = async (
     res.status(404).send();
     return;
   }
-  const findOptions = postFindOptions(req.params.authorId);
   const posts = await Post.findAll({
     ...postFindOptions(req.params.authorId, undefined, isFriend),
     offset: req.offset,
@@ -276,7 +267,7 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).send();
 };
 
-const getPostLikes: AuthenticatedRequestHandler = async (req, res) => {
+const getPostLikes = async (req: AuthenticatedRequest, res: Response) => {
   let isFriend = false;
   if (req.authorId) {
     isFriend = await isFriends(req.authorId, req.params.authorId);

@@ -4,7 +4,7 @@ import { unauthorized, findNode } from '../handlers/auth.handlers';
 import Author from '../models/Author';
 import {
   AuthenticatedRequest,
-  NodeAuthenticatedRequest,
+  FromNodeRequest,
   JwtPayload,
 } from '../types/auth';
 
@@ -33,7 +33,7 @@ const adminOnly: RequestHandler = async (
  * Adds `authorId` or `node` to the request based on the request Authorization header.
  */
 const authenticate: RequestHandler = async (
-  req: AuthenticatedRequest | NodeAuthenticatedRequest,
+  req: AuthenticatedRequest | FromNodeRequest,
   res,
   next
 ) => {
@@ -49,15 +49,15 @@ const authenticate: RequestHandler = async (
       unauthorized(res, 'Basic');
       return;
     }
-    (req as NodeAuthenticatedRequest).requesterType = 'node';
-    (req as NodeAuthenticatedRequest).node = node;
+    (req as FromNodeRequest).requestType = 'fromNode';
+    (req as FromNodeRequest).fromNode = node;
   } else if (authType === 'Bearer' && encodedData) {
     jwt.verify(
       encodedData,
       process.env.JWT_SECRET,
       (err, payload: JwtPayload) => {
         if (!err && payload) {
-          (req as AuthenticatedRequest).requesterType = 'author';
+          (req as AuthenticatedRequest).requestType = 'author';
           (req as AuthenticatedRequest).authorId = payload.authorId;
         } else {
           unauthorized(res);

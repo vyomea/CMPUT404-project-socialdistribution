@@ -2,6 +2,8 @@ import { Response } from 'express';
 import argon2 from 'argon2';
 import Node from '../models/Node';
 import { AuthenticatedRequest } from '../types/auth';
+import Author from '../models/Author';
+import { pick } from '../utilities/pick';
 
 const addOrUpdateNode = async (req: AuthenticatedRequest, res: Response) => {
   const serviceUrl = req.params.serviceUrl;
@@ -22,8 +24,22 @@ const addOrUpdateNode = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 const getAllNodes = async (req: AuthenticatedRequest, res: Response) => {
+  let requestingAuthor: Author;
+  if (req.authorId) requestingAuthor = await Author.findByPk(req.authorId);
+
   const nodes = await Node.findAll();
-  res.send(nodes);
+  res.status(200).json({
+    type: 'nodes',
+    items: nodes.map((node) =>
+      pick(node.toJSON(), [
+        'serviceUrl',
+        'incomingUsername',
+        ...(requestingAuthor?.isAdmin
+          ? ['outgoingUsername', 'outgoingPassword']
+          : []),
+      ])
+    ),
+  });
 };
 
 const removeNode = async (req: AuthenticatedRequest, res: Response) => {

@@ -19,19 +19,27 @@ export const serializeAuthor = async (
   author: Author,
   req: Request
 ): Promise<Record<string, unknown>> => {
+  const serializeLocalAuthorData = () => ({
+    type: 'author',
+    ...pick(author.toJSON(), authorPublicAttributes),
+    id: `${getHost(req)}/authors/${author.id}`,
+    url: `${getHost(req)}/authors/${author.id}`,
+    host: `${getHost(req)}/`,
+  });
+
   if (!author.nodeServiceUrl) {
     // Local author
-    return {
-      type: 'author',
-      ...pick(author.toJSON(), authorPublicAttributes),
-      id: `${getHost(req)}/authors/${author.id}`,
-      url: `${getHost(req)}/authors/${author.id}`,
-      host: `${getHost(req)}/`,
-    };
+    return serializeLocalAuthorData();
   } else {
     const node = await Node.findByPk(author.nodeServiceUrl);
     // Remote author
-    return (await axios.get(`/authors/${author.id}`, remoteRequestConfig(node)))
-      .data;
+    try {
+      return (
+        await axios.get(`/authors/${author.id}`, remoteRequestConfig(node))
+      ).data;
+    } catch (e) {
+      console.error(e);
+      return serializeLocalAuthorData();
+    }
   }
 };

@@ -8,6 +8,7 @@ import {
 } from '../controllers/inbox.controllers';
 import { paginate } from '../middlewares/pagination.middlewares';
 import { postValidations } from './post.routes';
+import { setToNodeOnRequest } from '../middlewares/to-node.middlewares';
 
 const stringEqualsCaseInsensitive: (target: string) => CustomValidator = (
   target: string
@@ -36,8 +37,10 @@ router.post(
         body('type').custom(stringEqualsCaseInsensitive('like')),
         body('object.id').isURL(),
       ],
+      [body('type').custom(stringEqualsCaseInsensitive('comment'))],
     ]),
   ],
+  setToNodeOnRequest,
   sendToInbox
 );
 

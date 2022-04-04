@@ -12,6 +12,7 @@ class Comment extends Model {
   declare published: Date;
   static Author: BelongsTo;
   declare author: Author;
+  declare authorId: string;
   static Post: BelongsTo;
   declare post: Post;
   declare postId: string;
