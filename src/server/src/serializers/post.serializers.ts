@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Request } from 'express';
 import Post from '../models/Post';
 import Comment from '../models/Comment';
@@ -54,7 +54,8 @@ export const serializePost = async (
     }),
   });
 
-  if (!post.nodeServiceUrl) {
+  const post2 = await Post.findByPk(post.id as unknown as string);
+  if (!post2.nodeServiceUrl) {
     return await serializeLocalPostData();
   } else {
     // Post is remote
@@ -66,6 +67,10 @@ export const serializePost = async (
         )
       ).data;
     } catch (e) {
+      if (axios.isAxiosError(e) && (e as AxiosError).response.status === 404) {
+        await post.destroy();
+        return {};
+      }
       console.error(e);
       return await serializeLocalPostData();
     }

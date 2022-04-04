@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Request } from 'express';
 import Author from '../models/Author';
 import { getHost } from '../utilities/host';
@@ -27,7 +27,8 @@ export const serializeAuthor = async (
     host: `${getHost(req)}/`,
   });
 
-  if (!author.nodeServiceUrl) {
+  const author2 = await Author.findByPk(author.id as unknown as string);
+  if (!author2.nodeServiceUrl) {
     // Local author
     return serializeLocalAuthorData();
   } else {
@@ -38,6 +39,10 @@ export const serializeAuthor = async (
         await axios.get(`/authors/${author.id}`, remoteRequestConfig(node))
       ).data;
     } catch (e) {
+      if (axios.isAxiosError(e) && (e as AxiosError).response.status === 404) {
+        await author.destroy();
+        return {};
+      }
       console.error(e);
       return serializeLocalAuthorData();
     }
