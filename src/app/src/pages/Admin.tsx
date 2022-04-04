@@ -131,7 +131,11 @@ export default function Admin(): JSX.Element {
     )),
     posts?.map((post) => <AdminPostCard post={post} key={post.id} />),
     nodes?.map((node) => (
-      <AdminNodeCard node={node} handleNodesChanged={handleNodesChanged} key={node.id} />
+      <AdminNodeCard
+        node={node}
+        handleNodesChanged={handleNodesChanged}
+        key={node.serviceUrl}
+      />
     )),
   ];
 
@@ -162,11 +166,17 @@ export default function Admin(): JSX.Element {
             }}
           />
           {listDisplay.title === "Nodes" ? (
-            <AddNode handleNodesChanged={handleNodesChanged} handleClose={handleClose} />
+            <AddNode
+              handleNodesChanged={handleNodesChanged}
+              handleClose={handleClose}
+            />
           ) : null}
 
           {listDisplay.title === "Authors" ? (
-            <AddAuthor handleAuthorsChanged={handleAuthorsChanged} handleClose={handleClose} />
+            <AddAuthor
+              handleAuthorsChanged={handleAuthorsChanged}
+              handleClose={handleClose}
+            />
           ) : null}
         </Backdrop>
       ) : (
@@ -183,7 +193,10 @@ export default function Admin(): JSX.Element {
               ]}
             />
           </Box>
-          <Box style={{ display: "flex", height: "95%" }} sx={{ bgcolor: "#fff" }}>
+          <Box
+            style={{ display: "flex", height: "95%" }}
+            sx={{ bgcolor: "#fff" }}
+          >
             <Box
               display="flex"
               sx={{
@@ -203,16 +216,30 @@ export default function Admin(): JSX.Element {
                 fullWidth={true}
               >
                 {buttons.map((button) => (
-                  <Button onClick={() => setListDisplay(button)} key={button.id} sx={buttonStyle}>
+                  <Button
+                    onClick={() => setListDisplay(button)}
+                    key={button.id}
+                    sx={buttonStyle}
+                  >
                     {" "}
                     {button.title}{" "}
-                    <Badge badgeContent={button.count} color="secondary" sx={badgeStyle} />
+                    <Badge
+                      badgeContent={button.count}
+                      color="secondary"
+                      sx={badgeStyle}
+                    />
                   </Button>
                 ))}
               </ButtonGroup>
 
-              {listDisplay.title === "Authors" || listDisplay.title === "Nodes" ? (
-                <Button onClick={handleToggle} variant="contained" fullWidth={true} sx={{ mt: 5 }}>
+              {listDisplay.title === "Authors" ||
+              listDisplay.title === "Nodes" ? (
+                <Button
+                  onClick={handleToggle}
+                  variant="contained"
+                  fullWidth={true}
+                  sx={{ mt: 5 }}
+                >
                   Add
                 </Button>
               ) : null}
@@ -249,7 +276,10 @@ export default function Admin(): JSX.Element {
             >
               <Typography variant="h4">{listDisplay.title}</Typography>
               <Divider style={{ width: "85%" }}></Divider>
-              <List style={{ maxHeight: "100%", overflow: "auto" }} sx={{ width: "90%" }}>
+              <List
+                style={{ maxHeight: "100%", overflow: "auto" }}
+                sx={{ width: "90%" }}
+              >
                 {lists[listDisplay.id]}
               </List>
             </Box>
