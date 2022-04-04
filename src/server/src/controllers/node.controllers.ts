@@ -28,18 +28,19 @@ const getAllNodes = async (req: AuthenticatedRequest, res: Response) => {
   if (req.authorId) requestingAuthor = await Author.findByPk(req.authorId);
 
   const nodes = await Node.findAll();
-  res.status(200).json({
-    type: 'nodes',
-    items: nodes.map((node) =>
-      pick(node.toJSON(), [
-        'serviceUrl',
-        'incomingUsername',
-        ...(requestingAuthor?.isAdmin
-          ? ['outgoingUsername', 'outgoingPassword']
-          : []),
-      ])
-    ),
-  });
+  res
+    .status(200)
+    .json(
+      nodes.map((node) =>
+        pick(node.toJSON(), [
+          'serviceUrl',
+          'incomingUsername',
+          ...(requestingAuthor?.isAdmin
+            ? ['outgoingUsername', 'outgoingPassword']
+            : []),
+        ])
+      )
+    );
 };
 
 const removeNode = async (req: AuthenticatedRequest, res: Response) => {
