@@ -167,6 +167,21 @@ const postFindOptions = (authorId?: string, postId?: string): FindOptions => ({
   ],
 });
 
+const getAllPublicPosts = async (req: PaginationRequest, res: Response) => {
+  const posts = await Post.findAll({
+    ...postFindOptions(),
+    where: {
+      visibility: 'PUBLIC',
+    },
+    offset: req.offset,
+    limit: req.limit,
+  });
+  res.send({
+    type: 'posts',
+    items: posts.map((post) => serializePost(post, req, post.comments)),
+  });
+};
+
 const getAuthorPost = async (
   req: AuthenticatedRequest & Request,
   res: Response
@@ -181,7 +196,7 @@ const getAuthorPost = async (
       ? { where: { visibility: ['PUBLIC', 'FRIENDS'] } }
       : { where: { visibility: ['PUBLIC'] } }),
   });
-
+  
   if (post === null) {
     res.status(404).send();
     return;
@@ -291,6 +306,7 @@ const updateAuthorPost = async (req: AuthenticatedRequest, res: Response) => {
 export {
   createPost,
   deleteAuthorPost,
+  getAllPublicPosts,
   getAuthorPost,
   getAuthorPosts,
   getPostImage,
