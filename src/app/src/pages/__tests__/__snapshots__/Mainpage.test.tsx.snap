@@ -138,18 +138,18 @@ exports[`Mainpage suite Renders correctly 1`] = `
       </ul>
     </div>
     <div
-      className="sc-iwjdpV fZAKJX"
+      className="sc-iwjdpV iKvgOc"
     >
       <div
-        className="sc-hBUSln jrhiCv"
+        className="sc-bdvvtL gMJIsT"
       >
         <div
-          className="sc-fotOHu hFHCBv"
+          className="sc-gsDKAQ bsTRyf"
         >
           Github Activity
         </div>
         <div
-          className="sc-fotOHu hFHCBv"
+          className="sc-gsDKAQ bsTRyf"
         >
           <span
             className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSuccess css-15u8j6q-MuiCircularProgress-root"
@@ -178,6 +178,41 @@ exports[`Mainpage suite Renders correctly 1`] = `
           </span>
         </div>
       </div>
+    </div>
+    <div
+      className="MuiBox-root css-0"
+      style={
+        Object {
+          "bottom": 20,
+          "left": "auto",
+          "margin": 5,
+          "position": "fixed",
+          "right": 100,
+          "top": "auto",
+        }
+      }
+    >
+      <button
+        className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButtonBase-root  css-k8um4m-MuiButtonBase-root-MuiButton-root"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex={0}
+        type="button"
+      >
+        Clear
+      </button>
     </div>
   </div>
 </div>
