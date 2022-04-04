@@ -10,7 +10,7 @@ import Backdrop from '@mui/material/Backdrop';
 import { CloseRounded } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, List, ButtonGroup, Button } from '@mui/material';
+import { Box, List, ButtonGroup, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import InboxComponents from '../components/InboxComponents';
 import UserPost from '../components/UserPost';
 import InboxItem from '../api/models/InboxItem';
@@ -244,6 +244,27 @@ export default function Mainpage({ currentUser }: Props) {
     )),
   ]
 
+  // Open Clear Dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleClickClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleClear = () => {
+      api.authors
+      .withId('' + currentUser?.id)
+      .inbox
+      .clear()
+      .then(()=>handleInboxChanged())
+      .catch((e) => console.log(e.response))
+
+      handleClickClose();
+  };
   return (
     <MainPageContainer>
       <NavBarContainer>
@@ -314,6 +335,7 @@ export default function Mainpage({ currentUser }: Props) {
                         width:'100%',
                       }}
                     >
+
                       {buttons.map((button) => (
                         <Button 
                           onClick={()=>setListDisplay(button)}
@@ -326,7 +348,8 @@ export default function Mainpage({ currentUser }: Props) {
                             width: '90%',
                             
                           }}
-                        > {button.title}</Button>
+                        > {button.title}
+                        </Button>
                       ))}
                     </ButtonGroup>
                 </Box>
@@ -337,7 +360,50 @@ export default function Mainpage({ currentUser }: Props) {
           <GitContainer>
             <Github username={currentUser?.github ? `${currentUser.github.split('/').pop()}`:''} />
           </GitContainer>
+          {listDisplay.title === "Inbox" ? (
+            <Box style={{
+              margin: 5,
+              top: 'auto',
+              right: 100,
+              bottom: 20,
+              left: 'auto',
+              position: 'fixed',
+            }}>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{ 
+                mt:5,
+                backgroundColor: 'red'
+              }}
+              onClick={handleClickOpen}
+              >Clear
+            </Button>
+            </Box>
+          ):null}
+
+        <Dialog
+          open={dialogOpen}
+          onClose={handleClickClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+      >
+          <DialogTitle id="alert-dialog-title">
+          {"Clear Inbox"}
+          </DialogTitle>
+          <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+              Clear your inbox?
+          </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+          <Button onClick={handleClickClose}>Cancel</Button>
+          <Button onClick={handleClear} autoFocus>Ok</Button>
+          </DialogActions>
+      </Dialog>
+
         </MainPageContentContainer>
+        
       )}
     </MainPageContainer>
   );
